@@ -1,0 +1,4 @@
+repository "ARİXON/ARİXON@18967036534144@cloud"
+  path "/"
+    br "/main"
+    co "/main"
