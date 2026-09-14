@@ -20,12 +20,11 @@ Bu sayfa, projede yapılan her işlemi hızlıca görebilmeniz için tutulan kı
 
 ---
 
-### 📌 [03] Çok Oyunculu Lobi Arayüzü (Multiplayer Lobby Hub)
-* **Durum:** ✅ Tamamlandı (Komple Lobi Tasarımı Olarak Baştan Yapıldı)
+### 📌 [03] Çok Oyunculu Lobi & Canlı Mesajlaşma Sistemi (Lobby Chat)
+* **Durum:** ✅ Tamamlandı
 * **Ne Yapıldı:** 
-  * Kuru menü butonları yerine gerçek bir **4 Kişilik Takım Lobi Odası** kuruldu.
-  * **Üst Bar:** Altın renkli ARİXON logosu, `#ARX-8842` Oda Kodu + Kopyala butonu ve Canlı Ping göstergesi (`TR-ISTANBUL 18ms`).
-  * **Orta Alan (Slotlar):** Lobi Lideri kartı (👑 Taç, Avatar, İsim, `[HAZIR]` rozeti) ve 3 adet `[+ DAVET ET]` özellikli boş oyuncu slotu.
-  * **Sağ Panel:** Harita & mod ayarları kartı ile canlı Lobi Bildirimleri / Sohbet kutusu.
-  * **Alt Bar:** `Lobiden Ayrıl`, `Ayarlar`, `Oda Bul/Katıl` ve dikkat çekici devasa kehribar renkli `[ OYUNU BAŞLAT ▶ ]` butonu.
+  * **4 Kişilik Takım Lobi Odası:** Lider kartı (👑), oyuncu slotları, davet butonları ve oda kodu sistemi.
+  * **Canlı Lobi Sohbeti (Chat):** Metin giriş alanı (`TextField`), `[GÖNDER]` butonu, `Enter` tuşu desteği ve otomatik aşağı kayan renkli mesaj akışı eklendi.
+  * **Sistem Bildirimleri:** Oda kodu kopyalandığında veya Relay modu değiştiğinde otomatik sohbete düşen sistem logları bağlandı.
+  * **2 Ekranlı Test & Unity Relay Desteği:** Editör araçları ve lobi içi toggle anahtarı aktif.
 * **Detaylı Doküman:** [03_ui_toolkit_giris_ekrani.md](./03_ui_toolkit_giris_ekrani.md)

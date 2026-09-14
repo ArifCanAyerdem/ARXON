@@ -88,7 +88,6 @@
     font-size: 11px;
     -unity-font-style: bold;
     padding: 4px 10px;
-    cursor: link;
 }
 
 .btn-copy:hover {
@@ -283,10 +282,10 @@
 }
 
 /* --------------------------------------------------------------------------
-   SAĞ PANEL (ODA AYARLARI VE GÜNLÜK)
+   SAĞ PANEL (ODA AYARLARI VE LOBİ SOHBETİ)
    -------------------------------------------------------------------------- */
 .side-panel {
-    width: 320px;
+    width: 350px;
 }
 
 .lobby-card {
@@ -294,8 +293,8 @@
     border-width: 1px;
     border-color: rgba(45, 60, 85, 0.6);
     border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 14px;
+    margin-bottom: 12px;
 }
 
 .card-heading {
@@ -305,14 +304,37 @@
     letter-spacing: 2px;
     border-bottom-width: 1px;
     border-bottom-color: rgba(255, 255, 255, 0.08);
-    padding-bottom: 8px;
-    margin-bottom: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+
+/* Relay Toggle Bölümü */
+.relay-toggle-box {
+    background-color: rgba(10, 14, 22, 0.7);
+    border-width: 1px;
+    border-color: rgba(0, 230, 255, 0.3);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+}
+
+.relay-toggle {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: rgb(0, 230, 255);
+}
+
+.relay-desc {
+    font-size: 10px;
+    color: rgba(140, 165, 195, 0.65);
+    margin-top: 2px;
+    white-space: normal;
 }
 
 .info-row {
     flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .info-label {
@@ -326,35 +348,149 @@
     color: rgb(240, 245, 255);
 }
 
-.accent-text {
-    color: rgb(255, 184, 0);
-}
-
 .green-text {
     color: rgb(0, 240, 140);
 }
 
-/* Lobi Bildirimleri / Chat */
-.chat-card {
-    height: 150px;
+/* --------------------------------------------------------------------------
+   CANLI LOBİ SOHBET KUTUSU (LOBBY CHAT)
+   -------------------------------------------------------------------------- */
+.chat-card-box {
+    height: 220px;
+    justify-content: space-between;
+}
+
+.chat-header-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-heading {
+    border-bottom-width: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.live-pill {
+    background-color: rgba(0, 240, 140, 0.2);
+    border-width: 1px;
+    border-color: rgb(0, 240, 140);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 9px;
+    -unity-font-style: bold;
+    color: rgb(0, 240, 140);
+    letter-spacing: 1px;
 }
 
 .chat-scroll {
     flex-grow: 1;
+    background-color: rgba(10, 14, 22, 0.6);
+    border-radius: 6px;
+    padding: 8px;
+    margin-top: 6px;
+    margin-bottom: 8px;
 }
 
-.chat-msg {
-    font-size: 11px;
+.chat-entry {
+    flex-direction: row;
+    flex-wrap: wrap;
     margin-bottom: 4px;
 }
 
-.system-msg {
-    color: rgba(140, 170, 200, 0.7);
+.system-entry {
+    background-color: rgba(0, 230, 255, 0.08);
+    border-radius: 4px;
+    padding: 2px 4px;
 }
 
-.user-msg {
-    color: rgb(255, 205, 80);
+.sender-system {
+    font-size: 10px;
     -unity-font-style: bold;
+    color: rgb(0, 230, 255);
+    margin-right: 4px;
+}
+
+.msg-text-system {
+    font-size: 10px;
+    color: rgba(200, 225, 255, 0.85);
+    white-space: normal;
+}
+
+.sender-me {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(255, 184, 0);
+    margin-right: 4px;
+}
+
+.msg-text {
+    font-size: 11px;
+    color: rgb(240, 245, 255);
+    white-space: normal;
+}
+
+/* Mesaj Yazma Alanı */
+.chat-input-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.chat-input {
+    flex-grow: 1;
+    height: 32px;
+    margin-right: 6px;
+    background-color: transparent;
+    border-width: 0;
+}
+
+/* Unity UI Toolkit TextField Asıl Yazı Yazılan İç Alanı */
+.chat-input > .unity-base-text-field__input,
+.chat-input TextInput,
+.chat-input TextElement {
+    background-color: rgba(10, 14, 22, 0.95);
+    border-width: 1px;
+    border-color: rgba(0, 230, 255, 0.4);
+    border-radius: 4px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: normal;
+    font-size: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
+    --unity-cursor-color: rgb(0, 230, 255);
+    --unity-selection-color: rgba(0, 230, 255, 0.4);
+}
+
+.chat-input > .unity-base-text-field__input:focus,
+.chat-input TextInput:focus {
+    border-color: rgb(0, 230, 255);
+    background-color: rgba(14, 20, 32, 1);
+    color: rgb(255, 255, 255);
+}
+
+
+.btn-chat-send {
+    height: 32px;
+    padding: 0 12px;
+    background-color: rgb(0, 230, 255);
+    border-width: 0;
+    border-radius: 4px;
+    color: rgb(10, 15, 25);
+    font-size: 11px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+    transition-property: all;
+    transition-duration: 0.15s;
+}
+
+.btn-chat-send:hover {
+    background-color: rgb(100, 245, 255);
+    scale: 1.04 1.04;
+}
+
+.btn-chat-send:active {
+    scale: 0.96 0.96;
 }
 
 /* --------------------------------------------------------------------------
@@ -413,7 +549,7 @@
     color: rgb(255, 255, 255);
 }
 
-/* BÜYÜK BAŞLAT BUTONU (GOLDEN AMBER) */
+/* BÜYÜK BAŞLAT BUTONU */
 .btn-start-game {
     height: 52px;
     padding: 0 36px;
