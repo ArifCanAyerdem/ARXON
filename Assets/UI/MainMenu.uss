@@ -1,0 +1,440 @@
+/* ==========================================================================
+   ARİXON - Çok Oyunculu Lobi Arayüzü (Multiplayer Lobby Hub) Stilleri (USS)
+   Renk Paleti: Derin Gece Mavisi, Karbon Siyahı, Zümrüt Yeşili, Kehribar Sarısı
+   ========================================================================== */
+
+/* Tam Ekran Arka Plan */
+.lobby-root {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(11, 14, 20);
+    justify-content: space-between;
+    padding: 24px 36px;
+}
+
+/* --------------------------------------------------------------------------
+   ÜST ÇUBUK (HEADER)
+   -------------------------------------------------------------------------- */
+.header-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(18, 24, 36, 0.9);
+    border-width: 1px;
+    border-color: rgba(45, 60, 85, 0.6);
+    border-radius: 10px;
+    padding: 12px 24px;
+    margin-bottom: 20px;
+}
+
+.header-left {
+    flex-direction: row;
+    align-items: center;
+}
+
+.lobby-logo {
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: rgb(255, 184, 0);
+    letter-spacing: 4px;
+    margin-right: 12px;
+    text-shadow: 0 0 12px rgba(255, 184, 0, 0.5);
+}
+
+.lobby-badge {
+    background-color: rgba(255, 184, 0, 0.15);
+    border-width: 1px;
+    border-color: rgb(255, 184, 0);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(255, 205, 80);
+    letter-spacing: 1.5px;
+}
+
+/* Orta Kısım: Oda Kodu */
+.header-center {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(11, 14, 20, 0.8);
+    border-width: 1px;
+    border-color: rgba(70, 90, 120, 0.4);
+    border-radius: 6px;
+    padding: 6px 16px;
+}
+
+.room-code-label {
+    font-size: 12px;
+    color: rgba(160, 180, 210, 0.7);
+    margin-right: 8px;
+}
+
+.room-code-val {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(0, 230, 255);
+    letter-spacing: 2px;
+    margin-right: 12px;
+}
+
+.btn-copy {
+    background-color: rgba(0, 230, 255, 0.15);
+    border-width: 1px;
+    border-color: rgba(0, 230, 255, 0.6);
+    border-radius: 4px;
+    color: rgb(0, 230, 255);
+    font-size: 11px;
+    -unity-font-style: bold;
+    padding: 4px 10px;
+    cursor: link;
+}
+
+.btn-copy:hover {
+    background-color: rgb(0, 230, 255);
+    color: rgb(10, 15, 25);
+}
+
+/* Sağ Kısım: Ping ve Bölge */
+.header-right {
+    flex-direction: row;
+    align-items: center;
+}
+
+.ping-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: rgb(0, 240, 140);
+    margin-right: 8px;
+}
+
+.server-info {
+    font-size: 12px;
+    color: rgb(0, 240, 140);
+    -unity-font-style: bold;
+}
+
+/* --------------------------------------------------------------------------
+   ORTA ALAN: TAKIM SLOTLARI VE ODA AYARLARI
+   -------------------------------------------------------------------------- */
+.main-section {
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* Sol Takım Paneli */
+.roster-panel {
+    flex-grow: 1;
+    margin-right: 24px;
+}
+
+.section-title {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgba(180, 200, 230, 0.9);
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+}
+
+.slots-container {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* Oyuncu Kartı Temeli */
+.player-card {
+    width: 23%;
+    height: 340px;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 14px;
+    transition-property: all;
+    transition-duration: 0.2s;
+}
+
+/* Aktif Oyuncu (Host Kartı) */
+.active-card {
+    background-color: rgba(20, 28, 44, 0.95);
+    border-width: 2px;
+    border-color: rgb(255, 184, 0);
+}
+
+.card-crown-tag {
+    background-color: rgb(255, 184, 0);
+    border-radius: 12px;
+    padding: 3px 12px;
+    margin-bottom: 8px;
+}
+
+.crown-text {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(20, 15, 5);
+}
+
+.card-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 45px;
+    background-color: rgba(255, 184, 0, 0.2);
+    border-width: 2px;
+    border-color: rgb(255, 184, 0);
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 16px;
+}
+
+.avatar-tag {
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: rgb(255, 215, 90);
+}
+
+.card-player-name {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    margin-bottom: 4px;
+}
+
+.card-player-rank {
+    font-size: 11px;
+    color: rgba(160, 185, 215, 0.7);
+    margin-bottom: 20px;
+}
+
+.ready-pill {
+    width: 80%;
+    height: 34px;
+    border-radius: 6px;
+    align-items: center;
+    justify-content: center;
+}
+
+.ready-yes {
+    background-color: rgba(0, 240, 140, 0.2);
+    border-width: 1px;
+    border-color: rgb(0, 240, 140);
+}
+
+.ready-text {
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(0, 240, 140);
+    letter-spacing: 2px;
+}
+
+/* Boş Slot Kartı */
+.empty-card {
+    background-color: rgba(15, 20, 30, 0.5);
+    border-width: 1.5px;
+    border-color: rgba(70, 95, 130, 0.4);
+    border-style: dashed;
+}
+
+.empty-avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    border-width: 1.5px;
+    border-color: rgba(90, 120, 160, 0.4);
+    border-style: dashed;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.empty-plus {
+    font-size: 32px;
+    color: rgba(100, 130, 170, 0.6);
+}
+
+.empty-title {
+    font-size: 12px;
+    color: rgba(130, 155, 185, 0.6);
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.btn-invite {
+    width: 85%;
+    height: 36px;
+    background-color: rgba(40, 55, 80, 0.5);
+    border-width: 1px;
+    border-color: rgba(80, 110, 150, 0.5);
+    border-radius: 6px;
+    color: rgb(180, 205, 235);
+    font-size: 12px;
+    -unity-font-style: bold;
+    transition-property: all;
+    transition-duration: 0.15s;
+}
+
+.btn-invite:hover {
+    background-color: rgba(0, 220, 255, 0.25);
+    border-color: rgb(0, 220, 255);
+    color: rgb(255, 255, 255);
+}
+
+/* --------------------------------------------------------------------------
+   SAĞ PANEL (ODA AYARLARI VE GÜNLÜK)
+   -------------------------------------------------------------------------- */
+.side-panel {
+    width: 320px;
+}
+
+.lobby-card {
+    background-color: rgba(18, 24, 36, 0.85);
+    border-width: 1px;
+    border-color: rgba(45, 60, 85, 0.6);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.card-heading {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: rgb(255, 184, 0);
+    letter-spacing: 2px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.info-row {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.info-label {
+    font-size: 11px;
+    color: rgba(150, 175, 205, 0.7);
+}
+
+.info-value {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(240, 245, 255);
+}
+
+.accent-text {
+    color: rgb(255, 184, 0);
+}
+
+.green-text {
+    color: rgb(0, 240, 140);
+}
+
+/* Lobi Bildirimleri / Chat */
+.chat-card {
+    height: 150px;
+}
+
+.chat-scroll {
+    flex-grow: 1;
+}
+
+.chat-msg {
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.system-msg {
+    color: rgba(140, 170, 200, 0.7);
+}
+
+.user-msg {
+    color: rgb(255, 205, 80);
+    -unity-font-style: bold;
+}
+
+/* --------------------------------------------------------------------------
+   ALT AKSİYON VE KONTROL ÇUBUĞU (FOOTER)
+   -------------------------------------------------------------------------- */
+.footer-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(18, 24, 36, 0.9);
+    border-width: 1px;
+    border-color: rgba(45, 60, 85, 0.6);
+    border-radius: 10px;
+    padding: 12px 24px;
+}
+
+.footer-left-buttons {
+    flex-direction: row;
+    align-items: center;
+}
+
+.btn-action {
+    height: 48px;
+    border-radius: 8px;
+    padding: 0 20px;
+    margin-right: 12px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+    transition-property: all;
+    transition-duration: 0.16s;
+}
+
+.btn-leave {
+    background-color: rgba(80, 20, 25, 0.5);
+    border-width: 1px;
+    border-color: rgba(220, 50, 60, 0.6);
+    color: rgb(255, 150, 160);
+}
+
+.btn-leave:hover {
+    background-color: rgb(220, 50, 60);
+    color: rgb(255, 255, 255);
+}
+
+.btn-secondary {
+    background-color: rgba(30, 42, 60, 0.6);
+    border-width: 1px;
+    border-color: rgba(70, 95, 130, 0.5);
+    color: rgb(220, 235, 255);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(50, 75, 110, 0.8);
+    border-color: rgb(0, 220, 255);
+    color: rgb(255, 255, 255);
+}
+
+/* BÜYÜK BAŞLAT BUTONU (GOLDEN AMBER) */
+.btn-start-game {
+    height: 52px;
+    padding: 0 36px;
+    background-color: rgb(255, 184, 0);
+    border-width: 0;
+    border-radius: 8px;
+    color: rgb(15, 18, 25);
+    font-size: 16px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    box-shadow: 0 0 16px rgba(255, 184, 0, 0.4);
+    margin-right: 0;
+}
+
+.btn-start-game:hover {
+    background-color: rgb(255, 205, 50);
+    scale: 1.03 1.03;
+    box-shadow: 0 0 24px rgba(255, 184, 0, 0.7);
+}
+
+.btn-start-game:active {
+    scale: 0.98 0.98;
+    background-color: rgb(220, 155, 0);
+}
