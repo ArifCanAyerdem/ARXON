@@ -61,6 +61,9 @@ namespace Arixon.UI
         private bool _isLocalPlayerReady = false;
         private System.Collections.Generic.Dictionary<ulong, bool> _playerReadyStates = new System.Collections.Generic.Dictionary<ulong, bool>();
         private System.Collections.Generic.Dictionary<ulong, string> _playerNames = new System.Collections.Generic.Dictionary<ulong, string>();
+        private System.Collections.Generic.Dictionary<ulong, string> _playerTeams = new System.Collections.Generic.Dictionary<ulong, string>();
+                private const string ROSTER_CHANNEL = "ArixonRosterSync";
+
         private const string READY_CHANNEL = "ArixonReadySync";
         private const string SYNC_NAMES_CHANNEL = "ArixonSyncNames";
 
@@ -98,7 +101,7 @@ namespace Arixon.UI
         {
             var root = _uiDocument.rootVisualElement;
             if (root == null) return;
-
+                        
             // Görünümler
             _viewHome = root.Q<VisualElement>("view-home");
             _viewLobby = root.Q<VisualElement>("view-lobby");
@@ -254,9 +257,18 @@ namespace Arixon.UI
             }
         }
 
+        private void OnDestroy()
+        {
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                Unity.Netcode.NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+                Unity.Netcode.NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+            }
+        }
+
         private void OnDisable()
         {
-            if (_btnHomeCreateRoom != null) _btnHomeCreateRoom.clicked -= OnCreateRoomClicked;
+                        if (_btnHomeCreateRoom != null) _btnHomeCreateRoom.clicked -= OnCreateRoomClicked;
             if (_btnHomeJoinCode != null) _btnHomeJoinCode.clicked -= OnJoinWithCodeClicked;
             if (_btnHomeQuit != null) _btnHomeQuit.clicked -= OnQuitClicked;
             if (_btnStartGame != null) _btnStartGame.clicked -= OnStartGameClicked;
@@ -413,7 +425,6 @@ namespace Arixon.UI
                 _localPlayerName = _inputPlayerName.value.Trim();
             }
 
-            // Benzersiz rastgele oda kodu üret
             _currentRoomCode = ArixonRoomDiscovery.GenerateRoomCode();
             _isHost = true;
             _hostPlayerName = _localPlayerName;
@@ -424,18 +435,27 @@ namespace Arixon.UI
             {
                 ArixonNetworkManager.Instance.StartHost();
             }
-            else if (NetworkManager.Singleton != null)
+            else if (Unity.Netcode.NetworkManager.Singleton != null)
             {
-                NetworkManager.Singleton.StartHost();
+                Unity.Netcode.NetworkManager.Singleton.StartHost();
             }
 
-            // Odayı ağa ve canlı listeye SADECE ŞİMDİ ekle (İlan et!)
+            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN HEMEN SONRA TAK! (CustomMessagingManager artık null değil!)
+            RegisterNetworkHandlers();
+
             ArixonRoomDiscovery.PublishRoom(_currentRoomCode, _localPlayerName);
+
+            // HOST kendini manuel olarak listeye eklesin
+            ulong hostId = Unity.Netcode.NetworkManager.ServerClientId;
+            _playerTeams[hostId] = "RED";
+            _playerReadyStates[hostId] = false;
+            _playerNames[hostId] = _localPlayerName;
 
             PrepareLobbyViewAsHost();
             SwitchView(true);
-            RegisterNetworkHandlers();
-
+            
+            BroadcastRoster(); // Kendi bilgisini lobidekilere ve kendi ekranına yansıt
+            
             AddMessageToChat("SİSTEM", $"Oda başarıyla açıldı! Oda Kodunuz: {_currentRoomCode}", true);
         }
 
@@ -488,14 +508,16 @@ namespace Arixon.UI
             {
                 ArixonNetworkManager.Instance.StartClient();
             }
-            else if (NetworkManager.Singleton != null)
+            else if (Unity.Netcode.NetworkManager.Singleton != null)
             {
-                NetworkManager.Singleton.StartClient();
+                Unity.Netcode.NetworkManager.Singleton.StartClient();
             }
+
+            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN SONRA TAK! (CustomMessagingManager null değil!)
+            RegisterNetworkHandlers();
 
             PrepareLobbyViewAsClient();
             SwitchView(true);
-            RegisterNetworkHandlers();
 
             AddMessageToChat("SİSTEM", $"Odaya bağlanıldı ({_currentRoomCode})! Hoş geldin {_localPlayerName}.", true);
         }
@@ -584,20 +606,57 @@ namespace Arixon.UI
         {
             if (NetworkManager.Singleton == null || NetworkManager.Singleton.CustomMessagingManager == null) return;
 
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+
+
             // Çoklu kayıtları önlemek için önce temizleyelim
+
+            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(ROSTER_CHANNEL);
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(ROSTER_CHANNEL, (senderClientId, reader) =>
+            {
+                reader.ReadValueSafe(out byte msgType);
+                if (msgType == 1 && NetworkManager.Singleton.IsClient) // 1 = Roster Update (Server'dan Client'a)
+                {
+                    reader.ReadValueSafe(out int count);
+                    _playerNames.Clear();
+                    _playerTeams.Clear();
+                    _playerReadyStates.Clear();
+                    for(int i = 0; i < count; i++)
+                    {
+                        reader.ReadValueSafe(out ulong cId);
+                        reader.ReadValueSafe(out string pName);
+                        reader.ReadValueSafe(out string pTeam);
+                        reader.ReadValueSafe(out bool cReady);
+                        
+                        _playerNames[cId] = pName;
+                        _playerTeams[cId] = pTeam;
+                        _playerReadyStates[cId] = cReady;
+                    }
+                    UpdateRosterReadyUI(); // Arayüzü güncelle
+                }
+                else if (msgType == 2 && NetworkManager.Singleton.IsServer) // 2 = Switch Team Request (Client'tan Server'a)
+                {
+                    string current = _playerTeams.ContainsKey(senderClientId) ? _playerTeams[senderClientId] : "RED";
+                    _playerTeams[senderClientId] = current == "RED" ? "BLUE" : "RED";
+                    BroadcastRoster(); // Değişen takımı herkese bildir
+                }
+            });
             
             NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(READY_CHANNEL);
             NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(READY_CHANNEL, (senderClientId, reader) =>
             {
-                reader.ReadValueSafe(out bool isReady);
                 if (NetworkManager.Singleton.IsServer)
                 {
+                    // Sunucu ise sadece Client'ın attığı TEK BOOL'u okur.
+                    reader.ReadValueSafe(out bool isReady);
                     _playerReadyStates[senderClientId] = isReady;
                     CheckAllReadyAndEnableStart();
                     BroadcastReadyStates();
                 }
                 else if (NetworkManager.Singleton.IsClient)
                 {
+                    // İstemci ise Sunucunun attığı INT (count) ve KADRO LİSTESİNİ okur.
                     reader.ReadValueSafe(out int count);
                     _playerReadyStates.Clear();
                     for(int i=0; i<count; i++) {
@@ -664,9 +723,9 @@ namespace Arixon.UI
             }
         }
 
-        private void BroadcastChatMessage(string senderName, string messageText, bool isSystem)
+        private void BroadcastChatMessage(string senderName, string messageText, bool isSystem, ulong excludeClientId = Unity.Netcode.NetworkManager.ServerClientId)
         {
-            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
+            if (Unity.Netcode.NetworkManager.Singleton == null || !Unity.Netcode.NetworkManager.Singleton.IsServer || Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager == null) return;
 
             // Mesajı tüm client'lara dağıtıyoruz.
             // Client'lar kendi mesajlarını yerelde basmadıkları için, bu mesajı aldıklarında çizecekler.
@@ -721,10 +780,115 @@ namespace Arixon.UI
         #endregion
 
         
+        
+        private void OnClientConnected(ulong clientId)
+        {
+            if (Unity.Netcode.NetworkManager.Singleton.IsServer)
+            {
+                // Yeni oyuncu bağlandı (Server)
+                _playerReadyStates[clientId] = false;
+                
+                // Müsait takımı bul
+                int redCount = 0; int blueCount = 0;
+                foreach(var kvp in _playerTeams) {
+                    if (kvp.Value == "RED") redCount++;
+                    else blueCount++;
+                }
+                _playerTeams[clientId] = redCount <= blueCount ? "RED" : "BLUE";
+
+                BroadcastRoster();
+            }
+            else if (Unity.Netcode.NetworkManager.Singleton.IsClient && clientId == Unity.Netcode.NetworkManager.Singleton.LocalClientId)
+            {
+                // Client odaya katıldığında KENDİ ADINI Sunucuya bildirsin
+                var writer = new Unity.Netcode.FastBufferWriter(64, Unity.Collections.Allocator.Temp);
+                using (writer)
+                {
+                    writer.WriteValueSafe(_localPlayerName);
+                    Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(SYNC_NAMES_CHANNEL, Unity.Netcode.NetworkManager.ServerClientId, writer);
+                }
+            }
+        }
+
+        private void OnClientDisconnect(ulong clientId)
+        {
+            if (Unity.Netcode.NetworkManager.Singleton.IsServer)
+            {
+                // Birisi koptuysa (Server isek listelerden çıkar ve duyur)
+                if (_playerNames.ContainsKey(clientId)) _playerNames.Remove(clientId);
+                if (_playerTeams.ContainsKey(clientId)) _playerTeams.Remove(clientId);
+                if (_playerReadyStates.ContainsKey(clientId)) _playerReadyStates.Remove(clientId);
+                BroadcastRoster();
+            }
+            else
+            {
+                // Eğer Client isek ve lider koptuysa ana menüye dön
+                if (clientId == Unity.Netcode.NetworkManager.ServerClientId || clientId == Unity.Netcode.NetworkManager.Singleton.LocalClientId)
+                {
+                    OnLeaveLobbyClicked();
+                    SetHomeStatus("Lider odadan ayrıldı veya bağlantı koptu.");
+                }
+            }
+        }
+
+        private void OnCardClicked(int slotIndex)
+        {
+            if (Unity.Netcode.NetworkManager.Singleton == null || !Unity.Netcode.NetworkManager.Singleton.IsListening) return;
+            ulong myId = Unity.Netcode.NetworkManager.Singleton.LocalClientId;
+            
+            if (_isLocalPlayerReady)
+            {
+                _isLocalPlayerReady = false;
+                UpdateClientReadyButtonUI();
+            }
+
+            if (Unity.Netcode.NetworkManager.Singleton.IsServer)
+            {
+                string current = _playerTeams.ContainsKey(myId) ? _playerTeams[myId] : "RED";
+                _playerTeams[myId] = current == "RED" ? "BLUE" : "RED";
+                BroadcastRoster();
+            }
+            else
+            {
+                var writer = new Unity.Netcode.FastBufferWriter(32, Unity.Collections.Allocator.Temp);
+                using (writer)
+                {
+                    writer.WriteValueSafe((byte)2); // 2 = Switch Team Request
+                    Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("ArixonRosterSync", Unity.Netcode.NetworkManager.ServerClientId, writer);
+                }
+            }
+        }
+
+        private void BroadcastRoster()
+        {
+            UpdateRosterReadyUI();
+            if (Unity.Netcode.NetworkManager.Singleton == null || !Unity.Netcode.NetworkManager.Singleton.IsServer || Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager == null) return;
+            
+            var writer = new Unity.Netcode.FastBufferWriter(1024, Unity.Collections.Allocator.Temp);
+            using (writer)
+            {
+                writer.WriteValueSafe((byte)1); // 1 = Roster Update
+                
+                int count = _playerTeams.Count;
+                writer.WriteValueSafe(count);
+                
+                foreach (var kvp in _playerTeams)
+                {
+                    ulong cId = kvp.Key;
+                    writer.WriteValueSafe(cId);
+                    writer.WriteValueSafe(_playerNames.ContainsKey(cId) ? _playerNames[cId] : $"Oyuncu_{cId}");
+                    writer.WriteValueSafe(kvp.Value); // Takım bilgisi (RED / BLUE)
+                    writer.WriteValueSafe(_playerReadyStates.ContainsKey(cId) && _playerReadyStates[cId]);
+                }
+                
+                Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager.SendNamedMessageToAll(ROSTER_CHANNEL, writer);
+            }
+        }
+
         private void BroadcastReadyStates()
         {
             UpdateRosterReadyUI();
-            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
+            if (Unity.Netcode.NetworkManager.Singleton == null || !Unity.Netcode.NetworkManager.Singleton.IsServer || Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager == null) return;
             var writer = new FastBufferWriter(1024, Allocator.Temp);
             using (writer)
             {
@@ -771,84 +935,159 @@ namespace Arixon.UI
             }
         }
 
+        
+        
         private void UpdateRosterReadyUI()
         {
-            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening) return;
+            if (Unity.Netcode.NetworkManager.Singleton == null || !Unity.Netcode.NetworkManager.Singleton.IsListening) return;
 
-            if (_slot2Card != null) { _slot2Card.AddToClassList("empty-card"); if (_slot2Name != null) _slot2Name.text = "OYUNCU BEKLENİYOR..."; if (_slot2Ready != null) _slot2Ready.style.display = DisplayStyle.None; }
-            if (_slot3Card != null) { _slot3Card.AddToClassList("empty-card"); if (_slot3Name != null) _slot3Name.text = "OYUNCU BEKLENİYOR..."; if (_slot3Ready != null) _slot3Ready.style.display = DisplayStyle.None; }
-            if (_slot4Card != null) { _slot4Card.AddToClassList("empty-card"); if (_slot4Name != null) _slot4Name.text = "OYUNCU BEKLENİYOR..."; if (_slot4Ready != null) _slot4Ready.style.display = DisplayStyle.None; }
+            var allCards = new[] { _slot1Card, _slot2Card, _slot3Card, _slot4Card };
+            var allNames = new[] { _slot1Name, _slot2Name, _slot3Name, _slot4Name };
+            var allReadys = new[] { _slot1Ready, _slot2Ready, _slot3Ready, _slot4Ready };
+            var allReadyLbls = new[] { _slot1ReadyLbl, _slot2ReadyLbl, _slot3ReadyLbl, _slot4ReadyLbl };
 
-            if (_slot1Ready != null) {
-                _slot1Ready.style.display = DisplayStyle.Flex;
-                _slot1Ready.style.backgroundColor = new StyleColor(new UnityEngine.Color32(46, 204, 113, 255));
-                if (_slot1ReadyLbl != null) _slot1ReadyLbl.text = "✔️ HAZIR";
-            }
-            if (_slot1Name != null && _playerNames.ContainsKey(NetworkManager.ServerClientId))
+            for(int k=0; k<4; k++)
             {
-                _slot1Name.text = _playerNames[NetworkManager.ServerClientId] + " (Lider)";
-            }
-
-            int slotIdx = 2; 
-            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-            {
-                ulong cId = client.ClientId;
-                if (cId == NetworkManager.ServerClientId) continue; 
-                if (slotIdx > 4) break;
-
-                VisualElement card = null, ready = null;
-                Label nameLbl = null, readyLbl = null;
-                
-                if (slotIdx == 2) { card = _slot2Card; nameLbl = _slot2Name; ready = _slot2Ready; readyLbl = _slot2ReadyLbl; }
-                else if (slotIdx == 3) { card = _slot3Card; nameLbl = _slot3Name; ready = _slot3Ready; readyLbl = _slot3ReadyLbl; }
-                else if (slotIdx == 4) { card = _slot4Card; nameLbl = _slot4Name; ready = _slot4Ready; readyLbl = _slot4ReadyLbl; }
-
-                if (card != null)
-                {
-                    card.RemoveFromClassList("empty-card");
-                    
-                    string pName = _playerNames.ContainsKey(cId) ? _playerNames[cId] : $"Oyuncu_{cId}";
-                    if (cId == NetworkManager.Singleton.LocalClientId) pName += " (Sen)";
-                    if (nameLbl != null) nameLbl.text = pName;
-
-                    bool isReady = _playerReadyStates.ContainsKey(cId) && _playerReadyStates[cId];
-                    if (ready != null) {
-                        ready.style.display = DisplayStyle.Flex;
-                        if (isReady) {
-                            ready.style.backgroundColor = new StyleColor(new UnityEngine.Color32(46, 204, 113, 255));
-                            if (readyLbl != null) readyLbl.text = "✔️ HAZIR";
-                        } else {
-                            ready.style.backgroundColor = new StyleColor(new UnityEngine.Color32(150, 40, 30, 255));
-                            if (readyLbl != null) readyLbl.text = "❌ BEKLENİYOR";
-                        }
-                    }
+                if (allCards[k] != null) {
+                    allCards[k].RemoveFromClassList("active-card");
+                    allCards[k].RemoveFromClassList("local-player-card");
+                    allCards[k].RemoveFromClassList("active-ready-card");
+                    allCards[k].RemoveFromClassList("team-red-card");
+                    allCards[k].RemoveFromClassList("team-blue-card");
+                    allCards[k].AddToClassList("empty-card");
                 }
-                slotIdx++;
+                if (allNames[k] != null) allNames[k].text = "OYUNCU BEKLENİYOR...";
+                if (allReadys[k] != null) allReadys[k].style.display = UnityEngine.UIElements.DisplayStyle.None;
+            }
+            
+            var redIds = new System.Collections.Generic.List<ulong>();
+            var blueIds = new System.Collections.Generic.List<ulong>();
+            
+            // Client'lar diğer client'ları ConnectedClientsList üzerinden göremez!
+            // Bu yüzden lobideki kartları çizmek için ağdan gelen _playerTeams sözlüğünü kullanıyoruz.
+            foreach (var kvp in _playerTeams)
+            {
+                ulong cId = kvp.Key;
+                string t = kvp.Value;
+                
+                if (t == "RED") redIds.Add(cId);
+                else blueIds.Add(cId);
             }
 
-            int playerCount = NetworkManager.Singleton.ConnectedClientsList.Count;
+            for(int k=0; k<2; k++)
+            {
+                if (k < redIds.Count) FillSlot(k, redIds[k], "RED");
+                if (k < blueIds.Count) FillSlot(k + 2, blueIds[k], "BLUE");
+            }
+            
+            int playerCount = _playerTeams.Count;
             if (_rosterTitle != null) _rosterTitle.text = $"👥 TAKIM ÜYELERİ ({playerCount}/4)";
+        }
+
+        private void FillSlot(int slotIndex, ulong clientId, string team)
+        {
+            var allCards = new[] { _slot1Card, _slot2Card, _slot3Card, _slot4Card };
+            var allNames = new[] { _slot1Name, _slot2Name, _slot3Name, _slot4Name };
+            var allReadys = new[] { _slot1Ready, _slot2Ready, _slot3Ready, _slot4Ready };
+            var allReadyLbls = new[] { _slot1ReadyLbl, _slot2ReadyLbl, _slot3ReadyLbl, _slot4ReadyLbl };
+
+            var card = allCards[slotIndex];
+            if (card == null) return;
+
+            string pName = _playerNames.ContainsKey(clientId) ? _playerNames[clientId] : $"Oyuncu_{clientId}";
+            bool isReady = _playerReadyStates.ContainsKey(clientId) && _playerReadyStates[clientId];
+            bool isMe = (clientId == Unity.Netcode.NetworkManager.Singleton.LocalClientId);
+            bool isHost = (clientId == Unity.Netcode.NetworkManager.ServerClientId);
+
+            if (isMe && isHost) pName += " (Sen)";
+            else if (isMe) pName += " (Sen)";
+            if (allNames[slotIndex] != null) allNames[slotIndex].text = pName;
+
+            // KART GÖRÜNÜRLÜĞÜ VE TAKIM RENKLERİ
+            card.RemoveFromClassList("empty-card");
+            card.AddToClassList("active-card"); // ÇOK ÖNEMLİ: KARTIN GÖRÜNMESİNİ SAĞLAYAN CLASS!
+            
+            card.RemoveFromClassList("team-red-card");
+            card.RemoveFromClassList("team-blue-card");
+            if (team == "RED") card.AddToClassList("team-red-card");
+            else card.AddToClassList("team-blue-card");
+
+            if (isMe) card.AddToClassList("local-player-card");
+            else card.RemoveFromClassList("local-player-card");
+            
+            if (isReady) card.AddToClassList("active-ready-card");
+            else card.RemoveFromClassList("active-ready-card");
+
+            // TAÇ KONTROLÜ
+            var crown = card.Q<UnityEngine.UIElements.VisualElement>($"slot-{slotIndex + 1}-crown");
+            if (crown != null)
+            {
+                crown.style.display = isHost ? UnityEngine.UIElements.DisplayStyle.Flex : UnityEngine.UIElements.DisplayStyle.None;
+            }
+
+            // FOTOĞRAF (AVATAR) VE P1/P2 ETİKETİ
+            var circle = card.Q<UnityEngine.UIElements.VisualElement>($"slot-{slotIndex + 1}-circle");
+            var avatarTag = card.Q<UnityEngine.UIElements.Label>($"slot-{slotIndex + 1}-avatar-tag");
+
+            if (circle != null)
+            {
+                // ESKİ VE ÇALIŞAN ORİJİNAL MANTIK
+                circle.style.backgroundColor = new UnityEngine.UIElements.StyleColor(UnityEngine.Color.clear); // Benim eklediğim bozucu düz renk siliniyor
+                circle.RemoveFromClassList("empty-avatar-circle");
+                circle.AddToClassList("card-avatar");
+                
+                circle.RemoveFromClassList("avatar-p1");
+                circle.RemoveFromClassList("avatar-p2");
+                
+                // Oyuncu Host ise P1 (Lider Fotoğrafı), Client ise P2 (Oyuncu Fotoğrafı) alır!
+                if (isHost) circle.AddToClassList("avatar-p1");
+                else circle.AddToClassList("avatar-p2");
+            }
+            if (avatarTag != null)
+            {
+                avatarTag.text = isHost ? "P1" : "P2";
+            }
+
+            // HAZIR / BEKLENİYOR BUTONU GÖRÜNÜMÜ
+            if (allReadys[slotIndex] != null)
+            {
+                allReadys[slotIndex].style.display = UnityEngine.UIElements.DisplayStyle.Flex;
+                
+                if (isReady)
+                {
+                    allReadys[slotIndex].style.backgroundColor = new UnityEngine.UIElements.StyleColor(new UnityEngine.Color32(46, 204, 113, 255));
+                    if (allReadyLbls[slotIndex] != null) allReadyLbls[slotIndex].text = "✔️ HAZIR";
+                }
+                else
+                {
+                    allReadys[slotIndex].style.backgroundColor = new UnityEngine.UIElements.StyleColor(new UnityEngine.Color32(231, 76, 60, 255));
+                    if (allReadyLbls[slotIndex] != null) allReadyLbls[slotIndex].text = "❌ BEKLENİYOR";
+                }
+            }
         }
 
         private void UpdateClientReadyButtonUI()
         {
             if (_btnStartGame != null)
             {
-                _btnStartGame.SetEnabled(true);
-                if (_isLocalPlayerReady)
+                if (_isHost)
                 {
-                    _btnStartGame.text = "❌ HAZIR DEĞİLİM";
-                    _btnStartGame.style.backgroundColor = new StyleColor(new Color32(231, 76, 60, 255));
+                    _btnStartGame.text = "▶ OYUNU BAŞLAT";
                 }
                 else
                 {
-                    _btnStartGame.text = "✔️ HAZIR OL";
-                    _btnStartGame.style.backgroundColor = new StyleColor(new Color32(46, 204, 113, 255));
+                    _btnStartGame.SetEnabled(true);
+                    if (_isLocalPlayerReady)
+                    {
+                        _btnStartGame.text = "✖ İPTAL (HAZIR)";
+                    }
+                    else
+                    {
+                        _btnStartGame.text = "✔ HAZIR OL";
+                    }
                 }
             }
         }
-
-        #region Alt Buton Olayları (Start, Leave, Copy)
 
         private void OnStartGameClicked()
         {
@@ -863,16 +1102,17 @@ namespace Arixon.UI
             }
             else
             {
+                // Lider değilsek, BAŞLAT butonu aslında HAZIR OL butonudur!
                 _isLocalPlayerReady = !_isLocalPlayerReady;
                 UpdateClientReadyButtonUI();
 
-                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
                 {
-                    var writer = new FastBufferWriter(32, Unity.Collections.Allocator.Temp);
+                    var writer = new Unity.Netcode.FastBufferWriter(32, Unity.Collections.Allocator.Temp);
                     using (writer)
                     {
                         writer.WriteValueSafe(_isLocalPlayerReady);
-                        NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(READY_CHANNEL, NetworkManager.ServerClientId, writer);
+                        Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("ArixonReadySync", Unity.Netcode.NetworkManager.ServerClientId, writer);
                     }
                 }
             }
@@ -928,7 +1168,5 @@ namespace Arixon.UI
         {
             SetHomeStatus(log);
         }
-
-        #endregion
     }
 }

@@ -635,10 +635,17 @@
 }
 
 .active-card {
-    background-color: rgb(48, 36, 86);
-    border-color: rgb(255, 204, 0);
+    background-color: rgb(42, 32, 75);
+    border-color: rgb(255, 93, 162); /* Bubblegum Pink / Neon Neon */
     border-bottom-width: 6px;
     border-bottom-color: rgb(20, 14, 40);
+}
+
+.active-ready-card {
+    background-color: rgb(30, 70, 46); /* Koyu Yeşil Zemin */
+    border-color: rgb(46, 204, 113); /* Neon Yeşil (Mint) */
+    border-bottom-width: 6px;
+    border-bottom-color: rgb(15, 40, 25);
 }
 
 .empty-card {
@@ -826,4 +833,51 @@
 
 .footer-right-buttons {
     flex-direction: row;
+}
+
+.local-player-card {
+    background-color: rgb(55, 35, 15);
+    border-color: rgb(255, 204, 0);
+    border-bottom-width: 6px;
+    border-bottom-color: rgb(150, 90, 0);
+}
+
+/* TAKIM SISTEMI CSS (2V2) */
+.teams-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.team-column {
+    width: 48%;
+    flex-direction: column;
+}
+
+.team-badge-red {
+    background-color: rgb(220, 50, 50);
+    border-color: rgb(150, 20, 20);
+    border-radius: 8px;
+    padding: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.team-badge-blue {
+    background-color: rgb(50, 100, 220);
+    border-color: rgb(20, 50, 150);
+    border-radius: 8px;
+    padding: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.team-red-card {
+    background-color: rgb(60, 20, 20);
+    border-color: rgb(255, 60, 60);
+}
+
+.team-blue-card {
+    background-color: rgb(20, 30, 60);
+    border-color: rgb(60, 120, 255);
 }

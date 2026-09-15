@@ -54,11 +54,7 @@
                         <ui:Label text="" name="home-status-msg" class="status-log-home" />
                     </ui:VisualElement>
 
-                    <!-- Alt Bilgilendirme -->
-                    <ui:VisualElement class="engine-tag-box">
-                        <ui:Label text="⚡ AĞ MOTORU:" class="engine-tag-label" />
-                        <ui:Label text="UNITY NETCODE (NGO)" class="engine-tag-val" />
-                    </ui:VisualElement>
+
                 </ui:VisualElement>
 
                 <!-- SAĞ PANEL: AKTİF LOBİ VE SUNUCU LİSTESİ -->
@@ -112,7 +108,7 @@
 
                 <ui:VisualElement class="header-right">
                     <ui:VisualElement class="ping-dot" />
-                    <ui:Label text="TR-ISTANBUL (18ms)" class="server-info" />
+                    <ui:Label name="ping-label" text="📡 Ping: Bağlanıyor..." class="server-info" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -125,57 +121,76 @@
                         <ui:Label text="👥 TAKIM ÜYELERİ (1/4)" name="roster-title" class="badge-title" />
                     </ui:VisualElement>
 
-                    <ui:VisualElement class="slots-container">
+                    <ui:VisualElement class="teams-wrapper">
+                        
+                        <!-- KIRMIZI TAKIM -->
+                        <ui:VisualElement class="team-column">
+                            <ui:VisualElement class="team-badge-red">
+                                <ui:Label text="🔴 KIRMIZI TAKIM" style="color: white; -unity-font-style: bold; font-size: 14px;" />
+                            </ui:VisualElement>
 
-                        <!-- SLOT 1: LOBİ LİDERİ (HOST) -->
-                        <ui:VisualElement name="slot-1-card" class="player-card active-card host-card">
-                            <ui:VisualElement name="slot-1-crown" class="card-crown-tag">
-                                <ui:Label text="👑 LİDER" class="crown-text" />
+                            <!-- SLOT 1 -->
+                            <ui:VisualElement name="slot-1-card" class="player-card empty-card" style="width: 100%;">
+                                <ui:VisualElement name="slot-1-crown" class="card-crown-tag" style="display: none;">
+                                    <ui:Label text="👑 LİDER" class="crown-text" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="slot-1-circle" class="empty-avatar-circle">
+                                    <ui:Label text="+" name="slot-1-avatar-tag" class="empty-plus" />
+                                </ui:VisualElement>
+                                <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-1-name" class="empty-title" />
+                                <ui:VisualElement name="slot-1-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
+                                    <ui:Label text="❌ BEKLENİYOR" name="slot-1-ready-lbl" class="ready-text" />
+                                </ui:VisualElement>
                             </ui:VisualElement>
-                            <ui:VisualElement class="card-avatar avatar-p1">
-                                <ui:Label text="P1" name="slot-1-avatar-tag" class="avatar-tag" />
-                            </ui:VisualElement>
-                            <ui:Label text="Oyuncu_01 (Sen)" name="slot-1-name" class="card-player-name" />
-                            <ui:Label text="⭐ LVL 1 • KOMUTAN" name="slot-1-rank" class="card-player-rank" />
-                            <ui:VisualElement name="slot-1-ready" class="ready-pill ready-yes">
-                                <ui:Label text="✓ HAZIR" class="ready-text" />
+
+                            <!-- SLOT 2 -->
+                            <ui:VisualElement name="slot-2-card" class="player-card empty-card" style="width: 100%;">
+                                <ui:VisualElement name="slot-2-crown" class="card-crown-tag" style="display: none;">
+                                    <ui:Label text="👑 LİDER" class="crown-text" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="slot-2-circle" class="empty-avatar-circle">
+                                    <ui:Label text="+" name="slot-2-avatar-tag" class="empty-plus" />
+                                </ui:VisualElement>
+                                <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-2-name" class="empty-title" />
+                                <ui:VisualElement name="slot-2-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
+                                    <ui:Label text="❌ BEKLENİYOR" name="slot-2-ready-lbl" class="ready-text" />
+                                </ui:VisualElement>
                             </ui:VisualElement>
                         </ui:VisualElement>
 
-                        <!-- SLOT 2: OYUNCU 2 -->
-                        <ui:VisualElement name="slot-2-card" class="player-card empty-card">
-                            <ui:VisualElement name="slot-2-circle" class="empty-avatar-circle">
-                                <ui:Label text="+" name="slot-2-avatar-tag" class="empty-plus" />
+                        <!-- MAVI TAKIM -->
+                        <ui:VisualElement class="team-column">
+                            <ui:VisualElement class="team-badge-blue">
+                                <ui:Label text="🔵 MAVİ TAKIM" style="color: white; -unity-font-style: bold; font-size: 14px;" />
                             </ui:VisualElement>
-                            <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-2-name" class="empty-title" />
-                            <ui:VisualElement name="slot-2-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
-                                <ui:Label text="❌ BEKLENİYOR" name="slot-2-ready-lbl" class="ready-text" />
-                            </ui:VisualElement>
-                            <ui:Button text="📩 DAVET ET" name="btn-invite-1" class="btn-cartoon btn-cartoon-blue btn-invite-small" />
-                        </ui:VisualElement>
 
-                        <!-- SLOT 3: OYUNCU 3 -->
-                        <ui:VisualElement name="slot-3-card" class="player-card empty-card">
-                            <ui:VisualElement name="slot-3-circle" class="empty-avatar-circle">
-                                <ui:Label text="+" name="slot-3-avatar-tag" class="empty-plus" />
+                            <!-- SLOT 3 -->
+                            <ui:VisualElement name="slot-3-card" class="player-card empty-card" style="width: 100%;">
+                                <ui:VisualElement name="slot-3-crown" class="card-crown-tag" style="display: none;">
+                                    <ui:Label text="👑 LİDER" class="crown-text" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="slot-3-circle" class="empty-avatar-circle">
+                                    <ui:Label text="+" name="slot-3-avatar-tag" class="empty-plus" />
+                                </ui:VisualElement>
+                                <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-3-name" class="empty-title" />
+                                <ui:VisualElement name="slot-3-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
+                                    <ui:Label text="❌ BEKLENİYOR" name="slot-3-ready-lbl" class="ready-text" />
+                                </ui:VisualElement>
                             </ui:VisualElement>
-                            <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-3-name" class="empty-title" />
-                            <ui:VisualElement name="slot-3-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
-                                <ui:Label text="❌ BEKLENİYOR" name="slot-3-ready-lbl" class="ready-text" />
-                            </ui:VisualElement>
-                            <ui:Button text="📩 DAVET ET" name="btn-invite-2" class="btn-cartoon btn-cartoon-blue btn-invite-small" />
-                        </ui:VisualElement>
 
-                        <!-- SLOT 4: OYUNCU 4 -->
-                        <ui:VisualElement name="slot-4-card" class="player-card empty-card">
-                            <ui:VisualElement name="slot-4-circle" class="empty-avatar-circle">
-                                <ui:Label text="+" name="slot-4-avatar-tag" class="empty-plus" />
+                            <!-- SLOT 4 -->
+                            <ui:VisualElement name="slot-4-card" class="player-card empty-card" style="width: 100%;">
+                                <ui:VisualElement name="slot-4-crown" class="card-crown-tag" style="display: none;">
+                                    <ui:Label text="👑 LİDER" class="crown-text" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="slot-4-circle" class="empty-avatar-circle">
+                                    <ui:Label text="+" name="slot-4-avatar-tag" class="empty-plus" />
+                                </ui:VisualElement>
+                                <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-4-name" class="empty-title" />
+                                <ui:VisualElement name="slot-4-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
+                                    <ui:Label text="❌ BEKLENİYOR" name="slot-4-ready-lbl" class="ready-text" />
+                                </ui:VisualElement>
                             </ui:VisualElement>
-                            <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-4-name" class="empty-title" />
-                            <ui:VisualElement name="slot-4-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
-                                <ui:Label text="❌ BEKLENİYOR" name="slot-4-ready-lbl" class="ready-text" />
-                            </ui:VisualElement>
-                            <ui:Button text="📩 DAVET ET" name="btn-invite-3" class="btn-cartoon btn-cartoon-blue btn-invite-small" />
                         </ui:VisualElement>
 
                     </ui:VisualElement>
@@ -215,7 +230,7 @@
                     <ui:Button text="⮌ ANA SAYFAYA DÖN" name="btn-leave-lobby" class="btn-cartoon btn-cartoon-red" />
                 </ui:VisualElement>
 
-                <ui:VisualElement class="footer-right-buttons">
+                <ui:VisualElement class="footer-right-buttons" style="flex-direction: row; align-items: center;">
                     <ui:Button text="🚀 OYUNU BAŞLAT" name="btn-start-game" class="btn-cartoon btn-cartoon-green btn-large-start" />
                 </ui:VisualElement>
             </ui:VisualElement>
