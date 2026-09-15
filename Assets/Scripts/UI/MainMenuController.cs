@@ -63,8 +63,8 @@ namespace Arixon.UI
         private System.Collections.Generic.Dictionary<ulong, string> _playerNames = new System.Collections.Generic.Dictionary<ulong, string>();
         private System.Collections.Generic.Dictionary<ulong, string> _playerTeams = new System.Collections.Generic.Dictionary<ulong, string>();
                 private const string ROSTER_CHANNEL = "ArixonRosterSync";
-
-        private const string READY_CHANNEL = "ArixonReadySync";
+        private const string READY_CHANNEL_C2S = "ArixonReadySync_C2S";
+        private const string READY_CHANNEL_S2C = "ArixonReadySync_S2C";
         private const string SYNC_NAMES_CHANNEL = "ArixonSyncNames";
 
         private Button _btnInvite1;
@@ -643,20 +643,25 @@ namespace Arixon.UI
                 }
             });
             
-            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(READY_CHANNEL);
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(READY_CHANNEL, (senderClientId, reader) =>
+            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(READY_CHANNEL_C2S);
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(READY_CHANNEL_C2S, (senderClientId, reader) =>
             {
                 if (NetworkManager.Singleton.IsServer)
                 {
-                    // Sunucu ise sadece Client'ın attığı TEK BOOL'u okur.
+                    // İstemci durumunu sunucuya atıyor
                     reader.ReadValueSafe(out bool isReady);
                     _playerReadyStates[senderClientId] = isReady;
                     CheckAllReadyAndEnableStart();
                     BroadcastReadyStates();
                 }
-                else if (NetworkManager.Singleton.IsClient)
+            });
+
+            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(READY_CHANNEL_S2C);
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(READY_CHANNEL_S2C, (senderClientId, reader) =>
+            {
+                if (NetworkManager.Singleton.IsClient)
                 {
-                    // İstemci ise Sunucunun attığı INT (count) ve KADRO LİSTESİNİ okur.
+                    // Sunucu tüm kadroyu istemciye atıyor
                     reader.ReadValueSafe(out int count);
                     _playerReadyStates.Clear();
                     for(int i=0; i<count; i++) {
@@ -665,6 +670,18 @@ namespace Arixon.UI
                         _playerReadyStates[cId] = cReady;
                     }
                     UpdateRosterReadyUI();
+                }
+            });
+            
+            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(SYNC_NAMES_CHANNEL);
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(SYNC_NAMES_CHANNEL, (senderClientId, reader) =>
+            {
+                if (NetworkManager.Singleton.IsServer)
+                {
+                    // Yeni bağlanan Client ismini yolladı
+                    reader.ReadValueSafe(out string pName);
+                    _playerNames[senderClientId] = pName;
+                    BroadcastRoster();
                 }
             });
 
@@ -897,7 +914,7 @@ namespace Arixon.UI
                     writer.WriteValueSafe(kvp.Key);
                     writer.WriteValueSafe(kvp.Value);
                 }
-                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessageToAll(READY_CHANNEL, writer);
+                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessageToAll(READY_CHANNEL_S2C, writer);
             }
         }
 
@@ -1112,7 +1129,7 @@ namespace Arixon.UI
                     using (writer)
                     {
                         writer.WriteValueSafe(_isLocalPlayerReady);
-                        Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("ArixonReadySync", Unity.Netcode.NetworkManager.ServerClientId, writer);
+                        Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(READY_CHANNEL_C2S, Unity.Netcode.NetworkManager.ServerClientId, writer);
                     }
                 }
             }

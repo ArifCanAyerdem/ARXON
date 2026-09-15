@@ -9,8 +9,10 @@
     flex-grow: 1;
     width: 100%;
     height: 100%;
-    background-color: rgb(24, 18, 43);
-    justify-content: space-between;
+    background-color: rgb(15, 20, 35); /* Koyu stadyum laciverti */
+    background-image: none; /* AI resimleri kaldırıldı, temiz arka plan */
+    justify-content: center; /* Merkezi kutuyu ortala */
+    align-items: center;
     padding: 20px 30px;
 }
 
@@ -22,170 +24,122 @@
 }
 
 /* --------------------------------------------------------------------------
-   ÜST ÇUBUK (CARTOON HEADER)
+   ÜST HEADER: DİEGETİK STADYUM VİNÇ / ÇATI DİREĞİ
    -------------------------------------------------------------------------- */
-.header-bar {
+.diegetic-top-rig {
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-    background-color: rgb(36, 27, 66);
-    border-width: 3px;
-    border-color: rgb(58, 43, 102);
-    border-bottom-width: 6px;
-    border-bottom-color: rgb(16, 11, 30);
-    border-radius: 18px;
-    padding: 10px 20px;
-    margin-bottom: 16px;
+    align-items: flex-start;
+    background-color: rgb(25, 28, 35); /* Koyu Demir */
+    border-bottom-width: 8px;
+    border-bottom-color: rgb(15, 18, 22); /* Demir Alt Gölgesi */
+    padding: 0 40px;
+    height: 80px;
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.5); /* Derinlik */
 }
 
-.header-left {
-    flex-direction: row;
-    align-items: center;
+/* Sol Tabela (Logo) */
+.rig-left-plate {
+    background-color: rgb(40, 45, 55);
+    border-width: 4px;
+    border-top-width: 0; /* Direğe asılı gibi */
+    border-color: rgb(80, 90, 100);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 10px 24px;
+    margin-right: 20px;
 }
 
-.lobby-logo {
-    font-size: 28px;
+.rig-logo {
+    font-size: 24px;
     -unity-font-style: bold;
-    color: rgb(255, 204, 0);
+    color: rgb(241, 196, 15);
     letter-spacing: 2px;
+    text-shadow: 2px 3px 0px rgba(0,0,0,0.5);
+}
+
+/* Orta Tabela (Kullanıcı Adı) */
+.rig-center-plate {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgb(15, 18, 22); /* Koyu Ekran */
+    border-width: 4px;
+    border-top-width: 0;
+    border-color: rgb(60, 70, 80);
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    padding: 8px 24px;
+}
+
+.rig-id-label {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(180, 190, 200);
     margin-right: 12px;
+    letter-spacing: 2px;
 }
 
-.lobby-badge {
-    background-color: rgb(255, 107, 0);
-    border-width: 2px;
-    border-color: rgb(255, 174, 66);
-    border-radius: 10px;
-    padding: 4px 10px;
-    font-size: 11px;
-    -unity-font-style: bold;
-    color: rgb(255, 255, 255);
+.rig-input-name {
+    width: 200px;
+    height: 40px;
+    background-color: transparent;
 }
 
-/* --------------------------------------------------------------------------
-   GENEL TEXTFIELD GİRİŞ ALANLARI (METİN GÖRÜNÜRLÜK GARANTİSİ)
-   -------------------------------------------------------------------------- */
-.unity-text-field {
-    --unity-cursor-color: rgb(255, 204, 0);
-    margin: 0;
-    padding: 0;
-}
-
-.unity-text-field__input,
-.unity-base-text-field__input {
-    color: rgb(0, 0, 0);
-    -unity-font-style: bold;
-    font-size: 15px;
-    background-color: rgb(255, 255, 255);
-    border-width: 2px;
-    border-color: rgb(150, 150, 150);
-    border-radius: 10px;
-    padding: 6px 12px;
-    -unity-text-align: middle-left;
-    selection-color: rgba(255, 204, 0, 0.5);
-}
-
-.unity-text-field__placeholder {
-    color: rgba(180, 160, 220, 0.55);
-    -unity-font-style: normal;
-}
-
-/* Profil Kutusu / Oyuncu Adı Girişi */
-.profile-box {
-    flex-direction: row;
-    align-items: center;
-    background-color: rgb(20, 14, 38);
-    border-width: 2px;
-    border-color: rgb(90, 65, 160);
-    border-radius: 14px;
-    padding: 4px 12px;
-}
-
-.profile-label {
-    font-size: 13px;
-    -unity-font-style: bold;
-    color: rgb(255, 215, 64);
-    margin-right: 8px;
-}
-
-.input-player-name {
-    width: 180px;
-    height: 36px;
-    background-color: rgb(42, 32, 74);
-    border-width: 2px;
-    border-color: rgb(110, 85, 180);
-    border-radius: 10px;
-}
-
-.input-player-name .unity-text-field__input {
-    color: rgb(0, 0, 0);
-    font-size: 15px;
-    -unity-font-style: bold;
-    padding: 4px 10px;
-    background-color: rgb(255, 255, 255);
-}
-
-.input-player-name:focus {
-    border-color: rgb(255, 204, 0);
-}
-
-/* Lobi Header: Oda Kodu Rozeti */
-.room-code-pill {
-    flex-direction: row;
-    align-items: center;
-    background-color: rgb(20, 14, 38);
-    border-width: 2px;
-    border-color: rgb(0, 200, 240);
-    border-bottom-width: 5px;
-    border-bottom-color: rgb(0, 100, 130);
-    border-radius: 14px;
-    padding: 6px 16px;
-}
-
-.room-code-label {
-    font-size: 13px;
-    -unity-font-style: bold;
-    color: rgb(255, 215, 64);
-    margin-right: 8px;
-}
-
-.room-code-val {
+.rig-input-name .unity-text-field__input {
+    color: rgb(0, 255, 150); /* Neon yeşil yazı */
     font-size: 18px;
     -unity-font-style: bold;
-    color: rgb(0, 240, 255);
     letter-spacing: 2px;
-    margin-right: 12px;
+    padding: 4px 12px;
+    background-color: rgb(10, 12, 15);
+    border-width: 2px;
+    border-color: rgb(100, 110, 120);
+    border-radius: 6px;
+    -unity-text-align: middle-center;
 }
 
-/* Sağ Kısım: Ping */
-.header-right {
+.rig-input-name:focus {
+    border-color: rgb(241, 196, 15);
+}
+
+/* Sağ Tabela (Sunucu Bilgisi) */
+.rig-right-plate {
     flex-direction: row;
     align-items: center;
+    background-color: rgb(40, 45, 55);
+    border-width: 4px;
+    border-top-width: 0;
+    border-color: rgb(80, 90, 100);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 10px 24px;
 }
 
 .ping-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
     background-color: rgb(46, 204, 113);
     border-width: 2px;
     border-color: rgb(255, 255, 255);
-    margin-right: 8px;
+    margin-right: 12px;
+    box-shadow: 0px 0px 8px rgb(46, 204, 113); /* Neon parlama */
 }
 
 .server-info {
-    font-size: 13px;
+    font-size: 16px;
     -unity-font-style: bold;
-    color: rgb(180, 160, 220);
+    color: rgb(200, 210, 220);
+    letter-spacing: 1px;
 }
 
 /* --------------------------------------------------------------------------
    GENEL CARTOON PANELLER & KARTLAR
    -------------------------------------------------------------------------- */
 .cartoon-panel {
-    background-color: rgb(34, 25, 61);
+    background-color: rgba(34, 25, 61, 0.85);
     border-width: 3px;
-    border-color: rgb(58, 43, 102);
+    border-color: rgb(88, 173, 255);
     border-bottom-width: 7px;
     border-bottom-color: rgb(15, 10, 28);
     border-radius: 20px;
@@ -235,46 +189,86 @@
 }
 
 /* --------------------------------------------------------------------------
-   ANA SAYFA DÜZENİ
+   SOCCER ARCADE MERKEZİ HUB TASARIMI
    -------------------------------------------------------------------------- */
 .home-section {
+    width: 85%;
+    height: 75%;
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.soccer-hub-container {
     flex-grow: 1;
     flex-direction: row;
-    margin-bottom: 16px;
+    background-color: rgba(20, 25, 45, 0.95); /* Koyu lacivert stadyum gecesi */
+    border-radius: 12px;
+    border-width: 4px;
+    border-color: rgb(46, 204, 113); /* Canlı çim yeşili kenarlık */
+    border-bottom-width: 10px;
+    border-bottom-color: rgb(20, 100, 50);
+    padding: 30px;
+    box-shadow: 0px 15px 30px rgba(0,0,0,0.6);
 }
 
 .home-left-panel {
-    width: 38%;
-    margin-right: 18px;
+    width: 45%;
+    margin-right: 40px;
     justify-content: space-between;
 }
 
 .home-right-panel {
     flex-grow: 1;
-    width: 62%;
+    width: 50%;
 }
 
-.divider-line {
-    height: 3px;
-    background-color: rgb(50, 38, 85);
+.soccer-badge {
+    align-self: flex-start;
+    border-radius: 6px;
+    padding: 6px 16px;
+    margin-bottom: 12px;
+    border-width: 2px;
+}
+
+.badge-orange { background-color: rgb(230, 126, 34); border-color: rgb(243, 156, 18); }
+.badge-blue { background-color: rgb(52, 152, 219); border-color: rgb(41, 128, 185); }
+
+.soccer-badge-title {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    letter-spacing: 2px;
+}
+
+.soccer-desc-text {
+    font-size: 15px;
+    -unity-font-style: bold;
+    color: rgb(180, 200, 220);
+    margin-bottom: 20px;
+    white-space: normal;
+}
+
+.soccer-divider {
+    height: 4px;
+    background-color: rgb(46, 204, 113);
     border-radius: 2px;
-    margin: 16px 0;
+    margin: 20px 0;
 }
 
 /* Kod Giriş Alanı */
-.code-entry-box {
-    background-color: rgb(22, 16, 40);
+.soccer-code-box {
+    background-color: rgb(15, 20, 45);
     border-width: 2px;
-    border-color: rgb(55, 40, 95);
-    border-radius: 14px;
-    padding: 12px;
+    border-color: rgb(40, 60, 100);
+    border-radius: 8px;
+    padding: 16px;
     margin-bottom: 12px;
 }
 
-.info-label-cartoon {
-    font-size: 12px;
+.soccer-input-label {
+    font-size: 14px;
     -unity-font-style: bold;
-    color: rgb(255, 215, 64);
+    color: rgb(241, 196, 15); /* Hakem sarısı */
     margin-bottom: 6px;
 }
 
@@ -283,60 +277,40 @@
     align-items: center;
 }
 
-.input-code-field {
+.soccer-input-field {
     flex-grow: 1;
-    height: 42px;
-    background-color: rgb(38, 28, 68);
-    border-width: 2px;
-    border-color: rgb(100, 80, 160);
-    border-radius: 12px;
-    margin-right: 8px;
+    height: 48px;
+    background-color: rgb(255, 255, 255);
+    border-width: 3px;
+    border-color: rgb(189, 195, 199);
+    border-radius: 6px;
+    margin-right: 12px;
 }
 
-.input-code-field .unity-text-field__input {
-    color: rgb(0, 0, 0);
-    font-size: 16px;
+.soccer-input-field .unity-text-field__input {
+    color: rgb(44, 62, 80);
+    font-size: 18px;
     -unity-font-style: bold;
-    letter-spacing: 2px;
-    padding: 6px 12px;
-    background-color: rgb(255, 255, 255);
+    letter-spacing: 3px;
+    padding: 6px 16px;
+    background-color: transparent;
     -unity-text-align: middle-left;
 }
 
-.input-code-field:focus {
-    border-color: rgb(255, 204, 0);
+.soccer-input-field:focus {
+    border-color: rgb(46, 204, 113);
 }
 
 .status-log-home {
     font-size: 13px;
     -unity-font-style: bold;
-    color: rgb(255, 107, 107);
+    color: rgb(255, 140, 140);
     margin-top: 6px;
     white-space: normal;
 }
 
-.engine-tag-box {
-    flex-direction: row;
-    justify-content: space-between;
-    background-color: rgb(22, 16, 40);
-    border-radius: 10px;
-    padding: 8px 12px;
-}
-
-.engine-tag-label {
-    font-size: 12px;
-    -unity-font-style: bold;
-    color: rgb(150, 135, 190);
-}
-
-.engine-tag-val {
-    font-size: 12px;
-    -unity-font-style: bold;
-    color: rgb(46, 204, 113);
-}
-
 /* --------------------------------------------------------------------------
-   CANLI ODA LİSTESİ (ROOMS SCROLLVIEW)
+   CANLI ODA LİSTESİ (ROOMS SCROLLVIEW) & ODA KARTLARI
    -------------------------------------------------------------------------- */
 .rooms-scroll {
     flex-grow: 1;
@@ -344,49 +318,51 @@
 }
 
 /* Boş Liste Kutusu */
-.empty-rooms-box {
+.soccer-empty-box {
     flex-grow: 1;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
-    background-color: rgb(24, 18, 44);
+    background-color: rgb(20, 30, 50);
+    border-radius: 12px;
     border-width: 2px;
-    border-color: rgb(50, 36, 88);
-    border-radius: 16px;
+    border-color: rgb(40, 60, 90);
+    border-style: dashed;
 }
 
-.empty-rooms-icon {
-    font-size: 42px;
+.soccer-empty-icon {
+    font-size: 72px;
+    margin-bottom: 16px;
+}
+
+.soccer-empty-title {
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(236, 240, 241);
     margin-bottom: 8px;
 }
 
-.empty-rooms-title {
-    font-size: 18px;
+.soccer-empty-desc {
+    font-size: 15px;
     -unity-font-style: bold;
-    color: rgb(255, 204, 0);
-    margin-bottom: 6px;
-}
-
-.empty-rooms-desc {
-    font-size: 13px;
-    color: rgb(160, 145, 200);
+    color: rgb(149, 165, 166);
     text-align: center;
     white-space: normal;
-    max-width: 420px;
+    max-width: 380px;
 }
 
-/* Dinamik Üretilen Cartoon Oda Kartı */
+/* Dinamik Üretilen Arcade Oda Kartı (EKSİK OLAN KISIM BURASIYDI) */
 .room-item {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    background-color: rgb(42, 32, 75);
+    background-color: rgb(30, 35, 60);
     border-width: 3px;
-    border-color: rgb(75, 55, 130);
+    border-color: rgb(60, 80, 120);
     border-bottom-width: 6px;
-    border-bottom-color: rgb(18, 13, 34);
-    border-radius: 16px;
-    padding: 12px 18px;
+    border-bottom-color: rgb(15, 20, 35);
+    border-radius: 10px;
+    padding: 16px;
     margin-bottom: 12px;
 }
 
@@ -405,38 +381,33 @@
 }
 
 .room-badge-status {
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
     -unity-font-style: bold;
     color: rgb(255, 255, 255);
-    margin-right: 12px;
+    margin-right: 16px;
 }
 
-.badge-open {
-    background-color: rgb(46, 204, 113);
-}
-
-.badge-closed {
-    background-color: rgb(231, 76, 60);
-}
+.badge-open { background-color: rgb(46, 204, 113); }
+.badge-closed { background-color: rgb(231, 76, 60); }
 
 .room-item-name {
-    font-size: 16px;
+    font-size: 18px;
     -unity-font-style: bold;
     color: rgb(255, 255, 255);
-    margin-right: 12px;
+    margin-right: 16px;
 }
 
 .room-item-code {
-    font-size: 14px;
+    font-size: 15px;
     -unity-font-style: bold;
-    color: rgb(0, 245, 255);
-    background-color: rgb(18, 12, 34);
+    color: rgb(241, 196, 15);
+    background-color: rgba(0, 0, 0, 0.4);
     border-width: 1px;
-    border-color: rgb(0, 200, 240);
+    border-color: rgb(241, 196, 15);
     padding: 4px 10px;
-    border-radius: 8px;
+    border-radius: 6px;
     letter-spacing: 1px;
 }
 
@@ -446,63 +417,117 @@
 }
 
 .room-item-players {
-    font-size: 14px;
+    font-size: 16px;
     -unity-font-style: bold;
     color: rgb(100, 220, 255);
-    margin-right: 16px;
+    margin-right: 20px;
 }
 
 .btn-room-join {
-    background-color: rgb(46, 204, 113);
+    background-color: rgb(52, 152, 219);
+    border-color: rgb(41, 128, 185);
     border-width: 2px;
-    border-color: rgb(80, 235, 140);
-    border-bottom-width: 5px;
-    border-bottom-color: rgb(25, 120, 65);
-    border-radius: 12px;
-    color: rgb(255, 255, 255);
-    font-size: 13px;
+    border-bottom-width: 4px;
+    border-bottom-color: rgb(30, 90, 140);
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
     -unity-font-style: bold;
-    padding: 6px 16px;
+    padding: 8px 16px;
+    transition-duration: 0.1s;
 }
 
 .btn-room-join:hover {
-    background-color: rgb(60, 220, 125);
+    background-color: rgb(41, 128, 185);
 }
-
 .btn-room-join:active {
     border-bottom-width: 2px;
+    margin-top: 2px;
 }
 
 /* --------------------------------------------------------------------------
-   3D CARTOON BUTONLAR (CARTOON BUTTON SYSTEM)
+   SOCCER ARCADE BUTONLAR (SPORTS SYSTEM)
    -------------------------------------------------------------------------- */
-.btn-cartoon {
-    border-radius: 14px;
-    font-size: 14px;
+.btn-soccer {
+    border-radius: 6px; /* Keskin, sportif hatlar */
+    border-width: 3px;
+    font-size: 18px;
     -unity-font-style: bold;
     color: rgb(255, 255, 255);
-    padding: 10px 20px;
+    padding: 12px 24px;
     align-items: center;
     justify-content: center;
-    border-width: 2px;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out-bounce;
+    transition-property: scale, background-color, border-bottom-width, margin-top;
+    cursor: link;
+    letter-spacing: 1px;
 }
 
-/* Turuncu Buton (+ Oda Kur) */
-.btn-cartoon-orange {
-    background-color: rgb(255, 107, 0);
-    border-color: rgb(255, 160, 60);
+.btn-soccer:hover {
+    scale: 1.05;
+}
+
+.btn-soccer:active {
+    scale: 0.95;
+    border-bottom-width: 3px;
+    margin-top: 5px;
+    transition-duration: 0.05s;
+}
+
+/* Ana Büyük Buton (YENİ MAÇ KUR) */
+.btn-soccer-primary {
+    width: 100%;
+    height: 80px;
+    background-color: rgb(241, 196, 15); /* Hakem sarısı / Altın kupa */
+    border-color: rgb(243, 156, 18);
+    border-bottom-width: 8px;
+    border-bottom-color: rgb(211, 84, 0);
+    color: rgb(44, 62, 80); /* Koyu lacivert yazı */
+    font-size: 28px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-soccer-primary:hover { background-color: rgb(243, 156, 18); }
+
+.btn-soccer-green {
+    background-color: rgb(46, 204, 113); /* Saha yeşili */
+    border-color: rgb(39, 174, 96);
     border-bottom-width: 6px;
-    border-bottom-color: rgb(170, 60, 0);
-    font-size: 16px;
-    height: 48px;
+    border-bottom-color: rgb(20, 143, 71);
+}
+.btn-soccer-green:hover { background-color: rgb(39, 174, 96); }
+
+.btn-soccer-red {
+    background-color: rgb(231, 76, 60); /* Kırmızı kart */
+    border-color: rgb(192, 57, 43);
+    border-bottom-width: 6px;
+    border-bottom-color: rgb(150, 40, 27);
+}
+.btn-soccer-red:hover { background-color: rgb(192, 57, 43); }
+
+.btn-soccer-purple {
+    background-color: rgb(155, 89, 182); /* Turnuva moru */
+    border-color: rgb(142, 68, 173);
+    border-bottom-width: 6px;
+    border-bottom-color: rgb(110, 44, 140);
+}
+.btn-soccer-purple:hover { background-color: rgb(142, 68, 173); }
+
+.footer-bar {
+    flex-direction: row;
+    width: 85%;
+    justify-content: flex-start;
 }
 
-.btn-cartoon-orange:hover {
-    background-color: rgb(255, 125, 25);
+.footer-left-buttons {
+    flex-direction: row;
+    align-items: center;
 }
 
-.btn-cartoon-orange:active {
-    border-bottom-width: 2px;
+.footer-left-buttons .btn-soccer {
+    margin-right: 16px;
 }
 
 /* Yeşil Buton (Giriş / Başlat) */

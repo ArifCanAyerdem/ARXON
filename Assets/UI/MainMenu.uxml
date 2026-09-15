@@ -9,79 +9,81 @@
              ================================================================== -->
         <ui:VisualElement name="view-home" class="screen-view">
             
-            <!-- ÜST HEADER -->
-            <ui:VisualElement class="header-bar">
-                <ui:VisualElement class="header-left">
-                    <ui:Label text="⚡ ARİXON" class="lobby-logo" />
-                    <ui:Label text="BETA • OYUN MERKEZİ" class="lobby-badge" />
+            <!-- ÜST HEADER: DİEGETİK STADYUM VİNÇ / ÇATI DİREĞİ -->
+            <ui:VisualElement class="diegetic-top-rig">
+                
+                <ui:VisualElement class="rig-left-plate">
+                    <ui:Label text="⚡ ARİXON ARENA" class="rig-logo" />
                 </ui:VisualElement>
 
-                <!-- KULLANICI PROFİL VE İSİM DÜZENLEME -->
-                <ui:VisualElement class="header-center profile-box">
-                    <ui:Label text="👤 OYUNCU ADIN:" class="profile-label" />
-                    <ui:TextField name="input-player-name" class="input-player-name" value="Oyuncu_01" max-length="16" />
+                <!-- KULLANICI PROFİL VE İSİM DÜZENLEME (Asılı LED Tabela) -->
+                <ui:VisualElement class="rig-center-plate">
+                    <ui:Label text="[ ID KARTI ]" class="rig-id-label" />
+                    <ui:TextField name="input-player-name" class="rig-input-name" value="Oyuncu_01" max-length="16" />
                 </ui:VisualElement>
 
-                <ui:VisualElement class="header-right">
+                <ui:VisualElement class="rig-right-plate">
                     <ui:VisualElement class="ping-dot" />
-                    <ui:Label text="TR-ISTANBUL (14ms)" class="server-info" />
+                    <ui:Label text="TR-IST (14ms)" class="server-info" />
                 </ui:VisualElement>
+                
             </ui:VisualElement>
 
-            <!-- ORTA ALAN: SOL (ODA KUR/KOD GİR) + SAĞ (AÇIK/KAPALI ODALAR LİSTESİ) -->
+            <!-- ORTA ALAN: SOCCER ARCADE HUB -->
             <ui:VisualElement class="home-section">
 
-                <!-- SOL PANEL: ODA YÖNETİMİ -->
-                <ui:VisualElement class="home-left-panel cartoon-panel">
-                    <ui:VisualElement class="panel-header-badge orange-badge">
-                        <ui:Label text="🎮 ODA MERKEZİ" class="badge-title" />
-                    </ui:VisualElement>
-
-                    <ui:Label text="Yeni bir oda kurup arkadaşlarına liderlik et veya paylaşılan kodu yazıp hemen savaşa katıl!" class="home-card-desc" />
-
-                    <!-- ODA KUR BUTONU -->
-                    <ui:Button text="👑 + YENİ ODA KUR" name="btn-home-create-room" class="btn-cartoon btn-cartoon-orange" />
-
-                    <ui:VisualElement class="divider-line" />
-
-                    <!-- KODLA KATILMA KUTUSU -->
-                    <ui:VisualElement class="code-entry-box">
-                        <ui:Label text="🔑 ODA KODU İLE KATIL:" class="info-label-cartoon" />
-                        <ui:VisualElement class="code-input-row">
-                            <ui:TextField name="input-room-code" class="input-code-field" placeholder-text="#ARX-..." />
-                            <ui:Button text="GİR ▶" name="btn-home-join-code" class="btn-cartoon btn-cartoon-green btn-small-enter" />
+                <!-- MERKEZİ SOCCER KUTUSU -->
+                <ui:VisualElement class="soccer-hub-container">
+                    
+                    <!-- SOL PANEL: ODA YÖNETİMİ -->
+                    <ui:VisualElement class="home-left-panel">
+                        <ui:VisualElement class="soccer-badge badge-orange">
+                            <ui:Label text="🏆 ODA MERKEZİ" class="soccer-badge-title" />
                         </ui:VisualElement>
-                        <ui:Label text="" name="home-status-msg" class="status-log-home" />
+
+                        <ui:Label text="Yeni bir saha kurup takımına liderlik et veya koda girip maça hemen katıl!" class="soccer-desc-text" />
+
+                        <!-- ODA KUR BUTONU -->
+                        <ui:Button text="YENİ MAÇ KUR" name="btn-home-create-room" class="btn-soccer btn-soccer-primary" />
+
+                        <ui:VisualElement class="soccer-divider" />
+
+                        <!-- KODLA KATILMA KUTUSU -->
+                        <ui:VisualElement class="soccer-code-box">
+                            <ui:Label text="ODA KODU:" class="soccer-input-label" />
+                            <ui:VisualElement class="code-input-row">
+                                <ui:TextField name="input-room-code" class="soccer-input-field" placeholder-text="#ARX-..." />
+                                <ui:Button text="GİR" name="btn-home-join-code" class="btn-soccer btn-soccer-green btn-small" />
+                            </ui:VisualElement>
+                            <ui:Label text="" name="home-status-msg" class="status-log-home" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
 
-
-                </ui:VisualElement>
-
-                <!-- SAĞ PANEL: AKTİF LOBİ VE SUNUCU LİSTESİ -->
-                <ui:VisualElement class="home-right-panel cartoon-panel">
-                    <ui:VisualElement class="panel-header-badge blue-badge">
-                        <ui:Label text="📡 CANLI ODALAR VE SUNUCULAR" class="badge-title" />
-                    </ui:VisualElement>
+                    <!-- SAĞ PANEL: AKTİF LOBİ LİSTESİ -->
+                    <ui:VisualElement class="home-right-panel">
+                        <ui:VisualElement class="soccer-badge badge-blue">
+                            <ui:Label text="📡 CANLI SAHALAR" class="soccer-badge-title" />
+                        </ui:VisualElement>
                     
                     <ui:Label text="Ağdaki aktif odalar burada anlık listelenir. Tek tıkla odaya katılabilirsin!" class="home-card-desc" />
 
-                    <!-- CANLI ODA LİSTESİ (C# TARAFINDAN DİNAMİK DOLDURULUR) -->
-                    <ui:ScrollView name="rooms-scroll" class="rooms-scroll">
-                        <ui:VisualElement name="empty-rooms-box" class="empty-rooms-box">
-                            <ui:Label text="🏝️" class="empty-rooms-icon" />
-                            <ui:Label text="ŞU ANDA AÇIK ODA YOK!" class="empty-rooms-title" />
-                            <ui:Label text="Henüz kimse oda kurmadı. Sol taraftaki 'YENİ ODA KUR' butonuna basarak ilk odayı sen açabilirsin!" class="empty-rooms-desc" />
-                        </ui:VisualElement>
-                    </ui:ScrollView>
+                        <!-- CANLI ODA LİSTESİ -->
+                        <ui:ScrollView name="rooms-scroll" class="rooms-scroll">
+                            <ui:VisualElement name="empty-rooms-box" class="soccer-empty-box">
+                                <ui:Label text="⚽" class="soccer-empty-icon" />
+                                <ui:Label text="SAHA ŞU AN BOŞ" class="soccer-empty-title" />
+                                <ui:Label text="Hemen yeni bir maç kur ve topu sahaya indir!" class="soccer-empty-desc" />
+                            </ui:VisualElement>
+                        </ui:ScrollView>
+                    </ui:VisualElement>
                 </ui:VisualElement>
-
             </ui:VisualElement>
 
             <!-- ALT BAR -->
             <ui:VisualElement class="footer-bar">
                 <ui:VisualElement class="footer-left-buttons">
-                    <ui:Button text="⮌ OYUNDAN ÇIK" name="btn-home-quit" class="btn-cartoon btn-cartoon-red" />
-                    <ui:Button text="⚙ AYARLAR" name="btn-home-settings" class="btn-cartoon btn-cartoon-purple" />
+                    <ui:Button text="ÇIKIŞ" name="btn-home-quit" class="btn-soccer btn-soccer-red btn-small" />
+                    <ui:Button text="AYARLAR" name="btn-home-settings" class="btn-soccer btn-soccer-purple btn-small" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -216,7 +218,7 @@
                         <!-- Mesaj Gönderme Giriş Alanı -->
                         <ui:VisualElement class="chat-input-row">
                             <ui:TextField name="chat-input" class="chat-input" placeholder-text="Mesajını yaz..." />
-                            <ui:Button text="GÖNDER ▶" name="btn-chat-send" class="btn-cartoon btn-cartoon-green btn-chat-small" />
+                            <ui:Button text="GÖNDER ▶" name="btn-chat-send" class="btn-soccer btn-soccer-green" style="font-size: 14px; padding: 4px 12px; height: 40px;" />
                         </ui:VisualElement>
                     </ui:VisualElement>
 
@@ -225,13 +227,13 @@
             </ui:VisualElement>
 
             <!-- ALT AKSİYON ÇUBUĞU (FOOTER) -->
-            <ui:VisualElement class="footer-bar">
+            <ui:VisualElement class="footer-bar" style="justify-content: space-between; width: 100%; padding-top: 20px;">
                 <ui:VisualElement class="footer-left-buttons">
-                    <ui:Button text="⮌ ANA SAYFAYA DÖN" name="btn-leave-lobby" class="btn-cartoon btn-cartoon-red" />
+                    <ui:Button text="⮌ ANA SAYFAYA DÖN" name="btn-leave-lobby" class="btn-soccer btn-soccer-red" />
                 </ui:VisualElement>
 
                 <ui:VisualElement class="footer-right-buttons" style="flex-direction: row; align-items: center;">
-                    <ui:Button text="🚀 OYUNU BAŞLAT" name="btn-start-game" class="btn-cartoon btn-cartoon-green btn-large-start" />
+                    <ui:Button text="🚀 OYUNU BAŞLAT" name="btn-start-game" class="btn-soccer btn-soccer-green" style="font-size: 24px; padding: 15px 40px; height: 60px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
