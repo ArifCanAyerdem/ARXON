@@ -13,8 +13,8 @@ Bu klasör, ARİXON çok oyunculu (Multiplayer) oyun projesinin sıfırdan geli�
 | 01 | **Zemin ve Sahne Kurulumu** | Karakterin üstünde duracağı zemin (Plane), Transform ve Collider ayarları | [01_zemin_ve_sahne_kurulumu.md](./01_zemin_ve_sahne_kurulumu.md) | ✅ Tamamlandı |
 | 02 | **Multiplayer Altyapısı (Netcode & MPPM Kurulumu)** | Unity Netcode for GameObjects (NGO) ve Multiplayer Play Mode paketlerinin projeye entegrasyonu | [02_multiplayer_ve_netcode_kurulumu.md](./02_multiplayer_ve_netcode_kurulumu.md) | ✅ Tamamlandı |
 | 03 | **UI Toolkit Giriş Ekranı (MainMenu)** | Modern UI Toolkit (UXML + USS + C#) ile oyun başlığı, Host/Join butonları ve sahne kurulumu | [03_ui_toolkit_giris_ekrani.md](./03_ui_toolkit_giris_ekrani.md) | ✅ Tamamlandı |
-| 04 | **NetworkManager ve Bağlantı Sistemi** | Giriş ekranından tetiklenen Host/Client bağlantı yöneticisi ve sahne geçişi | *(Sırada)* | ⏳ Bekliyor |
-| 05 | **Multiplayer Karakter Kontrolü** | NetworkObject, NetworkTransform ve IsOwner uyumlu oyuncu hareketi | *(Planlandı)* | ⏳ Bekliyor |
+| 04 | **NetworkManager ve Bağlantı Sistemi** | Giriş ekranından tetiklenen Host/Client bağlantı yöneticisi ve sahne geçişi | [04_networkmanager_ve_baglanti_sistemi.md](./04_networkmanager_ve_baglanti_sistemi.md) | ✅ Tamamlandı |
+| 05 | **Multiplayer Karakter Kontrolü** | NetworkObject, NetworkTransform ve IsOwner uyumlu oyuncu hareketi | *(Sırada)* | ⏳ Bekliyor |
 | 06 | **Steam Entegrasyonu** | Steamworks / Steam P2P Transport ve Lobi sistemi | *(Planlandı)* | ⏳ Bekliyor |
 
 ---

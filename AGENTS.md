@@ -81,5 +81,9 @@ Bu dosya, Antigravity AI asistanının ARİXON projesinde her etkileşimde, her 
   - **Mantık ve Etkileşim:** `UIDocument` bileşeni üzerinden `rootVisualElement.Q<Button>("...")` sorguları yapılarak C# Controller scriptleri ile yönetilecektir.
 * **Responsive ve Ölçeklenebilir:** UI Toolkit Flexbox motoru kullanılarak farklı ekran çözünürlüklerine tam uyumlu, modern ve yüksek performanslı arayüzler geliştirilecektir.
 
+---
 
-
+## 8. TAM OTOMATİK EYLEM VE DOĞRUDAN UYGULAMA (Autonomous Execution & Auto-Acceptance)
+* **Kullanıcı Onay Döngüsü Yok:** Kullanıcıya tekrar tekrar "kabul ediyor musunuz?", "planı onaylayın", "Proceed / Accept / Submit" gibi onay pencereleri sorulmayacaktır; yapılacak tüm işlemler peşinen kabul edilmiş sayılır.
+* **Doğrudan İcra:** Kullanıcı bir talep ilettiğinde, bir hata bildirdiğinde veya yol haritasında sıradaki aşamaya geçildiğinde; yapay zeka tüm kod değişikliklerini, sahne kurulumlarını, dosya üretimlerini ve wiki güncellemelerini duraksamadan **doğrudan uygular**.
+* **Kesintisiz Akış:** Değişiklikler anında yapılır, test aşamasına getirilir ve kullanıcıya sadece test edebileceği nihai durum adım adım ve anlaşılır şekilde özetlenir.

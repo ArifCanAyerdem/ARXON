@@ -1,143 +1,225 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Style src="MainMenu.uss" />
 
-    <!-- Lobi Ekranı Ana Taşıyıcı -->
+    <!-- Ana Konteyner -->
     <ui:VisualElement name="lobby-root" class="lobby-root">
 
-        <!-- ÜST BİLGİ VE BAŞLIK ÇUBUĞU (HEADER) -->
-        <ui:VisualElement name="header-bar" class="header-bar">
-            <ui:VisualElement class="header-left">
-                <ui:Label text="ARİXON" class="lobby-logo" />
-                <ui:Label text="MULTIPLAYER LOBBY" class="lobby-badge" />
-            </ui:VisualElement>
+        <!-- ==================================================================
+             EKRAN 1: ANA SAYFA (CARTOON HUB / ODA BULUCU)
+             ================================================================== -->
+        <ui:VisualElement name="view-home" class="screen-view">
+            
+            <!-- ÜST HEADER -->
+            <ui:VisualElement class="header-bar">
+                <ui:VisualElement class="header-left">
+                    <ui:Label text="⚡ ARİXON" class="lobby-logo" />
+                    <ui:Label text="BETA • OYUN MERKEZİ" class="lobby-badge" />
+                </ui:VisualElement>
 
-            <ui:VisualElement class="header-center">
-                <ui:Label text="ODA KODU:" class="room-code-label" />
-                <ui:Label text="#ARX-8842" name="room-code-val" class="room-code-val" />
-                <ui:Button text="KOPYALA" name="btn-copy-code" class="btn-copy" />
-            </ui:VisualElement>
+                <!-- KULLANICI PROFİL VE İSİM DÜZENLEME -->
+                <ui:VisualElement class="header-center profile-box">
+                    <ui:Label text="👤 OYUNCU ADIN:" class="profile-label" />
+                    <ui:TextField name="input-player-name" class="input-player-name" value="Oyuncu_01" max-length="16" />
+                </ui:VisualElement>
 
-            <ui:VisualElement class="header-right">
-                <ui:VisualElement class="ping-dot" />
-                <ui:Label text="TR-ISTANBUL (18ms)" class="server-info" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-
-        <!-- ORTA ALAN: OYUNCU SLOTLARI + SAĞ ODA AYARLARI VE SOHBET -->
-        <ui:VisualElement name="main-section" class="main-section">
-
-            <!-- SOL / ORTA: 4 Kişilik Takım Oyuncu Slotları -->
-            <ui:VisualElement name="roster-panel" class="roster-panel">
-                <ui:Label text="TAKIM ÜYELERİ (1/4)" class="section-title" />
-
-                <ui:VisualElement class="slots-container">
-
-                    <!-- SLOT 1: LOBİ LİDERİ (HOST) -->
-                    <ui:VisualElement class="player-card active-card host-card">
-                        <ui:VisualElement class="card-crown-tag">
-                            <ui:Label text="👑 LİDER" class="crown-text" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="card-avatar">
-                            <ui:Label text="P1" class="avatar-tag" />
-                        </ui:VisualElement>
-                        <ui:Label text="OYUNCU_01 (Sen)" class="card-player-name" />
-                        <ui:Label text="LVL 1 • KOMUTAN" class="card-player-rank" />
-                        <ui:VisualElement class="ready-pill ready-yes">
-                            <ui:Label text="HAZIR" class="ready-text" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-
-                    <!-- SLOT 2: BOŞ SLOT -->
-                    <ui:VisualElement class="player-card empty-card">
-                        <ui:VisualElement class="empty-avatar-circle">
-                            <ui:Label text="+" class="empty-plus" />
-                        </ui:VisualElement>
-                        <ui:Label text="OYUNCU BEKLENİYOR..." class="empty-title" />
-                        <ui:Button text="+ DAVET ET" name="btn-invite-1" class="btn-invite" />
-                    </ui:VisualElement>
-
-                    <!-- SLOT 3: BOŞ SLOT -->
-                    <ui:VisualElement class="player-card empty-card">
-                        <ui:VisualElement class="empty-avatar-circle">
-                            <ui:Label text="+" class="empty-plus" />
-                        </ui:VisualElement>
-                        <ui:Label text="OYUNCU BEKLENİYOR..." class="empty-title" />
-                        <ui:Button text="+ DAVET ET" name="btn-invite-2" class="btn-invite" />
-                    </ui:VisualElement>
-
-                    <!-- SLOT 4: BOŞ SLOT -->
-                    <ui:VisualElement class="player-card empty-card">
-                        <ui:VisualElement class="empty-avatar-circle">
-                            <ui:Label text="+" class="empty-plus" />
-                        </ui:VisualElement>
-                        <ui:Label text="OYUNCU BEKLENİYOR..." class="empty-title" />
-                        <ui:Button text="+ DAVET ET" name="btn-invite-3" class="btn-invite" />
-                    </ui:VisualElement>
-
+                <ui:VisualElement class="header-right">
+                    <ui:VisualElement class="ping-dot" />
+                    <ui:Label text="TR-ISTANBUL (14ms)" class="server-info" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
-            <!-- SAĞ ALAN: AYARLAR VE CANLI LOBİ SOHBETİ -->
-            <ui:VisualElement name="side-panel" class="side-panel">
-                
-                <!-- Oda Ayarları Kartı -->
-                <ui:VisualElement class="lobby-card">
-                    <ui:Label text="BAĞLANTI VE TEST AYARLARI" class="card-heading" />
+            <!-- ORTA ALAN: SOL (ODA KUR/KOD GİR) + SAĞ (AÇIK/KAPALI ODALAR LİSTESİ) -->
+            <ui:VisualElement class="home-section">
+
+                <!-- SOL PANEL: ODA YÖNETİMİ -->
+                <ui:VisualElement class="home-left-panel cartoon-panel">
+                    <ui:VisualElement class="panel-header-badge orange-badge">
+                        <ui:Label text="🎮 ODA MERKEZİ" class="badge-title" />
+                    </ui:VisualElement>
+
+                    <ui:Label text="Yeni bir oda kurup arkadaşlarına liderlik et veya paylaşılan kodu yazıp hemen savaşa katıl!" class="home-card-desc" />
+
+                    <!-- ODA KUR BUTONU -->
+                    <ui:Button text="👑 + YENİ ODA KUR" name="btn-home-create-room" class="btn-cartoon btn-cartoon-orange" />
+
+                    <ui:VisualElement class="divider-line" />
+
+                    <!-- KODLA KATILMA KUTUSU -->
+                    <ui:VisualElement class="code-entry-box">
+                        <ui:Label text="🔑 ODA KODU İLE KATIL:" class="info-label-cartoon" />
+                        <ui:VisualElement class="code-input-row">
+                            <ui:TextField name="input-room-code" class="input-code-field" placeholder-text="#ARX-..." />
+                            <ui:Button text="GİR ▶" name="btn-home-join-code" class="btn-cartoon btn-cartoon-green btn-small-enter" />
+                        </ui:VisualElement>
+                        <ui:Label text="" name="home-status-msg" class="status-log-home" />
+                    </ui:VisualElement>
+
+                    <!-- Alt Bilgilendirme -->
+                    <ui:VisualElement class="engine-tag-box">
+                        <ui:Label text="⚡ AĞ MOTORU:" class="engine-tag-label" />
+                        <ui:Label text="UNITY NETCODE (NGO)" class="engine-tag-val" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- SAĞ PANEL: AKTİF LOBİ VE SUNUCU LİSTESİ -->
+                <ui:VisualElement class="home-right-panel cartoon-panel">
+                    <ui:VisualElement class="panel-header-badge blue-badge">
+                        <ui:Label text="📡 CANLI ODALAR VE SUNUCULAR" class="badge-title" />
+                    </ui:VisualElement>
                     
-                    <ui:VisualElement class="relay-toggle-box">
-                        <ui:Toggle label="Unity Relay Kullan" name="toggle-relay" class="relay-toggle" />
-                        <ui:Label text="İşaretliyse internet/Relay, değilse Yerel Ağ (UTP) kullanılır." class="relay-desc" />
-                    </ui:VisualElement>
+                    <ui:Label text="Ağdaki aktif odalar burada anlık listelenir. Tek tıkla odaya katılabilirsin!" class="home-card-desc" />
 
-                    <ui:VisualElement class="info-row">
-                        <ui:Label text="AĞ KATMANI:" class="info-label" />
-                        <ui:Label text="UNITY NETCODE (NGO)" class="info-value green-text" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-
-                <!-- ==========================================================
-                     CANLI LOBİ SOHBET / MESAJLAŞMA SİSTEMİ (LOBBY CHAT)
-                     ========================================================== -->
-                <ui:VisualElement class="lobby-card chat-card-box">
-                    <ui:VisualElement class="chat-header-row">
-                        <ui:Label text="LOBİ SOHBETİ" class="card-heading chat-heading" />
-                        <ui:Label text="CANLI" class="live-pill" />
-                    </ui:VisualElement>
-
-                    <!-- Mesaj Akışı -->
-                    <ui:ScrollView name="chat-scroll" class="chat-scroll">
-                        <ui:VisualElement class="chat-entry system-entry">
-                            <ui:Label text="[SİSTEM]" class="sender-system" />
-                            <ui:Label text="Lobiye hoş geldiniz! Arkadaşlarınızla buradan yazışabilirsiniz." class="msg-text-system" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="chat-entry">
-                            <ui:Label text="OYUNCU_01:" class="sender-me" />
-                            <ui:Label text="Oyun için herkes hazır mı?" class="msg-text" />
+                    <!-- CANLI ODA LİSTESİ (C# TARAFINDAN DİNAMİK DOLDURULUR) -->
+                    <ui:ScrollView name="rooms-scroll" class="rooms-scroll">
+                        <ui:VisualElement name="empty-rooms-box" class="empty-rooms-box">
+                            <ui:Label text="🏝️" class="empty-rooms-icon" />
+                            <ui:Label text="ŞU ANDA AÇIK ODA YOK!" class="empty-rooms-title" />
+                            <ui:Label text="Henüz kimse oda kurmadı. Sol taraftaki 'YENİ ODA KUR' butonuna basarak ilk odayı sen açabilirsin!" class="empty-rooms-desc" />
                         </ui:VisualElement>
                     </ui:ScrollView>
-
-                    <!-- Mesaj Gönderme Giriş Alanı -->
-                    <ui:VisualElement class="chat-input-row">
-                        <ui:TextField name="chat-input" class="chat-input" placeholder-text="Mesajınızı yazın..." />
-                        <ui:Button text="GÖNDER" name="btn-chat-send" class="btn-chat-send" />
-                    </ui:VisualElement>
                 </ui:VisualElement>
 
             </ui:VisualElement>
 
+            <!-- ALT BAR -->
+            <ui:VisualElement class="footer-bar">
+                <ui:VisualElement class="footer-left-buttons">
+                    <ui:Button text="⮌ OYUNDAN ÇIK" name="btn-home-quit" class="btn-cartoon btn-cartoon-red" />
+                    <ui:Button text="⚙ AYARLAR" name="btn-home-settings" class="btn-cartoon btn-cartoon-purple" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
         </ui:VisualElement>
 
-        <!-- ALT AKSİYON ÇUBUĞU (FOOTER) -->
-        <ui:VisualElement name="footer-bar" class="footer-bar">
-            <ui:VisualElement class="footer-left-buttons">
-                <ui:Button text="⮌ LOBİDEN AYRIL" name="btn-quit" class="btn-action btn-leave" />
-                <ui:Button text="⚙ AYARLAR" name="btn-settings" class="btn-action btn-secondary" />
-                <ui:Button text="🌐 ODA BUL / KATIL" name="btn-join" class="btn-action btn-secondary" />
+
+        <!-- ==================================================================
+             EKRAN 2: LOBİ ODASI (CARTOON LOBBY ROOM VE SOHBET)
+             ================================================================== -->
+        <ui:VisualElement name="view-lobby" class="screen-view" style="display: none;">
+
+            <!-- ÜST BİLGİ VE BAŞLIK ÇUBUĞU (HEADER) -->
+            <ui:VisualElement class="header-bar">
+                <ui:VisualElement class="header-left">
+                    <ui:Label text="⚡ ARİXON" class="lobby-logo" />
+                    <ui:Label text="👑 LOBİ ODASI" name="lobby-badge" class="lobby-badge" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="header-center room-code-pill">
+                    <ui:Label text="ODA KODU:" class="room-code-label" />
+                    <ui:Label text="#ARX-0000" name="room-code-val" class="room-code-val" />
+                    <ui:Button text="📋 KOPYALA" name="btn-copy-code" class="btn-cartoon btn-cartoon-cyan btn-copy-small" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="header-right">
+                    <ui:VisualElement class="ping-dot" />
+                    <ui:Label text="TR-ISTANBUL (18ms)" class="server-info" />
+                </ui:VisualElement>
             </ui:VisualElement>
 
-            <ui:VisualElement class="footer-right-buttons">
-                <ui:Button text="OYUNU BAŞLAT ▶" name="btn-host" class="btn-action btn-start-game" />
+            <!-- ORTA ALAN: OYUNCU SLOTLARI + SAĞ ODA AYARLARI VE SOHBET -->
+            <ui:VisualElement class="main-section">
+
+                <!-- SOL / ORTA: 4 Kişilik Takım Oyuncu Slotları -->
+                <ui:VisualElement class="roster-panel cartoon-panel">
+                    <ui:VisualElement class="panel-header-badge yellow-badge">
+                        <ui:Label text="👥 TAKIM ÜYELERİ (1/4)" name="roster-title" class="badge-title" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="slots-container">
+
+                        <!-- SLOT 1: LOBİ LİDERİ (HOST) -->
+                        <ui:VisualElement name="slot-1-card" class="player-card active-card host-card">
+                            <ui:VisualElement name="slot-1-crown" class="card-crown-tag">
+                                <ui:Label text="👑 LİDER" class="crown-text" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card-avatar avatar-p1">
+                                <ui:Label text="P1" name="slot-1-avatar-tag" class="avatar-tag" />
+                            </ui:VisualElement>
+                            <ui:Label text="Oyuncu_01 (Sen)" name="slot-1-name" class="card-player-name" />
+                            <ui:Label text="⭐ LVL 1 • KOMUTAN" name="slot-1-rank" class="card-player-rank" />
+                            <ui:VisualElement name="slot-1-ready" class="ready-pill ready-yes">
+                                <ui:Label text="✓ HAZIR" class="ready-text" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <!-- SLOT 2: OYUNCU 2 -->
+                        <ui:VisualElement name="slot-2-card" class="player-card empty-card">
+                            <ui:VisualElement name="slot-2-circle" class="empty-avatar-circle">
+                                <ui:Label text="+" name="slot-2-avatar-tag" class="empty-plus" />
+                            </ui:VisualElement>
+                            <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-2-name" class="empty-title" />
+                            <ui:VisualElement name="slot-2-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
+                                <ui:Label text="❌ BEKLENİYOR" name="slot-2-ready-lbl" class="ready-text" />
+                            </ui:VisualElement>
+                            <ui:Button text="📩 DAVET ET" name="btn-invite-1" class="btn-cartoon btn-cartoon-blue btn-invite-small" />
+                        </ui:VisualElement>
+
+                        <!-- SLOT 3: OYUNCU 3 -->
+                        <ui:VisualElement name="slot-3-card" class="player-card empty-card">
+                            <ui:VisualElement name="slot-3-circle" class="empty-avatar-circle">
+                                <ui:Label text="+" name="slot-3-avatar-tag" class="empty-plus" />
+                            </ui:VisualElement>
+                            <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-3-name" class="empty-title" />
+                            <ui:VisualElement name="slot-3-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
+                                <ui:Label text="❌ BEKLENİYOR" name="slot-3-ready-lbl" class="ready-text" />
+                            </ui:VisualElement>
+                            <ui:Button text="📩 DAVET ET" name="btn-invite-2" class="btn-cartoon btn-cartoon-blue btn-invite-small" />
+                        </ui:VisualElement>
+
+                        <!-- SLOT 4: OYUNCU 4 -->
+                        <ui:VisualElement name="slot-4-card" class="player-card empty-card">
+                            <ui:VisualElement name="slot-4-circle" class="empty-avatar-circle">
+                                <ui:Label text="+" name="slot-4-avatar-tag" class="empty-plus" />
+                            </ui:VisualElement>
+                            <ui:Label text="OYUNCU BEKLENİYOR..." name="slot-4-name" class="empty-title" />
+                            <ui:VisualElement name="slot-4-ready" class="ready-pill" style="display: none; background-color: rgb(150, 40, 30);">
+                                <ui:Label text="❌ BEKLENİYOR" name="slot-4-ready-lbl" class="ready-text" />
+                            </ui:VisualElement>
+                            <ui:Button text="📩 DAVET ET" name="btn-invite-3" class="btn-cartoon btn-cartoon-blue btn-invite-small" />
+                        </ui:VisualElement>
+
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- SAĞ ALAN: AYARLAR VE CANLI LOBİ SOHBETİ -->
+                <ui:VisualElement class="side-panel">
+                    
+                    <!-- Canlı Lobi Sohbet Kutusu -->
+                    <ui:VisualElement class="cartoon-panel chat-panel-box">
+                        <ui:VisualElement class="panel-header-badge pink-badge">
+                            <ui:Label text="💬 LOBİ SOHBETİ" class="badge-title" />
+                        </ui:VisualElement>
+
+                        <!-- Mesaj Akışı -->
+                        <ui:ScrollView name="chat-scroll" class="chat-scroll">
+                            <ui:VisualElement class="chat-entry system-entry">
+                                <ui:Label text="[SİSTEM]" class="sender-system" />
+                                <ui:Label text="Lobiye hoş geldiniz! Maç başlamadan önce buradan taktik konuşabilirsiniz." class="msg-text-system" />
+                            </ui:VisualElement>
+                        </ui:ScrollView>
+
+                        <!-- Mesaj Gönderme Giriş Alanı -->
+                        <ui:VisualElement class="chat-input-row">
+                            <ui:TextField name="chat-input" class="chat-input" placeholder-text="Mesajını yaz..." />
+                            <ui:Button text="GÖNDER ▶" name="btn-chat-send" class="btn-cartoon btn-cartoon-green btn-chat-small" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+
             </ui:VisualElement>
+
+            <!-- ALT AKSİYON ÇUBUĞU (FOOTER) -->
+            <ui:VisualElement class="footer-bar">
+                <ui:VisualElement class="footer-left-buttons">
+                    <ui:Button text="⮌ ANA SAYFAYA DÖN" name="btn-leave-lobby" class="btn-cartoon btn-cartoon-red" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="footer-right-buttons">
+                    <ui:Button text="🚀 OYUNU BAŞLAT" name="btn-start-game" class="btn-cartoon btn-cartoon-green btn-large-start" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
         </ui:VisualElement>
 
     </ui:VisualElement>

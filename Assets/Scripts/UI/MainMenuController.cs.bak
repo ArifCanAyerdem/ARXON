@@ -54,15 +54,9 @@ namespace Arixon.UI
         private Label _slot1ReadyLbl;
         private VisualElement _slot2Ready;
         private Label _slot2ReadyLbl;
-        private VisualElement _slot3Card, _slot3Circle, _slot3Ready;
-        private Label _slot3Name, _slot3AvatarTag, _slot3ReadyLbl;
-        private VisualElement _slot4Card, _slot4Circle, _slot4Ready;
-        private Label _slot4Name, _slot4AvatarTag, _slot4ReadyLbl;
         private bool _isLocalPlayerReady = false;
         private System.Collections.Generic.Dictionary<ulong, bool> _playerReadyStates = new System.Collections.Generic.Dictionary<ulong, bool>();
-        private System.Collections.Generic.Dictionary<ulong, string> _playerNames = new System.Collections.Generic.Dictionary<ulong, string>();
         private const string READY_CHANNEL = "ArixonReadySync";
-        private const string SYNC_NAMES_CHANNEL = "ArixonSyncNames";
 
         private Button _btnInvite1;
 
@@ -80,6 +74,7 @@ namespace Arixon.UI
         private float _heartbeatTimer = 0f;
 
         private const string CHAT_CHANNEL = "ArixonLobbyChat";
+        private const string SYNC_NAMES_CHANNEL = "ArixonSyncNames";
 
         private void Awake()
         {
@@ -132,18 +127,6 @@ namespace Arixon.UI
             _slot1ReadyLbl = root.Q<Label>("slot-1-ready-lbl");
             _slot2Ready = root.Q<VisualElement>("slot-2-ready");
             _slot2ReadyLbl = root.Q<Label>("slot-2-ready-lbl");
-            _slot3Card = root.Q<VisualElement>("slot-3-card");
-            _slot3Name = root.Q<Label>("slot-3-name");
-            _slot3AvatarTag = root.Q<Label>("slot-3-avatar-tag");
-            _slot3Circle = root.Q<VisualElement>("slot-3-circle");
-            _slot3Ready = root.Q<VisualElement>("slot-3-ready");
-            _slot3ReadyLbl = root.Q<Label>("slot-3-ready-lbl");
-            _slot4Card = root.Q<VisualElement>("slot-4-card");
-            _slot4Name = root.Q<Label>("slot-4-name");
-            _slot4AvatarTag = root.Q<Label>("slot-4-avatar-tag");
-            _slot4Circle = root.Q<VisualElement>("slot-4-circle");
-            _slot4Ready = root.Q<VisualElement>("slot-4-ready");
-            _slot4ReadyLbl = root.Q<Label>("slot-4-ready-lbl");
 
             _btnInvite1 = root.Q<Button>("btn-invite-1");
 
@@ -525,6 +508,7 @@ namespace Arixon.UI
                 _btnStartGame.SetEnabled(true);
             }
 
+            SetSlot2State(false, "OYUNCU BEKLENİYOR...");
             _playerReadyStates.Clear();
             CheckAllReadyAndEnableStart();
             UpdateRosterReadyUI();
@@ -543,12 +527,42 @@ namespace Arixon.UI
                 _btnStartGame.SetEnabled(false);
             }
 
+            SetSlot2State(true, $"{_localPlayerName} (Sen)");
             _isLocalPlayerReady = false;
             UpdateClientReadyButtonUI();
         }
 
         private void SetSlot2State(bool active, string playerName)
         {
+            if (_slot2Card != null)
+            {
+                if (active)
+                {
+                    _slot2Card.RemoveFromClassList("empty-card");
+                    _slot2Card.AddToClassList("active-card");
+                }
+                else
+                {
+                    _slot2Card.RemoveFromClassList("active-card");
+                    _slot2Card.AddToClassList("empty-card");
+                }
+            }
+
+            if (_slot2Name != null)
+            {
+                _slot2Name.text = playerName;
+                if (active)
+                {
+                    _slot2Name.RemoveFromClassList("empty-title");
+                    _slot2Name.AddToClassList("card-player-name");
+                }
+                else
+                {
+                    _slot2Name.RemoveFromClassList("card-player-name");
+                    _slot2Name.AddToClassList("empty-title");
+                }
+            }
+
             if (_slot2AvatarTag != null)
             {
                 _slot2AvatarTag.text = active ? "P2" : "+";
@@ -739,15 +753,9 @@ namespace Arixon.UI
 
         private void CheckAllReadyAndEnableStart()
         {
-            if (_btnStartGame == null) return;
-            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening) return;
-
+            if (!_isHost) return;
             bool allReady = true;
-            int clientCount = NetworkManager.Singleton.ConnectedClientsList.Count;
-            
-            if (clientCount < 2) {
-                allReady = false;
-            } else {
+            if (NetworkManager.Singleton.ConnectedClientsList.Count > 1) {
                 foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
                 {
                     if (client.ClientId == NetworkManager.ServerClientId) continue;
@@ -759,75 +767,40 @@ namespace Arixon.UI
                 }
             }
 
-            if (allReady)
+            if (_btnStartGame != null)
             {
-                _btnStartGame.SetEnabled(true);
-                _btnStartGame.text = "🚀 OYUNU BAŞLAT";
-            }
-            else
-            {
-                _btnStartGame.SetEnabled(false);
-                _btnStartGame.text = "⏳ OYUNCULAR BEKLENİYOR...";
+                _btnStartGame.SetEnabled(allReady);
+                _btnStartGame.text = allReady ? "🚀 OYUNU BAŞLAT" : "⏳ OYUNCULAR BEKLENİYOR...";
             }
         }
 
         private void UpdateRosterReadyUI()
         {
-            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening) return;
-
-            if (_slot2Card != null) { _slot2Card.AddToClassList("empty-card"); if (_slot2Name != null) _slot2Name.text = "OYUNCU BEKLENİYOR..."; if (_slot2Ready != null) _slot2Ready.style.display = DisplayStyle.None; }
-            if (_slot3Card != null) { _slot3Card.AddToClassList("empty-card"); if (_slot3Name != null) _slot3Name.text = "OYUNCU BEKLENİYOR..."; if (_slot3Ready != null) _slot3Ready.style.display = DisplayStyle.None; }
-            if (_slot4Card != null) { _slot4Card.AddToClassList("empty-card"); if (_slot4Name != null) _slot4Name.text = "OYUNCU BEKLENİYOR..."; if (_slot4Ready != null) _slot4Ready.style.display = DisplayStyle.None; }
-
             if (_slot1Ready != null) {
                 _slot1Ready.style.display = DisplayStyle.Flex;
-                _slot1Ready.style.backgroundColor = new StyleColor(new UnityEngine.Color32(46, 204, 113, 255));
+                _slot1Ready.style.backgroundColor = new StyleColor(new Color32(46, 204, 113, 255));
                 if (_slot1ReadyLbl != null) _slot1ReadyLbl.text = "✔️ HAZIR";
             }
-            if (_slot1Name != null && _playerNames.ContainsKey(NetworkManager.ServerClientId))
-            {
-                _slot1Name.text = _playerNames[NetworkManager.ServerClientId] + " (Lider)";
-            }
 
-            int slotIdx = 2; 
-            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-            {
-                ulong cId = client.ClientId;
-                if (cId == NetworkManager.ServerClientId) continue; 
-                if (slotIdx > 4) break;
-
-                VisualElement card = null, ready = null;
-                Label nameLbl = null, readyLbl = null;
-                
-                if (slotIdx == 2) { card = _slot2Card; nameLbl = _slot2Name; ready = _slot2Ready; readyLbl = _slot2ReadyLbl; }
-                else if (slotIdx == 3) { card = _slot3Card; nameLbl = _slot3Name; ready = _slot3Ready; readyLbl = _slot3ReadyLbl; }
-                else if (slotIdx == 4) { card = _slot4Card; nameLbl = _slot4Name; ready = _slot4Ready; readyLbl = _slot4ReadyLbl; }
-
-                if (card != null)
-                {
-                    card.RemoveFromClassList("empty-card");
-                    
-                    string pName = _playerNames.ContainsKey(cId) ? _playerNames[cId] : $"Oyuncu_{cId}";
-                    if (cId == NetworkManager.Singleton.LocalClientId) pName += " (Sen)";
-                    if (nameLbl != null) nameLbl.text = pName;
-
-                    bool isReady = _playerReadyStates.ContainsKey(cId) && _playerReadyStates[cId];
-                    if (ready != null) {
-                        ready.style.display = DisplayStyle.Flex;
-                        if (isReady) {
-                            ready.style.backgroundColor = new StyleColor(new UnityEngine.Color32(46, 204, 113, 255));
-                            if (readyLbl != null) readyLbl.text = "✔️ HAZIR";
-                        } else {
-                            ready.style.backgroundColor = new StyleColor(new UnityEngine.Color32(150, 40, 30, 255));
-                            if (readyLbl != null) readyLbl.text = "❌ BEKLENİYOR";
-                        }
-                    }
+            bool p2Ready = false;
+            foreach (var kvp in _playerReadyStates) {
+                if (kvp.Key != NetworkManager.ServerClientId) {
+                    p2Ready = kvp.Value;
                 }
-                slotIdx++;
             }
 
-            int playerCount = NetworkManager.Singleton.ConnectedClientsList.Count;
-            if (_rosterTitle != null) _rosterTitle.text = $"👥 TAKIM ÜYELERİ ({playerCount}/4)";
+            if (_slot2Ready != null && _slot2Card != null && !_slot2Card.ClassListContains("empty-card")) {
+                _slot2Ready.style.display = DisplayStyle.Flex;
+                if (p2Ready) {
+                    _slot2Ready.style.backgroundColor = new StyleColor(new Color32(46, 204, 113, 255));
+                    if (_slot2ReadyLbl != null) _slot2ReadyLbl.text = "✔️ HAZIR";
+                } else {
+                    _slot2Ready.style.backgroundColor = new StyleColor(new Color32(150, 40, 30, 255));
+                    if (_slot2ReadyLbl != null) _slot2ReadyLbl.text = "❌ BEKLENİYOR";
+                }
+            } else if (_slot2Ready != null) {
+                _slot2Ready.style.display = DisplayStyle.None;
+            }
         }
 
         private void UpdateClientReadyButtonUI()
