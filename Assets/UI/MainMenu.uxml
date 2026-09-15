@@ -239,5 +239,69 @@
 
         </ui:VisualElement>
 
+        <!-- ==================================================================
+             EKRAN 3: AYARLAR (SETTINGS MENU)
+             ================================================================== -->
+        <ui:VisualElement name="view-settings" class="settings-fullscreen-overlay" style="display: none;">
+            
+            <!-- Üst Bar: Başlık, Geri Butonu ve Sekmeler -->
+            <ui:VisualElement class="settings-top-bar">
+                
+                <ui:VisualElement class="settings-top-left">
+                    <ui:Label text="SETTINGS" class="settings-main-title" />
+                    <ui:Button text="BACK" name="btn-close-settings" class="settings-btn-back" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="settings-tabs-container">
+                    <ui:Button text="AUDIO" name="btn-tab-audio" class="settings-tab active-tab" />
+                    <ui:Button text="GRAPHICS" name="btn-tab-graphics" class="settings-tab" />
+                    <ui:Button text="GAMEPLAY" name="btn-tab-gameplay" class="settings-tab" />
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <!-- İçerik Alanı -->
+            <ui:VisualElement class="settings-content-wrapper">
+                <ui:ScrollView class="settings-list-scroll">
+
+                    <!-- AUDIO SECTION -->
+                    <ui:VisualElement name="content-audio" style="display: flex;">
+                        <ui:VisualElement class="settings-row-strip row-dark">
+                            <ui:Label text="MASTER VOLUME" class="settings-row-label" />
+                            <ui:Slider name="slider-master-volume" low-value="0" high-value="100" value="100" class="modern-slider" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="settings-row-strip row-light">
+                            <ui:Label text="MUSIC VOLUME" class="settings-row-label" />
+                            <ui:Slider name="slider-music-volume" low-value="0" high-value="100" value="80" class="modern-slider" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- GRAPHICS SECTION -->
+                    <ui:VisualElement name="content-graphics" style="display: none;">
+                        <ui:VisualElement class="settings-row-strip row-dark">
+                            <ui:Label text="FULLSCREEN" class="settings-row-label" />
+                            <ui:Toggle name="toggle-fullscreen" value="true" class="modern-toggle" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="settings-row-strip row-light">
+                            <ui:Label text="GRAPHICS QUALITY" class="settings-row-label" />
+                            <ui:DropdownField name="dropdown-quality" choices="Low,Medium,High,Ultra" index="2" class="modern-dropdown" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- GAMEPLAY SECTION -->
+                    <ui:VisualElement name="content-gameplay" style="display: none;">
+                        <ui:VisualElement class="settings-row-strip row-dark">
+                            <ui:Label text="CAMERA SHAKE" class="settings-row-label" />
+                            <ui:Toggle name="toggle-camera-shake" value="true" class="modern-toggle" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
     </ui:VisualElement>
 </ui:UXML>

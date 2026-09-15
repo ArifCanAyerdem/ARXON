@@ -34,6 +34,24 @@ namespace Arixon.UI
         private ScrollView _roomsScroll;
         private VisualElement _emptyRoomsBox;
         private Button _btnHomeQuit;
+        
+        // --- AYARLAR (SETTINGS) ELEMANLARI ---
+        private VisualElement _viewSettings;
+        private Button _btnHomeSettings;
+        private Button _btnCloseSettings;
+        private Slider _sliderMasterVolume;
+        private Slider _sliderMusicVolume;
+        private Toggle _toggleFullscreen;
+        private Toggle _toggleCameraShake;
+        private DropdownField _dropdownQuality;
+
+        // Ayarlar Sekmeleri
+        private Button _btnTabAudio;
+        private Button _btnTabGraphics;
+        private Button _btnTabGameplay;
+        private VisualElement _contentAudio;
+        private VisualElement _contentGraphics;
+        private VisualElement _contentGameplay;
 
         // --- LOBİ ODASI ELEMANLARI ---
         private Label _lobbyBadge;
@@ -115,6 +133,28 @@ namespace Arixon.UI
             _roomsScroll = root.Q<ScrollView>("rooms-scroll");
             _emptyRoomsBox = root.Q<VisualElement>("empty-rooms-box");
             _btnHomeQuit = root.Q<Button>("btn-home-quit");
+            _btnHomeSettings = root.Q<Button>("btn-home-settings");
+
+            // Ayarlar Elemanları
+            _viewSettings = root.Q<VisualElement>("view-settings");
+            _btnCloseSettings = root.Q<Button>("btn-close-settings");
+            _sliderMasterVolume = root.Q<Slider>("slider-master-volume");
+            _sliderMusicVolume = root.Q<Slider>("slider-music-volume");
+            _toggleFullscreen = root.Q<Toggle>("toggle-fullscreen");
+            _toggleCameraShake = root.Q<Toggle>("toggle-camera-shake");
+            _dropdownQuality = root.Q<DropdownField>("dropdown-quality");
+
+            // Ayarlar Sekmeleri
+            _btnTabAudio = root.Q<Button>("btn-tab-audio");
+            _btnTabGraphics = root.Q<Button>("btn-tab-graphics");
+            _btnTabGameplay = root.Q<Button>("btn-tab-gameplay");
+            _contentAudio = root.Q<VisualElement>("content-audio");
+            _contentGraphics = root.Q<VisualElement>("content-graphics");
+            _contentGameplay = root.Q<VisualElement>("content-gameplay");
+
+            if (_btnTabAudio != null) _btnTabAudio.clicked += OnTabAudioClicked;
+            if (_btnTabGraphics != null) _btnTabGraphics.clicked += OnTabGraphicsClicked;
+            if (_btnTabGameplay != null) _btnTabGameplay.clicked += OnTabGameplayClicked;
 
             // Lobi Elemanları
             _lobbyBadge = root.Q<Label>("lobby-badge");
@@ -159,6 +199,8 @@ namespace Arixon.UI
             if (_btnHomeCreateRoom != null) _btnHomeCreateRoom.clicked += OnCreateRoomClicked;
             if (_btnHomeJoinCode != null) _btnHomeJoinCode.clicked += OnJoinWithCodeClicked;
             if (_btnHomeQuit != null) _btnHomeQuit.clicked += OnQuitClicked;
+            if (_btnHomeSettings != null) _btnHomeSettings.clicked += OpenSettings;
+            if (_btnCloseSettings != null) _btnCloseSettings.clicked += CloseSettings;
 
             if (_btnStartGame != null) _btnStartGame.clicked += OnStartGameClicked;
             if (_btnLeaveLobby != null) _btnLeaveLobby.clicked += OnLeaveLobbyClicked;
@@ -246,13 +288,6 @@ namespace Arixon.UI
                         // Discovery listesindeki oyuncu sayısını senkronize tut
                         ArixonRoomDiscovery.UpdatePlayerCount(_currentRoomCode, playerCount);
                     }
-                    else if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient)
-                    {
-                        if (_rosterTitle != null) _rosterTitle.text = "👥 TAKIM ÜYELERİ (2/4)";
-                        SetSlot2State(true, $"{_localPlayerName} (Sen)");
-            _isLocalPlayerReady = false;
-            UpdateClientReadyButtonUI();
-                    }
                 }
             }
         }
@@ -268,9 +303,16 @@ namespace Arixon.UI
 
         private void OnDisable()
         {
-                        if (_btnHomeCreateRoom != null) _btnHomeCreateRoom.clicked -= OnCreateRoomClicked;
+            if (_btnHomeCreateRoom != null) _btnHomeCreateRoom.clicked -= OnCreateRoomClicked;
             if (_btnHomeJoinCode != null) _btnHomeJoinCode.clicked -= OnJoinWithCodeClicked;
             if (_btnHomeQuit != null) _btnHomeQuit.clicked -= OnQuitClicked;
+            if (_btnHomeSettings != null) _btnHomeSettings.clicked -= OpenSettings;
+            if (_btnCloseSettings != null) _btnCloseSettings.clicked -= CloseSettings;
+            
+            if (_btnTabAudio != null) _btnTabAudio.clicked -= OnTabAudioClicked;
+            if (_btnTabGraphics != null) _btnTabGraphics.clicked -= OnTabGraphicsClicked;
+            if (_btnTabGameplay != null) _btnTabGameplay.clicked -= OnTabGameplayClicked;
+
             if (_btnStartGame != null) _btnStartGame.clicked -= OnStartGameClicked;
             if (_btnLeaveLobby != null) _btnLeaveLobby.clicked -= OnLeaveLobbyClicked;
             if (_btnCopyCode != null) _btnCopyCode.clicked -= OnCopyCodeClicked;
@@ -297,6 +339,10 @@ namespace Arixon.UI
 
         private void InitializePlayerIdentity()
         {
+            // [STEAM ENTEGRASYON HAZIRLIĞI]
+            // İleride Steamworks.NET eklendiğinde burası: SteamFriends.GetPersonaName() olacak.
+            // Şimdilik çakışmayı önlemek için geçici benzersiz (unique) isimler üretiyoruz.
+            
             bool isMainEditor = true;
 #if UNITY_EDITOR
             isMainEditor = CurrentPlayer.IsMainEditor;
@@ -304,23 +350,107 @@ namespace Arixon.UI
 
             if (isMainEditor)
             {
-                _localPlayerName = "Oyuncu_01";
+                int randomId = UnityEngine.Random.Range(1000, 9999);
+                _localPlayerName = $"SteamUser_{randomId}";
                 _isHost = true;
-                if (_inputPlayerName != null) _inputPlayerName.value = _localPlayerName;
             }
             else
             {
-                _localPlayerName = "Oyuncu_02";
+                _localPlayerName = "MPPM_Clone";
                 _isHost = false;
-                if (_inputPlayerName != null) _inputPlayerName.value = _localPlayerName;
+            }
+
+            if (_inputPlayerName != null) 
+            {
+                _inputPlayerName.value = _localPlayerName;
             }
         }
 
         private void SwitchView(bool toLobby)
         {
-            if (_viewHome != null) _viewHome.style.display = toLobby ? DisplayStyle.None : DisplayStyle.Flex;
-            if (_viewLobby != null) _viewLobby.style.display = toLobby ? DisplayStyle.Flex : DisplayStyle.None;
+            SwitchView(toLobby ? "lobby" : "home");
         }
+
+        private void SwitchView(string viewName)
+        {
+            if (_viewHome != null) _viewHome.style.display = (viewName == "home") ? DisplayStyle.Flex : DisplayStyle.None;
+            if (_viewLobby != null) _viewLobby.style.display = (viewName == "lobby") ? DisplayStyle.Flex : DisplayStyle.None;
+            if (_viewSettings != null) _viewSettings.style.display = (viewName == "settings") ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        #region Ayarlar (Settings) Menüsü
+
+        private void OpenSettings()
+        {
+            SwitchView("settings");
+            SwitchSettingsTab("AUDIO"); // Varsayılan olarak Ses sekmesiyle başla
+            
+            // Mevcut ayarları yükle
+            if (_sliderMasterVolume != null) _sliderMasterVolume.value = PlayerPrefs.GetFloat("MasterVolume", 100f);
+            if (_sliderMusicVolume != null) _sliderMusicVolume.value = PlayerPrefs.GetFloat("MusicVolume", 80f);
+            if (_toggleFullscreen != null) _toggleFullscreen.value = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
+            if (_toggleCameraShake != null) _toggleCameraShake.value = PlayerPrefs.GetInt("CameraShake", 1) == 1;
+            if (_dropdownQuality != null) _dropdownQuality.index = PlayerPrefs.GetInt("QualityIndex", 2);
+        }
+
+        private void CloseSettings()
+        {
+            // Yeni ayarları kaydet
+            if (_sliderMasterVolume != null) PlayerPrefs.SetFloat("MasterVolume", _sliderMasterVolume.value);
+            if (_sliderMusicVolume != null) PlayerPrefs.SetFloat("MusicVolume", _sliderMusicVolume.value);
+            if (_toggleFullscreen != null) PlayerPrefs.SetInt("Fullscreen", _toggleFullscreen.value ? 1 : 0);
+            if (_toggleCameraShake != null) PlayerPrefs.SetInt("CameraShake", _toggleCameraShake.value ? 1 : 0);
+            if (_dropdownQuality != null) PlayerPrefs.SetInt("QualityIndex", _dropdownQuality.index);
+            
+            PlayerPrefs.Save();
+            ApplySettings();
+            
+            SwitchView("home");
+        }
+
+        private void OnTabAudioClicked() => SwitchSettingsTab("AUDIO");
+        private void OnTabGraphicsClicked() => SwitchSettingsTab("GRAPHICS");
+        private void OnTabGameplayClicked() => SwitchSettingsTab("GAMEPLAY");
+
+        private void SwitchSettingsTab(string tabName)
+        {
+            if (_contentAudio != null) _contentAudio.style.display = (tabName == "AUDIO") ? DisplayStyle.Flex : DisplayStyle.None;
+            if (_contentGraphics != null) _contentGraphics.style.display = (tabName == "GRAPHICS") ? DisplayStyle.Flex : DisplayStyle.None;
+            if (_contentGameplay != null) _contentGameplay.style.display = (tabName == "GAMEPLAY") ? DisplayStyle.Flex : DisplayStyle.None;
+
+            if (_btnTabAudio != null)
+            {
+                if (tabName == "AUDIO") _btnTabAudio.AddToClassList("active-tab");
+                else _btnTabAudio.RemoveFromClassList("active-tab");
+            }
+            if (_btnTabGraphics != null)
+            {
+                if (tabName == "GRAPHICS") _btnTabGraphics.AddToClassList("active-tab");
+                else _btnTabGraphics.RemoveFromClassList("active-tab");
+            }
+            if (_btnTabGameplay != null)
+            {
+                if (tabName == "GAMEPLAY") _btnTabGameplay.AddToClassList("active-tab");
+                else _btnTabGameplay.RemoveFromClassList("active-tab");
+            }
+        }
+
+        private void ApplySettings()
+        {
+            // Tam Ekran
+            bool isFullscreen = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
+            Screen.fullScreen = isFullscreen;
+            
+            // Kalite
+            int qualityIndex = PlayerPrefs.GetInt("QualityIndex", 2);
+            QualitySettings.SetQualityLevel(qualityIndex, true);
+            
+            // Ana Ses
+            float masterVol = PlayerPrefs.GetFloat("MasterVolume", 100f) / 100f;
+            AudioListener.volume = masterVol;
+        }
+
+        #endregion
 
         #region Dinamik Canlı Oda Keşif Sistemi (Room Discovery)
 
