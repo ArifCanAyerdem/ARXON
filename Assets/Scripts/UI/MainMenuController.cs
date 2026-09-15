@@ -561,6 +561,17 @@ namespace Arixon.UI
 
             SetHomeStatus("Oda kuruluyor (Host başlatılıyor)...");
 
+            int assignedPort = 7777;
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                var transport = Unity.Netcode.NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+                if (transport != null)
+                {
+                    assignedPort = UnityEngine.Random.Range(7000, 8999);
+                    transport.SetConnectionData("127.0.0.1", (ushort)assignedPort);
+                }
+            }
+
             if (ArixonNetworkManager.Instance != null)
             {
                 ArixonNetworkManager.Instance.StartHost();
@@ -570,10 +581,10 @@ namespace Arixon.UI
                 Unity.Netcode.NetworkManager.Singleton.StartHost();
             }
 
-            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN HEMEN SONRA TAK! (CustomMessagingManager artık null değil!)
+            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN HEMEN SONRA TAK!
             RegisterNetworkHandlers();
 
-            ArixonRoomDiscovery.PublishRoom(_currentRoomCode, _localPlayerName);
+            ArixonRoomDiscovery.PublishRoom(_currentRoomCode, _localPlayerName, assignedPort);
 
             // HOST kendini manuel olarak listeye eklesin
             ulong hostId = Unity.Netcode.NetworkManager.ServerClientId;
@@ -634,6 +645,18 @@ namespace Arixon.UI
 
             SetHomeStatus($"'{roomCode}' odasına bağlanılıyor...");
 
+            var room = ArixonRoomDiscovery.FindRoom(roomCode);
+            int targetPort = (room != null) ? room.port : 7777;
+
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                var transport = Unity.Netcode.NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+                if (transport != null)
+                {
+                    transport.SetConnectionData(room != null ? room.ipAddress : "127.0.0.1", (ushort)targetPort);
+                }
+            }
+
             if (ArixonNetworkManager.Instance != null)
             {
                 ArixonNetworkManager.Instance.StartClient();
@@ -643,7 +666,7 @@ namespace Arixon.UI
                 Unity.Netcode.NetworkManager.Singleton.StartClient();
             }
 
-            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN SONRA TAK! (CustomMessagingManager null değil!)
+            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN SONRA TAK!
             RegisterNetworkHandlers();
 
             PrepareLobbyViewAsClient();

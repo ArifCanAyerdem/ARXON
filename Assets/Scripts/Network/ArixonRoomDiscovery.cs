@@ -55,8 +55,8 @@ namespace Arixon.Network
             {
                 var container = LoadContainer();
 
-                // Varsa eskisini kaldır
-                container.rooms.RemoveAll(r => r.roomCode == roomCode || r.hostName == hostName);
+                // Varsa eskisini kaldır (Sadece oda kodu aynı olanı sil, hostName'e göre SİLME ki aynı isimde farklı odalar kurulabilsin)
+                container.rooms.RemoveAll(r => r.roomCode == roomCode);
 
                 var newRoom = new RoomData
                 {
