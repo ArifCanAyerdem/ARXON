@@ -87,3 +87,24 @@ Bu dosya, Antigravity AI asistanının ARİXON projesinde her etkileşimde, her 
 * **Kullanıcı Onay Döngüsü Yok:** Kullanıcıya tekrar tekrar "kabul ediyor musunuz?", "planı onaylayın", "Proceed / Accept / Submit" gibi onay pencereleri sorulmayacaktır; yapılacak tüm işlemler peşinen kabul edilmiş sayılır.
 * **Doğrudan İcra:** Kullanıcı bir talep ilettiğinde, bir hata bildirdiğinde veya yol haritasında sıradaki aşamaya geçildiğinde; yapay zeka tüm kod değişikliklerini, sahne kurulumlarını, dosya üretimlerini ve wiki güncellemelerini duraksamadan **doğrudan uygular**.
 * **Kesintisiz Akış:** Değişiklikler anında yapılır, test aşamasına getirilir ve kullanıcıya sadece test edebileceği nihai durum adım adım ve anlaşılır şekilde özetlenir.
+
+---
+
+## 9. YERELLEŞTİRME VE DİL DESTEĞİ (Localization)
+* **Unity Localization Paketi:** Oyundaki tüm metinler, diyaloglar ve arayüz (UI) yazıları doğrudan koda veya arayüze (hardcoded) yazılmayacak; **Unity Localization** paketi kullanılarak sisteme entegre edilecektir.
+* **Tam Entegrasyon:** Oyunun en başından itibaren, her bir yeni özellik ve arayüz geliştirilirken yerelleştirme (çoklu dil desteği) gözetilerek yapılacaktır. 
+* **Tablo (Table) ve Anahtar (Key) Yapısı:** Metinler ilgili Localization String Table'larında uygun anahtarlarla (Örn: `MainMenu_PlayButton`, `Settings_Volume`) tutulacak ve C# kodlarından veya UI Toolkit üzerinden bu anahtarlarla çağrılacaktır.
+
+---
+
+## 10. KAPSAMLI LOGLAMA VE HATA AYIKLAMA (Logging & Debugging Standards)
+* **Her Adımda Log:** Yazılan her sistemin (ağ bağlantısı, veri yükleme, UI etkileşimi, lokalizasyon) önemli aşamalarına ve metodlarına açıklayıcı `Debug.Log` komutları yerleştirilecektir.
+* **Hata Tespiti (Traceability):** Olası bir sorun anında hatanın tam olarak hangi sistemden ve hangi aşamadan kaynaklandığını (Örn: `[Network]`, `[Localization]`, `[UI]`) belirten net prefix'ler (etiketler) kullanılacaktır.
+* **Proaktif Hata Yakalama:** Beklenmeyen değerler veya boş referanslar için sadece kodun çökmesini beklemek yerine `Debug.LogWarning` veya `Debug.LogError` ile açıklayıcı hata mesajları yazılıp anında müdahale edilebilir bir altyapı oluşturulacaktır.
+
+---
+
+## 11. SÜREKLİ GÖRSEL ANALİZ VE HATA TESPİTİ (Continuous Vision Analysis)
+* **Otomatik Ekran Görüntüsü Sistemi:** Kullanıcı oyunu test ederken her sayfa değişiminde veya bir hata oluştuğunda sistem otomatik olarak ekran görüntüsü (`AgentVision`) alır.
+* **Görsel Kanıta Dayalı Çözüm:** Kullanıcı bir "hata var" veya "tasarım bozuldu" bildiriminde bulunduğunda, sadece kodlara bakmakla yetinilmeyecek; anında en güncel ekran görüntüleri incelenip sorunun görsel kaynağı tespit edilecektir.
+* **Proaktif İzleme:** Ekran görüntüleri sadece oyun başlamadan önce değil, oyun esnasında girilen tüm sayfalarda ve kritik durumlarda güncel tutulup, yapay zeka tarafından aktif olarak analiz edilecektir.

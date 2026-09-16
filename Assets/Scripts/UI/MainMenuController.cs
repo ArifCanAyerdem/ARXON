@@ -1,7 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Unity.Netcode;
+using UnityEngine.Localization.Settings;
+using UnityEngine.Localization;
 using Unity.Collections;
 using Arixon.Network;
 #if UNITY_EDITOR
@@ -44,6 +46,7 @@ namespace Arixon.UI
         private Toggle _toggleFullscreen;
         private Toggle _toggleCameraShake;
         private DropdownField _dropdownQuality;
+        private DropdownField _dropdownLanguage;
 
         // Ayarlar Sekmeleri
         private Button _btnTabAudio;
@@ -58,6 +61,23 @@ namespace Arixon.UI
         private Label _roomCodeVal;
         private Button _btnCopyCode;
         private Label _rosterTitle;
+        private Label _lblTeamRed;
+        private Label _lblTeamBlue;
+        private Label _lblLobbyChat;
+        private Label _lblPing;
+        
+        // Home Screen Labels
+        private Label _homeRigLogo;
+        private Label _homeIdLabel;
+        private Label _homeBadgeRoomCenter;
+        private Label _homeDescCreate;
+        private Label _homeRoomCodeLbl;
+        private Label _homeBadgeLiveFields;
+        private Label _homeDescLive;
+        private Label _homeEmptyTitle;
+        private Label _homeEmptyDesc;
+        private Label _lobbyLogoLbl;
+        
         private Button _btnStartGame;
         private Button _btnLeaveLobby;
 
@@ -143,6 +163,15 @@ namespace Arixon.UI
             _toggleFullscreen = root.Q<Toggle>("toggle-fullscreen");
             _toggleCameraShake = root.Q<Toggle>("toggle-camera-shake");
             _dropdownQuality = root.Q<DropdownField>("dropdown-quality");
+            _dropdownLanguage = root.Q<DropdownField>("dropdown-language");
+
+            if (_dropdownLanguage != null)
+            {
+                _dropdownLanguage.RegisterValueChangedCallback(evt =>
+                {
+                    ChangeLanguage(evt.newValue);
+                });
+            }
 
             // Ayarlar Sekmeleri
             _btnTabAudio = root.Q<Button>("btn-tab-audio");
@@ -161,6 +190,22 @@ namespace Arixon.UI
             _roomCodeVal = root.Q<Label>("room-code-val");
             _btnCopyCode = root.Q<Button>("btn-copy-code");
             _rosterTitle = root.Q<Label>("roster-title");
+            _lblTeamRed = root.Q<Label>("lbl-team-red");
+            _lblTeamBlue = root.Q<Label>("lbl-team-blue");
+            _lblLobbyChat = root.Q<Label>("lbl-lobby-chat");
+            _lblPing = root.Q<Label>("ping-label");
+            
+            _homeRigLogo = root.Q<Label>("home-rig-logo");
+            _homeIdLabel = root.Q<Label>("home-id-label");
+            _homeBadgeRoomCenter = root.Q<Label>("home-badge-room-center");
+            _homeDescCreate = root.Q<Label>("home-desc-create");
+            _homeRoomCodeLbl = root.Q<Label>("home-room-code-lbl");
+            _homeBadgeLiveFields = root.Q<Label>("home-badge-live-fields");
+            _homeDescLive = root.Q<Label>("home-desc-live");
+            _homeEmptyTitle = root.Q<Label>("home-empty-title");
+            _homeEmptyDesc = root.Q<Label>("home-empty-desc");
+            _lobbyLogoLbl = root.Q<Label>("lobby-logo-lbl");
+            
             _btnStartGame = root.Q<Button>("btn-start-game");
             _btnLeaveLobby = root.Q<Button>("btn-leave-lobby");
 
@@ -236,6 +281,8 @@ namespace Arixon.UI
             InitializePlayerIdentity();
             SwitchView(false); // Başlangıçta daima Ana Sayfa
             RefreshRoomsListUI();
+
+            LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
         }
 
         private void Start()
@@ -246,6 +293,9 @@ namespace Arixon.UI
             }
 
             RegisterNetworkHandlers();
+
+            // Kayıtlı dili yükle
+            StartCoroutine(SetLocaleRoutine(PlayerPrefs.GetString("LanguageCode", "tr")));
         }
 
         private void Update()
@@ -277,8 +327,7 @@ namespace Arixon.UI
                         }
 
                         int playerCount = NetworkManager.Singleton.ConnectedClientsList.Count;
-                        if (_rosterTitle != null) _rosterTitle.text = $"👥 TAKIM ÜYELERİ ({playerCount}/4)";
-                        SetSlot2State(playerCount >= 2, playerCount >= 2 ? "Oyuncu_02 (Bağlandı)" : "OYUNCU BEKLENİYOR...");
+                        if (_rosterTitle != null) _rosterTitle.text = $"{GetLoc("ROSTER_TITLE")} ({playerCount}/4)";
                         
                         if (playerCount < 2) _playerReadyStates.Clear();
                         
@@ -322,6 +371,8 @@ namespace Arixon.UI
             {
                 ArixonNetworkManager.Instance.OnNetworkLog -= OnNetworkLogReceived;
             }
+
+            LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
 
             if (_isHost && !string.IsNullOrEmpty(_currentRoomCode))
             {
@@ -376,7 +427,30 @@ namespace Arixon.UI
             if (_viewHome != null) _viewHome.style.display = (viewName == "home") ? DisplayStyle.Flex : DisplayStyle.None;
             if (_viewLobby != null) _viewLobby.style.display = (viewName == "lobby") ? DisplayStyle.Flex : DisplayStyle.None;
             if (_viewSettings != null) _viewSettings.style.display = (viewName == "settings") ? DisplayStyle.Flex : DisplayStyle.None;
+
+#if UNITY_EDITOR
+            if (Application.isPlaying) CaptureAgentVision(viewName);
+#endif
         }
+
+#if UNITY_EDITOR
+        private void CaptureAgentVision(string pageName)
+        {
+            StartCoroutine(CaptureAgentVisionRoutine(pageName));
+        }
+        
+        private System.Collections.IEnumerator CaptureAgentVisionRoutine(string pageName)
+        {
+            yield return new WaitForSeconds(0.2f); // UI'ın renderlanmasını (yerleşmesini) bekle
+            string basePath = System.IO.Directory.GetParent(Application.dataPath).FullName;
+            string dir = System.IO.Path.Combine(basePath, "AgentVision");
+            if (!System.IO.Directory.Exists(dir)) System.IO.Directory.CreateDirectory(dir);
+            
+            string path = System.IO.Path.Combine(dir, $"Page_{pageName}.png");
+            ScreenCapture.CaptureScreenshot(path);
+            Debug.Log($"[Agent Vision] {pageName} sayfasının görüntüsü başarıyla alındı: {path}");
+        }
+#endif
 
         #region Ayarlar (Settings) Menüsü
 
@@ -391,6 +465,14 @@ namespace Arixon.UI
             if (_toggleFullscreen != null) _toggleFullscreen.value = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
             if (_toggleCameraShake != null) _toggleCameraShake.value = PlayerPrefs.GetInt("CameraShake", 1) == 1;
             if (_dropdownQuality != null) _dropdownQuality.index = PlayerPrefs.GetInt("QualityIndex", 2);
+            if (_dropdownLanguage != null) 
+            {
+                string savedLang = PlayerPrefs.GetString("LanguageCode", "tr");
+                if (savedLang == "en")
+                    _dropdownLanguage.index = 0;
+                else
+                    _dropdownLanguage.index = 1;
+            }
         }
 
         private void CloseSettings()
@@ -401,6 +483,7 @@ namespace Arixon.UI
             if (_toggleFullscreen != null) PlayerPrefs.SetInt("Fullscreen", _toggleFullscreen.value ? 1 : 0);
             if (_toggleCameraShake != null) PlayerPrefs.SetInt("CameraShake", _toggleCameraShake.value ? 1 : 0);
             if (_dropdownQuality != null) PlayerPrefs.SetInt("QualityIndex", _dropdownQuality.index);
+            // Dil değişikliği anında (ChangeLanguage) yapıldığı için burada sadece diğerleri kaydediliyor
             
             PlayerPrefs.Save();
             ApplySettings();
@@ -448,6 +531,175 @@ namespace Arixon.UI
             // Ana Ses
             float masterVol = PlayerPrefs.GetFloat("MasterVolume", 100f) / 100f;
             AudioListener.volume = masterVol;
+        }
+
+        private void ChangeLanguage(string languageName)
+        {
+            Debug.Log($"[Localization] Arayüzden dil seçimi değişti: {languageName}");
+            string code = (languageName == "English") ? "en" : "tr";
+            StartCoroutine(SetLocaleRoutine(code));
+        }
+
+        private System.Collections.IEnumerator SetLocaleRoutine(string code)
+        {
+            Debug.Log($"[Localization] Dil yükleniyor... Hedef Kod: {code}");
+            yield return LocalizationSettings.InitializationOperation;
+            
+            if (LocalizationSettings.AvailableLocales != null)
+            {
+                var locales = LocalizationSettings.AvailableLocales.Locales;
+                bool found = false;
+                for (int i = 0; i < locales.Count; i++)
+                {
+                    if (locales[i].Identifier.Code == code)
+                    {
+                        LocalizationSettings.SelectedLocale = locales[i];
+                        PlayerPrefs.SetString("LanguageCode", code);
+                        PlayerPrefs.Save();
+                        Debug.Log($"[Localization] Dil başarıyla değiştirildi! Yeni Dil: {code}");
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) Debug.LogError($"[Localization] HATA: '{code}' kodlu dil bulunamadı!");
+            }
+        }
+
+        private void OnLocaleChanged(Locale locale)
+        {
+            UpdateLocalizedTexts();
+        }
+
+        private string GetLoc(string key, params object[] args)
+        {
+            try 
+            {
+                var str = LocalizationSettings.StringDatabase.GetLocalizedString("UITexts", key, arguments: args);
+                if (string.IsNullOrEmpty(str) || str.StartsWith("No translation"))
+                {
+                    return key;
+                }
+                return str;
+            }
+            catch 
+            {
+                return key; 
+            }
+        }
+
+        private void UpdateLocalizedTexts()
+        {
+            var root = _uiDocument.rootVisualElement;
+            if (root == null) return;
+
+            // Ayarlar
+            var settingsTitle = root.Q<Label>(className: "settings-main-title");
+            if (settingsTitle != null) settingsTitle.text = GetLoc("SETTINGS");
+
+            if (_btnCloseSettings != null) _btnCloseSettings.text = GetLoc("BACK");
+            if (_btnTabAudio != null) _btnTabAudio.text = GetLoc("AUDIO");
+            if (_btnTabGraphics != null) _btnTabGraphics.text = GetLoc("GRAPHICS");
+            if (_btnTabGameplay != null) _btnTabGameplay.text = GetLoc("GAMEPLAY");
+            
+            // Home Screen Translations
+            if (_homeRigLogo != null) _homeRigLogo.text = GetLoc("HOME_ARENA_TITLE");
+            if (_homeIdLabel != null) _homeIdLabel.text = GetLoc("HOME_ID_CARD");
+            if (_homeBadgeRoomCenter != null) _homeBadgeRoomCenter.text = GetLoc("HOME_ROOM_CENTER");
+            if (_homeDescCreate != null) _homeDescCreate.text = GetLoc("HOME_DESC_CREATE");
+            if (_btnHomeCreateRoom != null) _btnHomeCreateRoom.text = GetLoc("HOME_CREATE_MATCH");
+            if (_homeRoomCodeLbl != null) _homeRoomCodeLbl.text = GetLoc("ROOM_CODE");
+            if (_btnHomeJoinCode != null) _btnHomeJoinCode.text = GetLoc("JOIN_BTN");
+            if (_homeBadgeLiveFields != null) _homeBadgeLiveFields.text = GetLoc("HOME_LIVE_FIELDS");
+            if (_homeDescLive != null) _homeDescLive.text = GetLoc("HOME_DESC_LIVE");
+            if (_homeEmptyTitle != null) _homeEmptyTitle.text = GetLoc("HOME_EMPTY_TITLE");
+            if (_homeEmptyDesc != null) _homeEmptyDesc.text = GetLoc("HOME_EMPTY_DESC");
+            if (_btnHomeQuit != null) _btnHomeQuit.text = GetLoc("HOME_QUIT");
+            if (_btnHomeSettings != null) _btnHomeSettings.text = GetLoc("SETTINGS");
+
+            var rowLabels = root.Query<Label>(className: "settings-row-label").ToList();
+            if (rowLabels.Count >= 6)
+            {
+                rowLabels[0].text = GetLoc("MASTER_VOLUME");
+                rowLabels[1].text = GetLoc("MUSIC_VOLUME");
+                rowLabels[2].text = GetLoc("FULLSCREEN");
+                rowLabels[3].text = GetLoc("GRAPHICS_QUALITY");
+                rowLabels[4].text = GetLoc("LANGUAGE_TITLE");
+                rowLabels[5].text = GetLoc("CAMERA_SHAKE");
+            }
+            
+            if (_dropdownQuality != null)
+            {
+                _dropdownQuality.choices = new System.Collections.Generic.List<string> {
+                    GetLoc("QUALITY_LOW"),
+                    GetLoc("QUALITY_MEDIUM"),
+                    GetLoc("QUALITY_HIGH"),
+                    GetLoc("QUALITY_ULTRA")
+                };
+                
+                // Seçili olan indexin text'ini güncellemek için
+                if (_dropdownQuality.index >= 0 && _dropdownQuality.index < _dropdownQuality.choices.Count)
+                    _dropdownQuality.value = _dropdownQuality.choices[_dropdownQuality.index];
+            }
+
+            // Lobi
+            if (_lobbyBadge != null) 
+            {
+                if (_isHost) _lobbyBadge.text = GetLoc("LOBBY_LEADER");
+                else _lobbyBadge.text = GetLoc("PARTICIPANT");
+            }
+            
+            var crownLabels = root.Query<Label>(className: "crown-text").ToList();
+            foreach (var crownLbl in crownLabels)
+            {
+                crownLbl.text = GetLoc("LOBBY_LEADER");
+            }
+            
+            if (_lblTeamRed != null) _lblTeamRed.text = GetLoc("TEAM_RED");
+            if (_lblTeamBlue != null) _lblTeamBlue.text = GetLoc("TEAM_BLUE");
+            if (_lblLobbyChat != null) _lblLobbyChat.text = GetLoc("LOBBY_CHAT");
+            if (_btnCopyCode != null) _btnCopyCode.text = GetLoc("COPY_BTN");
+            if (_lblPing != null) _lblPing.text = GetLoc("PING_CONNECTING");
+            if (_lobbyLogoLbl != null) _lobbyLogoLbl.text = GetLoc("LOBBY_LOGO");
+            if (_btnChatSend != null) _btnChatSend.text = GetLoc("CHAT_SEND");
+            if (_btnLeaveLobby != null) _btnLeaveLobby.text = GetLoc("LEAVE_LOBBY_BTN");
+
+            var roomCodeLbls = root.Query<Label>(className: "room-code-label").ToList();
+            if (roomCodeLbls.Count > 0) roomCodeLbls[0].text = GetLoc("ROOM_CODE");
+
+            if (_btnCopyCode != null) _btnCopyCode.text = GetLoc("COPY");
+
+            var teamRed = root.Q<VisualElement>(className: "team-badge-red")?.Q<Label>();
+            if (teamRed != null) teamRed.text = GetLoc("TEAM_RED");
+            
+            var teamBlue = root.Q<VisualElement>(className: "team-badge-blue")?.Q<Label>();
+            if (teamBlue != null) teamBlue.text = GetLoc("TEAM_BLUE");
+
+            if (_btnLeaveLobby != null) _btnLeaveLobby.text = GetLoc("BACK_HOME");
+            
+            if (_btnStartGame != null)
+            {
+                if (_isHost) _btnStartGame.text = GetLoc("START_GAME");
+                else _btnStartGame.text = GetLoc("WAITING_LEADER");
+            }
+
+            // Sohbet
+            var chatBadge = root.Q<VisualElement>(className: "pink-badge")?.Q<Label>();
+            if (chatBadge != null) chatBadge.text = GetLoc("LOBBY_CHAT");
+
+            var sysSender = root.Q<Label>(className: "sender-system");
+            if (sysSender != null) sysSender.text = GetLoc("SYSTEM");
+
+            var sysMsg = root.Q<Label>(className: "msg-text-system");
+            if (sysMsg != null) sysMsg.text = GetLoc("WELCOME_CHAT");
+            
+            if (_btnChatSend != null) _btnChatSend.text = GetLoc("SEND");
+
+            // Roster Title Force Update
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                int playerCount = NetworkManager.Singleton.ConnectedClientsList.Count;
+                if (_rosterTitle != null) _rosterTitle.text = $"{GetLoc("ROSTER_TITLE")} ({playerCount}/4)";
+            }
         }
 
         #endregion
@@ -504,11 +756,11 @@ namespace Arixon.UI
                 var left = new VisualElement();
                 left.AddToClassList("room-item-left");
 
-                var badge = new Label(isOpen ? "🟢 AÇIK" : (room.isGameStarted ? "⚔ MAÇTA" : "🔒 DOLU"));
+                var badge = new Label(isOpen ? GetLoc("ROOM_OPEN") : (room.isGameStarted ? GetLoc("ROOM_IN_GAME") : GetLoc("ROOM_FULL_BADGE")));
                 badge.AddToClassList("room-badge-status");
                 badge.AddToClassList(isOpen ? "badge-open" : "badge-closed");
 
-                var nameLbl = new Label(room.roomName);
+                var nameLbl = new Label(string.Format(GetLoc("ROOM_NAME_FORMAT"), room.hostName));
                 nameLbl.AddToClassList("room-item-name");
 
                 var codeLbl = new Label(room.roomCode);
@@ -529,7 +781,7 @@ namespace Arixon.UI
                 if (isOpen)
                 {
                     var joinBtn = new Button();
-                    joinBtn.text = "KATIL ▶";
+                    joinBtn.text = GetLoc("JOIN_BTN");
                     joinBtn.AddToClassList("btn-room-join");
                     string targetCode = room.roomCode;
                     string targetHost = room.hostName;
@@ -597,7 +849,7 @@ namespace Arixon.UI
             
             BroadcastRoster(); // Kendi bilgisini lobidekilere ve kendi ekranına yansıt
             
-            AddMessageToChat("SİSTEM", $"Oda başarıyla açıldı! Oda Kodunuz: {_currentRoomCode}", true);
+            AddMessageToChat(GetLoc("SYSTEM"), $"{GetLoc("HOST_STARTING")} {GetLoc("ROOM_CODE")} {_currentRoomCode}", true);
         }
 
         private void OnJoinWithCodeClicked()
@@ -605,7 +857,7 @@ namespace Arixon.UI
             string code = _inputRoomCode != null ? _inputRoomCode.value.Trim() : "";
             if (string.IsNullOrEmpty(code))
             {
-                SetHomeStatus("Lütfen geçerli bir oda kodu yazın!");
+                SetHomeStatus(GetLoc("ENTER_VALID_CODE"));
                 return;
             }
 
@@ -613,19 +865,19 @@ namespace Arixon.UI
             var room = ArixonRoomDiscovery.FindRoom(code);
             if (room == null)
             {
-                SetHomeStatus($"HATA: '{code}' koduna ait aktif bir oda bulunamadı!\nLütfen önce Host'un odayı kurmasını bekleyin.");
+                SetHomeStatus($"{GetLoc("ROOM_NOT_FOUND")} '{code}'");
                 return;
             }
 
             if (room.isGameStarted)
             {
-                SetHomeStatus($"UYARI: '{code}' odasındaki maç zaten başladı!");
+                SetHomeStatus($"{GetLoc("ROOM_STARTED")} '{code}'!");
                 return;
             }
 
             if (room.currentPlayers >= room.maxPlayers)
             {
-                SetHomeStatus($"UYARI: '{code}' odası tamamen dolu (4/4)!");
+                SetHomeStatus($"{GetLoc("ROOM_FULL")} '{code}'");
                 return;
             }
 
@@ -672,7 +924,7 @@ namespace Arixon.UI
             PrepareLobbyViewAsClient();
             SwitchView(true);
 
-            AddMessageToChat("SİSTEM", $"Odaya bağlanıldı ({_currentRoomCode})! Hoş geldin {_localPlayerName}.", true);
+            AddMessageToChat(GetLoc("SYSTEM"), GetLoc("CHAT_SYSTEM_JOIN", _currentRoomCode, _localPlayerName), true);
         }
 
         private void SetHomeStatus(string message)
@@ -690,13 +942,13 @@ namespace Arixon.UI
         private void PrepareLobbyViewAsHost()
         {
             if (_roomCodeVal != null) _roomCodeVal.text = _currentRoomCode;
-            if (_lobbyBadge != null) _lobbyBadge.text = "👑 LOBİ LİDERİ";
-            if (_slot1Name != null) _slot1Name.text = $"{_localPlayerName} (Sen)";
-            if (_rosterTitle != null) _rosterTitle.text = "👥 TAKIM ÜYELERİ (1/4)";
+            if (_lobbyBadge != null) _lobbyBadge.text = _isHost ? GetLoc("LOBBY_LEADER") : GetLoc("PARTICIPANT");
+            if (_slot1Name != null) _slot1Name.text = $"{_localPlayerName}{GetLoc("YOU_POSTFIX")}";
+            if (_rosterTitle != null) _rosterTitle.text = $"{GetLoc("ROSTER_TITLE")} (1/4)";
 
             if (_btnStartGame != null)
             {
-                _btnStartGame.text = "🚀 OYUNU BAŞLAT";
+                _btnStartGame.text = GetLoc("START_GAME");
                 _btnStartGame.SetEnabled(true);
             }
 
@@ -708,13 +960,13 @@ namespace Arixon.UI
         private void PrepareLobbyViewAsClient()
         {
             if (_roomCodeVal != null) _roomCodeVal.text = _currentRoomCode;
-            if (_lobbyBadge != null) _lobbyBadge.text = "🎮 KATILIMCI";
-            if (_slot1Name != null) _slot1Name.text = $"{_hostPlayerName} (Lider)";
-            if (_rosterTitle != null) _rosterTitle.text = "👥 TAKIM ÜYELERİ (2/4)";
+            if (_lobbyBadge != null) _lobbyBadge.text = GetLoc("PARTICIPANT");
+            if (_slot1Name != null) _slot1Name.text = $"{_hostPlayerName}{GetLoc("LEADER_POSTFIX")}";
+            if (_rosterTitle != null) _rosterTitle.text = $"{GetLoc("ROSTER_TITLE")} (2/4)";
 
             if (_btnStartGame != null)
             {
-                _btnStartGame.text = "⏳ LİDER BEKLENİYOR...";
+                _btnStartGame.text = GetLoc("WAITING_LEADER");
                 _btnStartGame.SetEnabled(false);
             }
 
@@ -722,34 +974,7 @@ namespace Arixon.UI
             UpdateClientReadyButtonUI();
         }
 
-        private void SetSlot2State(bool active, string playerName)
-        {
-            if (_slot2AvatarTag != null)
-            {
-                _slot2AvatarTag.text = active ? "P2" : "+";
-            }
-
-            if (_slot2Circle != null)
-            {
-                if (active)
-                {
-                    _slot2Circle.RemoveFromClassList("empty-avatar-circle");
-                    _slot2Circle.AddToClassList("card-avatar");
-                    _slot2Circle.AddToClassList("avatar-p2");
-                }
-                else
-                {
-                    _slot2Circle.RemoveFromClassList("card-avatar");
-                    _slot2Circle.RemoveFromClassList("avatar-p2");
-                    _slot2Circle.AddToClassList("empty-avatar-circle");
-                }
-            }
-
-            if (_btnInvite1 != null)
-            {
-                _btnInvite1.style.display = active ? DisplayStyle.None : DisplayStyle.Flex;
-            }
-        }
+        // SetSlot2State mantığı 4 oyunculu FillSlot ve UpdateRosterReadyUI içerisine taşındığı için kaldırıldı.
 
         #endregion
 
@@ -928,7 +1153,7 @@ namespace Arixon.UI
             if (isSystem)
             {
                 entry.AddToClassList("system-entry");
-                senderLbl.text = "[SİSTEM]";
+                senderLbl.text = GetLoc("SYSTEM");
                 senderLbl.AddToClassList("sender-system");
                 textLbl.AddToClassList("msg-text-system");
             }
@@ -996,7 +1221,7 @@ namespace Arixon.UI
                 if (clientId == Unity.Netcode.NetworkManager.ServerClientId || clientId == Unity.Netcode.NetworkManager.Singleton.LocalClientId)
                 {
                     OnLeaveLobbyClicked();
-                    SetHomeStatus("Lider odadan ayrıldı veya bağlantı koptu.");
+                    SetHomeStatus(GetLoc("LEADER_LEFT"));
                 }
             }
         }
@@ -1096,12 +1321,12 @@ namespace Arixon.UI
             if (allReady)
             {
                 _btnStartGame.SetEnabled(true);
-                _btnStartGame.text = "🚀 OYUNU BAŞLAT";
+                _btnStartGame.text = GetLoc("START_GAME");
             }
             else
             {
                 _btnStartGame.SetEnabled(false);
-                _btnStartGame.text = "⏳ OYUNCULAR BEKLENİYOR...";
+                _btnStartGame.text = GetLoc("WAITING_PLAYERS_START");
             }
         }
 
@@ -1125,8 +1350,22 @@ namespace Arixon.UI
                     allCards[k].RemoveFromClassList("team-red-card");
                     allCards[k].RemoveFromClassList("team-blue-card");
                     allCards[k].AddToClassList("empty-card");
+
+                    var avatarTag = allCards[k].Q<UnityEngine.UIElements.Label>($"slot-{k + 1}-avatar-tag");
+                    if (avatarTag != null) avatarTag.text = "+";
+
+                    var circle = allCards[k].Q<UnityEngine.UIElements.VisualElement>($"slot-{k + 1}-circle");
+                    if (circle != null)
+                    {
+                        circle.RemoveFromClassList("card-avatar");
+                        circle.RemoveFromClassList("avatar-p1");
+                        circle.RemoveFromClassList("avatar-p2");
+                        circle.RemoveFromClassList("avatar-p3");
+                        circle.RemoveFromClassList("avatar-p4");
+                        circle.AddToClassList("empty-avatar-circle");
+                    }
                 }
-                if (allNames[k] != null) allNames[k].text = "OYUNCU BEKLENİYOR...";
+                if (allNames[k] != null) allNames[k].text = GetLoc("WAITING_PLAYER");
                 if (allReadys[k] != null) allReadys[k].style.display = UnityEngine.UIElements.DisplayStyle.None;
             }
             
@@ -1151,7 +1390,7 @@ namespace Arixon.UI
             }
             
             int playerCount = _playerTeams.Count;
-            if (_rosterTitle != null) _rosterTitle.text = $"👥 TAKIM ÜYELERİ ({playerCount}/4)";
+            if (_rosterTitle != null) _rosterTitle.text = $"{GetLoc("ROSTER_TITLE")} ({playerCount}/4)";
         }
 
         private void FillSlot(int slotIndex, ulong clientId, string team)
@@ -1169,8 +1408,8 @@ namespace Arixon.UI
             bool isMe = (clientId == Unity.Netcode.NetworkManager.Singleton.LocalClientId);
             bool isHost = (clientId == Unity.Netcode.NetworkManager.ServerClientId);
 
-            if (isMe && isHost) pName += " (Sen)";
-            else if (isMe) pName += " (Sen)";
+            if (isMe && isHost) pName += GetLoc("YOU_POSTFIX");
+            else if (isMe) pName += GetLoc("YOU_POSTFIX");
             if (allNames[slotIndex] != null) allNames[slotIndex].text = pName;
 
             // KART GÖRÜNÜRLÜĞÜ VE TAKIM RENKLERİ
@@ -1208,14 +1447,15 @@ namespace Arixon.UI
                 
                 circle.RemoveFromClassList("avatar-p1");
                 circle.RemoveFromClassList("avatar-p2");
+                circle.RemoveFromClassList("avatar-p3");
+                circle.RemoveFromClassList("avatar-p4");
                 
-                // Oyuncu Host ise P1 (Lider Fotoğrafı), Client ise P2 (Oyuncu Fotoğrafı) alır!
-                if (isHost) circle.AddToClassList("avatar-p1");
-                else circle.AddToClassList("avatar-p2");
+                // Oyuncu Slot'una göre avatar ekle
+                circle.AddToClassList($"avatar-p{slotIndex + 1}");
             }
             if (avatarTag != null)
             {
-                avatarTag.text = isHost ? "P1" : "P2";
+                avatarTag.text = $"P{slotIndex + 1}";
             }
 
             // HAZIR / BEKLENİYOR BUTONU GÖRÜNÜMÜ
@@ -1226,12 +1466,12 @@ namespace Arixon.UI
                 if (isReady)
                 {
                     allReadys[slotIndex].style.backgroundColor = new UnityEngine.UIElements.StyleColor(new UnityEngine.Color32(46, 204, 113, 255));
-                    if (allReadyLbls[slotIndex] != null) allReadyLbls[slotIndex].text = "✔️ HAZIR";
+                    if (allReadyLbls[slotIndex] != null) allReadyLbls[slotIndex].text = GetLoc("READY_STATE");
                 }
                 else
                 {
                     allReadys[slotIndex].style.backgroundColor = new UnityEngine.UIElements.StyleColor(new UnityEngine.Color32(231, 76, 60, 255));
-                    if (allReadyLbls[slotIndex] != null) allReadyLbls[slotIndex].text = "❌ BEKLENİYOR";
+                    if (allReadyLbls[slotIndex] != null) allReadyLbls[slotIndex].text = GetLoc("NOT_READY");
                 }
             }
         }
@@ -1242,18 +1482,18 @@ namespace Arixon.UI
             {
                 if (_isHost)
                 {
-                    _btnStartGame.text = "▶ OYUNU BAŞLAT";
+                    _btnStartGame.text = GetLoc("START_GAME");
                 }
                 else
                 {
                     _btnStartGame.SetEnabled(true);
                     if (_isLocalPlayerReady)
                     {
-                        _btnStartGame.text = "✖ İPTAL (HAZIR)";
+                        _btnStartGame.text = GetLoc("CANCEL_READY");
                     }
                     else
                     {
-                        _btnStartGame.text = "✔ HAZIR OL";
+                        _btnStartGame.text = GetLoc("GET_READY");
                     }
                 }
             }
@@ -1264,7 +1504,7 @@ namespace Arixon.UI
             if (_isHost)
             {
                 ArixonRoomDiscovery.UpdateGameStarted(_currentRoomCode, true);
-                AddMessageToChat("SİSTEM", "Oyun başlatılıyor! Sahne yükleniyor...", true);
+                AddMessageToChat(GetLoc("SYSTEM"), GetLoc("CHAT_GAME_STARTING"), true);
                 if (ArixonNetworkManager.Instance != null)
                 {
                     ArixonNetworkManager.Instance.LoadGameScene();
@@ -1300,8 +1540,18 @@ namespace Arixon.UI
                 NetworkManager.Singleton.Shutdown();
             }
 
+            // Önceki odadan kalan oyuncu verilerini (Hayalet oyuncuları) ve sohbeti temizle
+            _playerNames.Clear();
+            _playerTeams.Clear();
+            _playerReadyStates.Clear();
+            _isLocalPlayerReady = false;
+            _isHost = false;
+            _currentRoomCode = "";
+            
+            if (_chatScroll != null) _chatScroll.Clear();
+
             SwitchView(false);
-            SetHomeStatus("Lobiden ayrıldınız.");
+            SetHomeStatus(GetLoc("HOME_TITLE")); // Veya "Lobiden ayrıldınız" mesajı
             RefreshRoomsListUI();
         }
 

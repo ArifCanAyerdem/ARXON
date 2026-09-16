@@ -1,0 +1,547 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: UITexts_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 4b0cb2fcc2995a84eb8f0adfa0b3676c, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 2205507543040
+    m_Localized: "\u26A1 ARIXON ARENA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205557874688
+    m_Localized: '[ ID CARD ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068992
+    m_Localized: "\U0001F3C6 ROOM CENTER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068993
+    m_Localized: Create a new field and lead your team or enter a code to join instantly!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068994
+    m_Localized: CREATE NEW MATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068995
+    m_Localized: 'ROOM CODE:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068996
+    m_Localized: JOIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068997
+    m_Localized: "\U0001F4E1 LIVE FIELDS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068998
+    m_Localized: Active rooms are listed here. Join with one click!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562068999
+    m_Localized: FIELD IS EMPTY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069000
+    m_Localized: Create a new match and drop the ball!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069001
+    m_Localized: QUIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069002
+    m_Localized: SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069003
+    m_Localized: "\U0001F451 LOBBY ROOM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069004
+    m_Localized: "\U0001F4CB COPY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069005
+    m_Localized: "\U0001F465 TEAM MEMBERS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069006
+    m_Localized: "\U0001F534 RED TEAM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205562069007
+    m_Localized: "\U0001F535 BLUE TEAM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263296
+    m_Localized: WAITING FOR PLAYER...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263297
+    m_Localized: "\u274C WAITING"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263298
+    m_Localized: "\U0001F4AC LOBBY CHAT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263299
+    m_Localized: '[SYSTEM]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263300
+    m_Localized: Welcome to the lobby! Discuss tactics here before the match starts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263301
+    m_Localized: Type message...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263302
+    m_Localized: "SEND \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263303
+    m_Localized: "\u2B8C BACK TO HOME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263304
+    m_Localized: "\U0001F680 START GAME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263305
+    m_Localized: BACK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263306
+    m_Localized: AUDIO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263307
+    m_Localized: GRAPHICS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263308
+    m_Localized: GAMEPLAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263309
+    m_Localized: MASTER VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263310
+    m_Localized: MUSIC VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263311
+    m_Localized: FULLSCREEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263312
+    m_Localized: GRAPHICS QUALITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263313
+    m_Localized: CAMERA SHAKE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263314
+    m_Localized: "LANGUAGE (D\u0130L)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263315
+    m_Localized: Connecting...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263316
+    m_Localized: Creating room (Host starting)...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263317
+    m_Localized: Please enter a valid room code!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263318
+    m_Localized: 'ERROR: No active room found for code'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263319
+    m_Localized: 'WARNING: Match has already started in room'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263320
+    m_Localized: 'WARNING: Room is completely full (4/4)!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263321
+    m_Localized: Connecting to room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263322
+    m_Localized: "\U0001F451 LOBBY LEADER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263323
+    m_Localized: "\U0001F3AE PARTICIPANT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263324
+    m_Localized: "\u23F3 WAITING FOR LEADER..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263325
+    m_Localized: "\U0001F7E2 OPEN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263326
+    m_Localized: "\u2694 IN GAME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263327
+    m_Localized: "\U0001F512 FULL"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2205566263328
+    m_Localized: "JOIN \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870225698816
+    m_Localized: "\u26A1 ARIXON ARENA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870280224768
+    m_Localized: '[ ID CARD ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419072
+    m_Localized: "\U0001F3C6 ROOM CENTER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419073
+    m_Localized: Create a new field and lead your team or enter a code to join instantly!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419074
+    m_Localized: CREATE NEW MATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419075
+    m_Localized: 'ROOM CODE:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419076
+    m_Localized: JOIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419077
+    m_Localized: "\U0001F4E1 LIVE FIELDS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419078
+    m_Localized: Active rooms are listed here. Join with one click!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419079
+    m_Localized: FIELD IS EMPTY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419080
+    m_Localized: Create a new match and drop the ball!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419081
+    m_Localized: QUIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419082
+    m_Localized: SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419083
+    m_Localized: "\U0001F451 LOBBY ROOM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419084
+    m_Localized: "\U0001F4CB COPY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419085
+    m_Localized: "\U0001F465 TEAM MEMBERS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419086
+    m_Localized: "\U0001F534 RED TEAM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419087
+    m_Localized: "\U0001F535 BLUE TEAM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419088
+    m_Localized: WAITING FOR PLAYER...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419089
+    m_Localized: "\u274C WAITING"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419090
+    m_Localized: "\U0001F4AC LOBBY CHAT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419091
+    m_Localized: '[SYSTEM]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419092
+    m_Localized: Welcome to the lobby! Discuss tactics here before the match starts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419093
+    m_Localized: Type message...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419094
+    m_Localized: "SEND \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419095
+    m_Localized: "\u2B8C BACK TO HOME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419096
+    m_Localized: "\U0001F680 START GAME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419097
+    m_Localized: BACK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419098
+    m_Localized: AUDIO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419099
+    m_Localized: GRAPHICS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419100
+    m_Localized: GAMEPLAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419101
+    m_Localized: MASTER VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419102
+    m_Localized: MUSIC VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419103
+    m_Localized: FULLSCREEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419104
+    m_Localized: GRAPHICS QUALITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419105
+    m_Localized: CAMERA SHAKE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419106
+    m_Localized: "LANGUAGE (D\u0130L)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419107
+    m_Localized: Connecting...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419108
+    m_Localized: Creating room (Host starting)...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419109
+    m_Localized: Please enter a valid room code!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419110
+    m_Localized: 'ERROR: No active room found for code'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419111
+    m_Localized: 'WARNING: Match has already started in room'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419112
+    m_Localized: 'WARNING: Room is completely full (4/4)!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419113
+    m_Localized: Connecting to room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419114
+    m_Localized: "\U0001F451 LOBBY LEADER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419115
+    m_Localized: "\U0001F3AE PARTICIPANT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419116
+    m_Localized: "\u23F3 WAITING FOR LEADER..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419117
+    m_Localized: "\U0001F7E2 OPEN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419118
+    m_Localized: "\u2694 IN GAME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419119
+    m_Localized: "\U0001F512 FULL"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 870284419120
+    m_Localized: "JOIN \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392276144128
+    m_Localized: "\u2714 READY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392330670080
+    m_Localized: "\u2716 CANCEL (READY)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392330670081
+    m_Localized: "\u2714 GET READY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392330670082
+    m_Localized: ' (Leader)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392330670083
+    m_Localized: ' (You)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392330670084
+    m_Localized: Connected to room ({0})! Welcome {1}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392330670085
+    m_Localized: Game is starting! Loading scene...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7392330670086
+    m_Localized: "\u23F3 WAITING FOR PLAYERS..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13118675509248
+    m_Localized: Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13118813921280
+    m_Localized: Medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13118813921281
+    m_Localized: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13118813921282
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14653484589056
+    m_Localized: Leader left or disconnected.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14653497171968
+    m_Localized: '{0}''s Room'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14653497171969
+    m_Localized: "\U0001F4CB COPY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14739434266624
+    m_Localized: "\U0001F4E1 Ping: Connecting..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739401814016
+    m_Localized: "\u26A1 ARIXON ARENA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728576
+    m_Localized: '[ ID CARD ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728577
+    m_Localized: "\U0001F3C6 ROOM CENTER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728578
+    m_Localized: Create a new field and lead your team or enter a code to join instantly!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728579
+    m_Localized: CREATE NEW MATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728580
+    m_Localized: "\U0001F4E1 LIVE FIELDS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728581
+    m_Localized: Active rooms are listed here. Join with one click!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728582
+    m_Localized: FIELD IS EMPTY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728583
+    m_Localized: Create a new match and bring the ball to the field!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728584
+    m_Localized: QUIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728585
+    m_Localized: "\u26A1 ARIXON"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728586
+    m_Localized: "SEND \u27A1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17739464728587
+    m_Localized: "\u2B05 BACK TO HOME"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

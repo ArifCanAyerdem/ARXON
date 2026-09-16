@@ -1,7 +1,7 @@
 /* ==========================================================================
-   ARİXON - CARTOON / STYLIZED OYUN ARAYÜZÜ (CARTOON UI TOOLKIT STYLES)
-   Tema: Enerjik, Canlı, 3D Basılabilir Çizgi Film Butonları & Tombul Kartlar
-   Renkler: Canlı Turuncu, Altın Sarısı, Fıstık Yeşili, Gökyüzü Mavisi, Derin Mor
+   ARÄ°XON - CARTOON / STYLIZED OYUN ARAYÃœZÃœ (CARTOON UI TOOLKIT STYLES)
+   Tema: Enerjik, CanlÄ±, 3D BasÄ±labilir Ã‡izgi Film ButonlarÄ± & Tombul Kartlar
+   Renkler: CanlÄ± Turuncu, AltÄ±n SarÄ±sÄ±, FÄ±stÄ±k YeÅŸili, GÃ¶kyÃ¼zÃ¼ Mavisi, Derin Mor
    ========================================================================== */
 
 /* Tam Ekran Arka Plan */
@@ -10,7 +10,7 @@
     width: 100%;
     height: 100%;
     background-color: rgb(15, 20, 35); /* Koyu stadyum laciverti */
-    background-image: none; /* AI resimleri kaldırıldı, temiz arka plan */
+    background-image: none; /* AI resimleri kaldÄ±rÄ±ldÄ±, temiz arka plan */
     justify-content: center; /* Merkezi kutuyu ortala */
     align-items: center;
     padding: 20px 30px;
@@ -24,7 +24,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   ÜST HEADER: DİEGETİK STADYUM VİNÇ / ÇATI DİREĞİ
+   ÃœST HEADER: DÄ°EGETÄ°K STADYUM VÄ°NÃ‡ / Ã‡ATI DÄ°REÄÄ°
    -------------------------------------------------------------------------- */
 .diegetic-top-rig {
     flex-direction: row;
@@ -32,7 +32,7 @@
     align-items: flex-start;
     background-color: rgb(25, 28, 35); /* Koyu Demir */
     border-bottom-width: 8px;
-    border-bottom-color: rgb(15, 18, 22); /* Demir Alt Gölgesi */
+    border-bottom-color: rgb(15, 18, 22); /* Demir Alt GÃ¶lgesi */
     padding: 0 40px;
     height: 80px;
     box-shadow: 0px 10px 20px rgba(0,0,0,0.5); /* Derinlik */
@@ -42,7 +42,7 @@
 .rig-left-plate {
     background-color: rgb(40, 45, 55);
     border-width: 4px;
-    border-top-width: 0; /* Direğe asılı gibi */
+    border-top-width: 0; /* DireÄŸe asÄ±lÄ± gibi */
     border-color: rgb(80, 90, 100);
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
@@ -58,7 +58,7 @@
     text-shadow: 2px 3px 0px rgba(0,0,0,0.5);
 }
 
-/* Orta Tabela (Kullanıcı Adı) */
+/* Orta Tabela (KullanÄ±cÄ± AdÄ±) */
 .rig-center-plate {
     flex-direction: row;
     align-items: center;
@@ -86,7 +86,7 @@
 }
 
 .rig-input-name .unity-text-field__input {
-    color: rgb(0, 255, 150); /* Neon yeşil yazı */
+    color: rgb(0, 255, 150); /* Neon yeÅŸil yazÄ± */
     font-size: 18px;
     -unity-font-style: bold;
     letter-spacing: 2px;
@@ -102,7 +102,7 @@
     border-color: rgb(241, 196, 15);
 }
 
-/* Sağ Tabela (Sunucu Bilgisi) */
+/* SaÄŸ Tabela (Sunucu Bilgisi) */
 .rig-right-plate {
     flex-direction: row;
     align-items: center;
@@ -181,6 +181,10 @@
     letter-spacing: 1px;
 }
 
+.yellow-badge > .badge-title {
+    color: rgb(30, 30, 30);
+}
+
 .home-card-desc {
     font-size: 13px;
     color: rgb(170, 155, 210);
@@ -189,7 +193,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   SOCCER ARCADE MERKEZİ HUB TASARIMI
+   SOCCER ARCADE MERKEZÄ° HUB TASARIMI
    -------------------------------------------------------------------------- */
 .home-section {
     width: 85%;
@@ -204,7 +208,7 @@
     background-color: rgba(20, 25, 45, 0.95); /* Koyu lacivert stadyum gecesi */
     border-radius: 12px;
     border-width: 4px;
-    border-color: rgb(46, 204, 113); /* Canlı çim yeşili kenarlık */
+    border-color: rgb(46, 204, 113); /* CanlÄ± Ã§im yeÅŸili kenarlÄ±k */
     border-bottom-width: 10px;
     border-bottom-color: rgb(20, 100, 50);
     padding: 30px;
@@ -255,7 +259,7 @@
     margin: 20px 0;
 }
 
-/* Kod Giriş Alanı */
+/* Kod GiriÅŸ AlanÄ± */
 .soccer-code-box {
     background-color: rgb(15, 20, 45);
     border-width: 2px;
@@ -268,7 +272,7 @@
 .soccer-input-label {
     font-size: 14px;
     -unity-font-style: bold;
-    color: rgb(241, 196, 15); /* Hakem sarısı */
+    color: rgb(241, 196, 15); /* Hakem sarÄ±sÄ± */
     margin-bottom: 6px;
 }
 
@@ -310,14 +314,14 @@
 }
 
 /* --------------------------------------------------------------------------
-   CANLI ODA LİSTESİ (ROOMS SCROLLVIEW) & ODA KARTLARI
+   CANLI ODA LÄ°STESÄ° (ROOMS SCROLLVIEW) & ODA KARTLARI
    -------------------------------------------------------------------------- */
 .rooms-scroll {
     flex-grow: 1;
     margin-top: 8px;
 }
 
-/* Boş Liste Kutusu */
+/* BoÅŸ Liste Kutusu */
 .soccer-empty-box {
     flex-grow: 1;
     align-items: center;
@@ -351,7 +355,7 @@
     max-width: 380px;
 }
 
-/* Dinamik Üretilen Arcade Oda Kartı (EKSİK OLAN KISIM BURASIYDI) */
+/* Dinamik Ãœretilen Arcade Oda KartÄ± (EKSÄ°K OLAN KISIM BURASIYDI) */
 .room-item {
     flex-direction: row;
     justify-content: space-between;
@@ -475,15 +479,15 @@
     transition-duration: 0.05s;
 }
 
-/* Ana Büyük Buton (YENİ MAÇ KUR) */
+/* Ana BÃ¼yÃ¼k Buton (YENÄ° MAÃ‡ KUR) */
 .btn-soccer-primary {
     width: 100%;
     height: 80px;
-    background-color: rgb(241, 196, 15); /* Hakem sarısı / Altın kupa */
+    background-color: rgb(241, 196, 15); /* Hakem sarÄ±sÄ± / AltÄ±n kupa */
     border-color: rgb(243, 156, 18);
     border-bottom-width: 8px;
     border-bottom-color: rgb(211, 84, 0);
-    color: rgb(44, 62, 80); /* Koyu lacivert yazı */
+    color: rgb(44, 62, 80); /* Koyu lacivert yazÄ± */
     font-size: 28px;
     margin-top: 10px;
     margin-bottom: 20px;
@@ -492,7 +496,7 @@
 .btn-soccer-primary:hover { background-color: rgb(243, 156, 18); }
 
 .btn-soccer-green {
-    background-color: rgb(46, 204, 113); /* Saha yeşili */
+    background-color: rgb(46, 204, 113); /* Saha yeÅŸili */
     border-color: rgb(39, 174, 96);
     border-bottom-width: 6px;
     border-bottom-color: rgb(20, 143, 71);
@@ -500,7 +504,7 @@
 .btn-soccer-green:hover { background-color: rgb(39, 174, 96); }
 
 .btn-soccer-red {
-    background-color: rgb(231, 76, 60); /* Kırmızı kart */
+    background-color: rgb(231, 76, 60); /* KÄ±rmÄ±zÄ± kart */
     border-color: rgb(192, 57, 43);
     border-bottom-width: 6px;
     border-bottom-color: rgb(150, 40, 27);
@@ -530,7 +534,7 @@
     margin-right: 16px;
 }
 
-/* Yeşil Buton (Giriş / Başlat) */
+/* YeÅŸil Buton (GiriÅŸ / BaÅŸlat) */
 .btn-cartoon-green {
     background-color: rgb(46, 204, 113);
     border-color: rgb(85, 235, 145);
@@ -546,7 +550,7 @@
     border-bottom-width: 2px;
 }
 
-/* Kırmızı Buton (Çıkış / Ayrıl) */
+/* KÄ±rmÄ±zÄ± Buton (Ã‡Ä±kÄ±ÅŸ / AyrÄ±l) */
 .btn-cartoon-red {
     background-color: rgb(231, 76, 60);
     border-color: rgb(255, 120, 110);
@@ -622,7 +626,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   LOBİ ODASI DÜZENİ (VIEW-LOBBY)
+   LOBÄ° ODASI DÃœZENÄ° (VIEW-LOBBY)
    -------------------------------------------------------------------------- */
 .main-section {
     flex-grow: 1;
@@ -646,7 +650,7 @@
     justify-content: space-between;
 }
 
-/* Oyuncu Kartı (Cartoon) */
+/* Oyuncu KartÄ± (Cartoon) */
 .player-card {
     width: 48%;
     height: 180px;
@@ -667,8 +671,8 @@
 }
 
 .active-ready-card {
-    background-color: rgb(30, 70, 46); /* Koyu Yeşil Zemin */
-    border-color: rgb(46, 204, 113); /* Neon Yeşil (Mint) */
+    background-color: rgb(30, 70, 46); /* Koyu YeÅŸil Zemin */
+    border-color: rgb(46, 204, 113); /* Neon YeÅŸil (Mint) */
     border-bottom-width: 6px;
     border-bottom-color: rgb(15, 40, 25);
 }
@@ -693,7 +697,7 @@
 .crown-text {
     font-size: 11px;
     -unity-font-style: bold;
-    color: rgb(25, 20, 10);
+    color: rgb(30, 30, 30);
 }
 
 .card-avatar {
@@ -844,7 +848,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   FOOTER BAR (ALT AKSİYON ALANI)
+   FOOTER BAR (ALT AKSÄ°YON ALANI)
    -------------------------------------------------------------------------- */
 .footer-bar {
     flex-direction: row;
@@ -1027,7 +1031,7 @@
     width: 350px;
 }
 
-/* Slider �zelle�tirme */
+/* Slider Özelleştirme */
 .modern-slider .unity-base-slider__tracker {
     background-color: rgba(255, 255, 255, 0.3);
     border-width: 0;
@@ -1044,7 +1048,7 @@
     margin-top: -6px;
 }
 
-/* Dropdown �zelle�tirme */
+/* Dropdown Özelleştirme */
 .modern-dropdown .unity-base-popup-field__input {
     background-color: rgb(255, 255, 255);
     border-width: 0;
@@ -1060,7 +1064,7 @@
     -unity-font-style: bold;
 }
 
-/* Toggle �zelle�tirme */
+/* Toggle Özelleştirme */
 .modern-toggle .unity-toggle__input {
     justify-content: flex-end;
 }
@@ -1072,3 +1076,69 @@
     height: 24px;
     -unity-background-image-tint-color: rgb(0, 0, 0);
 }
+/* =======================================
+   LOBBY HEADER STYLES (Eksik Olanlar)
+   ======================================= */
+.header-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: rgba(15, 20, 30, 0.9);
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(46, 204, 113, 0.5);
+    margin-bottom: 15px;
+}
+
+.header-left, .header-right {
+    flex-direction: row;
+    align-items: center;
+}
+
+.header-center {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.lobby-logo {
+    color: #f1c40f;
+    font-size: 16px;
+    -unity-font-style: bold;
+    margin-right: 15px;
+}
+
+.lobby-badge {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: #f1c40f;
+    font-size: 12px;
+    -unity-font-style: bold;
+}
+
+.room-code-pill {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    padding: 5px 15px;
+    border-width: 1px;
+    border-color: #2ecc71;
+    margin: 0 20px;
+}
+
+.room-code-label {
+    color: #bdc3c7;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.room-code-val {
+    color: #2ecc71;
+    font-size: 16px;
+    -unity-font-style: bold;
+    margin-right: 15px;
+}
+
