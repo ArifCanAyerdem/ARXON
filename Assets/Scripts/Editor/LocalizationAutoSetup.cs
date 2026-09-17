@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -10,9 +10,16 @@ namespace Arixon.Editor
 {
     public static class LocalizationAutoSetup
     {
-        [InitializeOnLoadMethod]
-        [MenuItem("ARİXON/Tam Otomatik Kurulum/Localization Tablosunu Güncelle")]
+        [MenuItem("ARİXON/Kurulum/Adım 07: Localization Tablosunu Güncelle")]
         public static void AutoSetupLocalization()
+        {
+            EditorApplication.delayCall += () =>
+            {
+                RunSetup();
+            };
+        }
+
+        private static void RunSetup()
         {
             Debug.Log("ARİXON: Localization Kurulum/Güncelleme Başlıyor...");
 

@@ -201,32 +201,49 @@ namespace Arixon.Network
 
         private static RoomListContainer LoadContainer()
         {
-            try
+            if (!File.Exists(DiscoveryFilePath)) return new RoomListContainer();
+            
+            for (int i = 0; i < 5; i++)
             {
-                if (File.Exists(DiscoveryFilePath))
+                try
                 {
                     string json = File.ReadAllText(DiscoveryFilePath);
-                    return JsonUtility.FromJson<RoomListContainer>(json) ?? new RoomListContainer();
+                    var container = JsonUtility.FromJson<RoomListContainer>(json);
+                    return container ?? new RoomListContainer();
+                }
+                catch (System.IO.IOException)
+                {
+                    // Dosya meşgul, bekle ve tekrar dene
+                    System.Threading.Thread.Sleep(50);
+                }
+                catch (System.Exception)
+                {
+                    break;
                 }
             }
-            catch
-            {
-                // Okuma hatası olursa boş döner
-            }
-
             return new RoomListContainer();
         }
 
         private static void SaveContainer(RoomListContainer container)
         {
-            try
+            for (int i = 0; i < 5; i++)
             {
-                string json = JsonUtility.ToJson(container, true);
-                File.WriteAllText(DiscoveryFilePath, json);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[ARİXON Discovery] Oda kaydedilemedi: {ex.Message}");
+                try
+                {
+                    string json = JsonUtility.ToJson(container, true);
+                    File.WriteAllText(DiscoveryFilePath, json);
+                    return; // Başarılı
+                }
+                catch (System.IO.IOException)
+                {
+                    // Dosya meşgul, bekle ve tekrar dene
+                    System.Threading.Thread.Sleep(50);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"[ARİXON Discovery] Oda kaydedilemedi: {ex.Message}");
+                    break;
+                }
             }
         }
     }

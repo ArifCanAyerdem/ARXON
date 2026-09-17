@@ -97,10 +97,12 @@ Bu dosya, Antigravity AI asistanının ARİXON projesinde her etkileşimde, her 
 
 ---
 
-## 10. KAPSAMLI LOGLAMA VE HATA AYIKLAMA (Logging & Debugging Standards)
-* **Her Adımda Log:** Yazılan her sistemin (ağ bağlantısı, veri yükleme, UI etkileşimi, lokalizasyon) önemli aşamalarına ve metodlarına açıklayıcı `Debug.Log` komutları yerleştirilecektir.
-* **Hata Tespiti (Traceability):** Olası bir sorun anında hatanın tam olarak hangi sistemden ve hangi aşamadan kaynaklandığını (Örn: `[Network]`, `[Localization]`, `[UI]`) belirten net prefix'ler (etiketler) kullanılacaktır.
-* **Proaktif Hata Yakalama:** Beklenmeyen değerler veya boş referanslar için sadece kodun çökmesini beklemek yerine `Debug.LogWarning` veya `Debug.LogError` ile açıklayıcı hata mesajları yazılıp anında müdahale edilebilir bir altyapı oluşturulacaktır.
+## 10. AŞIRI KAPSAMLI LOGLAMA (Hyper-Detailed Logging Standards)
+* **HER İŞLEM İÇİN LOG ZORUNLULUĞU:** Yazılan her sınıf, her metot, her ağ olayı ve her durum (state) değişimi İSTİSNASIZ olarak konsola loglanacaktır. Hiçbir metot sessizce çalışıp bitmeyecektir. 
+* **Standart Format:** Loglar her zaman şu formatta yazılacaktır: `Debug.Log("[SistemAdı] [SınıfAdı.MetotAdı] -> Yapılan işlem açıklaması (Değişken: X)");`
+  - *Örnek:* `Debug.Log("[Network] [PlayerController.OnNetworkSpawn] -> Oyuncu sahneye doğdu. (IsOwner: True)");`
+* **Hata Tespiti (Traceability):** Hataların nerede koptuğunu anında anlamak için, bir işlem başarısız olduğunda veya beklenen bir değer gelmediğinde (null geldiğinde) `Debug.LogWarning` veya `Debug.LogError` ile hatanın tam konumu ve sebebi anında yazdırılacaktır. Kodun çökmesi beklenmeyecektir.
+* **Geliştirici Rahatlığı:** Bu sayede kullanıcı Unity Console'a baktığında oyunun arka planda adım adım ne yaptığını bir kitap gibi okuyabilecektir. Hata çıkarsa saniyeler içinde "şu metotta patlamış" denilebilecektir.
 
 ---
 
@@ -108,3 +110,5 @@ Bu dosya, Antigravity AI asistanının ARİXON projesinde her etkileşimde, her 
 * **Otomatik Ekran Görüntüsü Sistemi:** Kullanıcı oyunu test ederken her sayfa değişiminde veya bir hata oluştuğunda sistem otomatik olarak ekran görüntüsü (`AgentVision`) alır.
 * **Görsel Kanıta Dayalı Çözüm:** Kullanıcı bir "hata var" veya "tasarım bozuldu" bildiriminde bulunduğunda, sadece kodlara bakmakla yetinilmeyecek; anında en güncel ekran görüntüleri incelenip sorunun görsel kaynağı tespit edilecektir.
 * **Proaktif İzleme:** Ekran görüntüleri sadece oyun başlamadan önce değil, oyun esnasında girilen tüm sayfalarda ve kritik durumlarda güncel tutulup, yapay zeka tarafından aktif olarak analiz edilecektir.
+
+* **Manuel Sürükle-Bırak Yasaktır:** Kullanıcıdan Inspector üzerinden script ataması, objeleri sürükleyip bırakması (drag and drop) veya referans bağlaması KESİNLİKLE istenmeyecektir. Tüm referans bağlamaları, component eklemeleri ve prefab atamaları C# Editor scriptleri (gerekirse SerializedObject ve SerializedProperty kullanılarak) yapay zeka tarafından tam otomatik yapılacaktır.
