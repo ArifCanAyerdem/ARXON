@@ -21,7 +21,7 @@ namespace Arixon.Network
 
         [Header("Sahne Ayarları")]
         [Tooltip("Host başlatıldığında tüm oyuncuların aktarılacağı oyun sahnesi adı")]
-        [SerializeField] private string gameSceneName = "SampleScene";
+        [SerializeField] private string gameSceneName = "GameScene";
 
         private void Awake()
         {

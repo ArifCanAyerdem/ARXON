@@ -25,8 +25,8 @@ namespace Arixon.Gameplay
         {
             if (_target == null) return;
 
-            // Scene'e göre kontrol tipini belirle
-            bool isGameScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "GameScene";
+            // MainMenu hariç diğer sahnelerde farenin karakteri/kamerayı döndürmesine izin ver
+            bool isGameScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "MainMenu";
 
             if (UnityEngine.InputSystem.Mouse.current != null)
             {
