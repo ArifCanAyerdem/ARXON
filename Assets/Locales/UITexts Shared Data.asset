@@ -14,7 +14,327 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
   m_TableCollectionName: UITexts
   m_TableCollectionNameGuidString: 4b0cb2fcc2995a84eb8f0adfa0b3676c
-  m_Entries: []
+  m_Entries:
+  - m_Id: 191498238713856
+    m_Key: HOME_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498347765760
+    m_Key: ID_CARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498356154368
+    m_Key: ROOM_CENTER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498356154369
+    m_Key: ROOM_DESC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348672
+    m_Key: CREATE_ROOM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348673
+    m_Key: ROOM_CODE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348674
+    m_Key: JOIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348675
+    m_Key: LIVE_FIELDS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348676
+    m_Key: LIVE_FIELDS_DESC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348677
+    m_Key: EMPTY_FIELD_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348678
+    m_Key: EMPTY_FIELD_DESC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348679
+    m_Key: QUIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348680
+    m_Key: SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348681
+    m_Key: LOBBY_ROOM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348682
+    m_Key: COPY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348683
+    m_Key: ROSTER_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348684
+    m_Key: TEAM_RED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348685
+    m_Key: TEAM_BLUE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348686
+    m_Key: WAITING_PLAYER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348687
+    m_Key: NOT_READY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348688
+    m_Key: LOBBY_CHAT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348689
+    m_Key: SYSTEM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348690
+    m_Key: WELCOME_CHAT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348691
+    m_Key: TYPE_MESSAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348692
+    m_Key: SEND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348693
+    m_Key: BACK_HOME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348694
+    m_Key: START_GAME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348695
+    m_Key: BACK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348696
+    m_Key: AUDIO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348697
+    m_Key: GRAPHICS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348698
+    m_Key: GAMEPLAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348699
+    m_Key: MASTER_VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348700
+    m_Key: MUSIC_VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348701
+    m_Key: FULLSCREEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348702
+    m_Key: GRAPHICS_QUALITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348703
+    m_Key: CAMERA_SHAKE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348704
+    m_Key: LANGUAGE_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348705
+    m_Key: CONNECTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348706
+    m_Key: READY_STATE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348707
+    m_Key: CANCEL_READY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348708
+    m_Key: GET_READY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348709
+    m_Key: LEADER_POSTFIX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348710
+    m_Key: YOU_POSTFIX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348711
+    m_Key: CHAT_SYSTEM_JOIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348712
+    m_Key: CHAT_GAME_STARTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348713
+    m_Key: WAITING_PLAYERS_START
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348714
+    m_Key: HOST_STARTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348715
+    m_Key: ENTER_VALID_CODE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348716
+    m_Key: ROOM_NOT_FOUND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348717
+    m_Key: ROOM_STARTED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348718
+    m_Key: ROOM_FULL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348719
+    m_Key: ROOM_JOINING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348720
+    m_Key: LOBBY_LEADER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348721
+    m_Key: PARTICIPANT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348722
+    m_Key: WAITING_LEADER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348723
+    m_Key: ROOM_OPEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348724
+    m_Key: ROOM_IN_GAME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348725
+    m_Key: ROOM_FULL_BADGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348726
+    m_Key: JOIN_BTN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348727
+    m_Key: QUALITY_LOW
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348728
+    m_Key: QUALITY_MEDIUM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348729
+    m_Key: QUALITY_HIGH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348730
+    m_Key: QUALITY_ULTRA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348731
+    m_Key: LEADER_LEFT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348732
+    m_Key: ROOM_NAME_FORMAT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348733
+    m_Key: COPY_BTN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348734
+    m_Key: PING_CONNECTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348735
+    m_Key: HOME_ARENA_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348736
+    m_Key: HOME_ID_CARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348737
+    m_Key: HOME_ROOM_CENTER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348738
+    m_Key: HOME_DESC_CREATE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348739
+    m_Key: HOME_CREATE_MATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348740
+    m_Key: HOME_LIVE_FIELDS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348741
+    m_Key: HOME_DESC_LIVE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348742
+    m_Key: HOME_EMPTY_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348743
+    m_Key: HOME_EMPTY_DESC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348744
+    m_Key: HOME_QUIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348745
+    m_Key: LOBBY_LOGO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348746
+    m_Key: CHAT_SEND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348747
+    m_Key: LEAVE_LOBBY_BTN
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -29,3 +29,18 @@ Bir hata çözüldüğünde bu dosyaya kaydedilir. Aynı hatanın tekrar etmesin
 - **Gerçek Nedeni:** Takım butonları ve sohbet kutusu başlığı UI Toolkit (UXML) dosyasında hardcoded kalmıştı ve bir isimleri (name) yoktu. Oda ismi ise ArixonRoomDiscovery.cs içinde hardcoded oluşturulup JSON olarak kaydediliyordu.
 - **Uygulanan Çözüm:** UXML içindeki etiketlere name (lbl-team-red, lbl-lobby-chat vb.) atamaları yapılıp MainMenuController içinde çevirileri aktif edildi. ArixonRoomDiscovery den gelen oda ismi ROOM_NAME_FORMAT ({0}'s Room veya {0}'in Odası) lokalizasyon anahtarı kullanılarak dinamikleştirildi. Ayrıca yanlış argüman alan LEADER_LEFT referans hatası düzeltildi.
 - **Gelecek İçin Kural:** Network üzerinden giden veriler (oda ismi vb.) ham data taşımalı (sadece HostName), arayüzde gösterilirken ise formatlanıp çevrilmelidir. Hiçbir UXML elementi 'name' etiketi olmadan bırakılmamalıdır.
+
+## HATA: Derleme (Compilation) Hatalarının Otomatik Kurulumu Engellemesi (Kayıp GameBall)
+- **Belirtiler:** Kullanıcı Play tuşuna bastığında Lobiye girilse bile "GameBall" prefabı ve sahne (GameScene) tam otomatik olarak yüklenemedi/çalışmadı. Hata mesajı olarak "CS1022" gibi sentaks hataları alındı veya hiçbir hata vermeden top oluşmadı.
+- **Gerçek Nedeni:** `SetupGameBall.cs` gibi editör scriptleri, Play mode dışında otomatik çalışacak şekilde ayarlandı (`ForceAutoSetup.cs`). Ancak, başka bir scriptte (örn: `SetupGameArena.cs`) olan bir derleme (compile) hatası veya küçük bir yazım hatası, tüm assembly'nin derlenmesini durdurduğu için, `ForceAutoSetup` hiçbir zaman sorunsuz olarak çalışıp prefab'ı oluşturamadı.
+- **Kaynaklanan Sistem:** `ForceAutoSetup.cs` ve `SetupGameBall.cs` (Editor Automation).
+- **Yanlış Yapılan Varsayım:** Sadece bir kere çalışan `EditorPrefs.GetBool` mantığının her durumda başarıyla tamamlanacağı varsayıldı. Eğer işlem yarıda kesilirse, sistem işlemin yapıldığını zannedip bir daha asla tekrar etmiyordu.
+- **Uygulanan Çözüm:** `ForceAutoSetup.cs` scriptindeki `EditorPrefs` kullanımı kaldırılarak, bunun yerine dosya sisteminde "GameBall.prefab" ve "GameScene.unity" dosyalarının **gerçekten** var olup olmadığı kontrol edilecek şekilde (File.Exists) güncellendi.
+- **Gelecek İçin Kural:** Kritik asset üretimleri (otomatik kurucu scriptler), başarılı olduklarını EditorPrefs ile değil, **gerçek dosya kontrolü** ile teyit etmelidir. Herhangi bir script düzenlemesinde en ufak bir sentaks hatası, tüm otomatik sistemleri kilitleyeceği için loglar sıkı takip edilmelidir.
+
+## HATA: Tek Oyunculu Test Sırasında Yanlış Lobi Butonunun Kullanılması ("GİR" vs "YENİ MAÇ KUR")
+- **Belirtiler:** Kullanıcı "join butonuna basınca lobiye giremiyorum" şikayetinde bulundu.
+- **Gerçek Nedeni:** Kullanıcı yerel (solo) test yapmasına rağmen "YENİ MAÇ KUR" (Host) butonu yerine "GİR" (Client Join) butonuna basıyordu. "GİR" butonu, geçerli bir arkadaş oda kodu beklediği için oda bulunamıyor ve sessizce (veya küçük bir mesajla) hata veriyordu.
+- **Kaynaklanan Sistem:** `MainMenuController.cs` (Kullanıcı Deneyimi / UX).
+- **Uygulanan Çözüm:** Sorun kodsal değil, iletişimseldi. Kullanıcıya açıkça Host (YENİ MAÇ KUR) butonunu kullanması gerektiği anlatıldı.
+- **Gelecek İçin Kural:** Eğer oyuncu tek başına test ediyorsa ve oda kurması gerekiyorsa, bunu çok net bir şekilde yönlendiren UI uyarıları veya otomatik test modları eklenebilir. Yapay zeka, kullanıcı "Lobiye giremiyorum" dediğinde sadece teknik hataları değil, kullanıcının UI üzerinde hangi butona bastığını da (Loglar aracılığıyla) analiz etmelidir.

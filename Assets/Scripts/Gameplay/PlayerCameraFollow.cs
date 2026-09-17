@@ -25,13 +25,22 @@ namespace Arixon.Gameplay
         {
             if (_target == null) return;
 
-            // Mouse Input - Sadece Sağ Tıka (Right Mouse Button) basılı tutuluyorsa döndür
+            // Scene'e göre kontrol tipini belirle
+            bool isGameScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "GameScene";
+
             if (UnityEngine.InputSystem.Mouse.current != null)
             {
-                if (UnityEngine.InputSystem.Mouse.current.rightButton.isPressed)
+                // Eğer oyundaysak (GameScene) kamerayı hep farenin yönüne çevir.
+                bool shouldRotateCamera = isGameScene && _target != null;
+
+                if (shouldRotateCamera)
                 {
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
+                    // Kamerayı kontrol ederken farenin ekrandan çıkmaması için kilitle
+                    if (Cursor.lockState != CursorLockMode.Locked)
+                    {
+                        Cursor.lockState = CursorLockMode.Locked;
+                        Cursor.visible = false;
+                    }
                     
                     Vector2 mouseDelta = UnityEngine.InputSystem.Mouse.current.delta.ReadValue();
                     _currentX += mouseDelta.x * _mouseSensitivity * 0.1f;
@@ -40,8 +49,12 @@ namespace Arixon.Gameplay
                 }
                 else
                 {
-                    Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
+                    // Kamerayı kontrol etmiyorsak (Örn: Lobide sağ tık bırakıldıysa) imleci göster
+                    if (Cursor.lockState != CursorLockMode.None)
+                    {
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+                    }
                 }
             }
 
@@ -65,9 +78,7 @@ namespace Arixon.Gameplay
             {
                 Debug.Log($"[Gameplay] [PlayerCameraFollow.SetTarget] -> Kamera hedefi ayarlandı. (Hedef: {_target.name})");
                 
-                // Mouse'u varsayılan olarak serbest bırak
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
+                // (Kursor kilitleme işlemi LateUpdate içinde yapılıyor)
                 
                 // Başlangıç rotasyonunu hedefin arkasına göre ayarla
                 _currentX = _target.eulerAngles.y;

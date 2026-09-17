@@ -550,6 +550,331 @@ MonoBehaviour:
     m_Localized: "\u2B05 ANA SAYFAYA D\xD6N"
     m_Metadata:
       m_Items: []
+  - m_Id: 191498238713856
+    m_Localized: "\u26A1 AR\u0130XON ARENA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498347765760
+    m_Localized: '[ ID KARTI ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498356154368
+    m_Localized: "\U0001F3C6 ODA MERKEZ\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498356154369
+    m_Localized: "Yeni bir saha kurup tak\u0131m\u0131na liderlik et veya koda girip
+      ma\xE7a hemen kat\u0131l!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348672
+    m_Localized: "YEN\u0130 MA\xC7 KUR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348673
+    m_Localized: 'ODA KODU:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348674
+    m_Localized: "G\u0130R"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348675
+    m_Localized: "\U0001F4E1 CANLI SAHALAR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348676
+    m_Localized: "A\u011Fdaki aktif odalar burada anl\u0131k listelenir. Tek t\u0131kla
+      odaya kat\u0131labilirsin!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348677
+    m_Localized: "SAHA \u015EU AN BO\u015E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348678
+    m_Localized: "Hemen yeni bir ma\xE7 kur ve topu sahaya indir!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348679
+    m_Localized: "\xC7IKI\u015E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348680
+    m_Localized: AYARLAR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348681
+    m_Localized: "\U0001F451 LOB\u0130 ODASI"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348682
+    m_Localized: "\U0001F4CB KOPYALA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348683
+    m_Localized: "\U0001F465 TAKIM \xDCYELER\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348684
+    m_Localized: "\U0001F534 KIRMIZI TAKIM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348685
+    m_Localized: "\U0001F535 MAV\u0130 TAKIM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348686
+    m_Localized: "OYUNCU BEKLEN\u0130YOR..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348687
+    m_Localized: "\u274C BEKLEN\u0130YOR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348688
+    m_Localized: "\U0001F4AC LOB\u0130 SOHBET\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348689
+    m_Localized: "[S\u0130STEM]"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348690
+    m_Localized: "Lobiye ho\u015F geldiniz! Ma\xE7 ba\u015Flamadan \xF6nce buradan
+      taktik konu\u015Fabilirsiniz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348691
+    m_Localized: "Mesaj\u0131n\u0131 yaz..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348692
+    m_Localized: "G\xD6NDER \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348693
+    m_Localized: "\u2B8C ANA SAYFAYA D\xD6N"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348694
+    m_Localized: "\U0001F680 OYUNU BA\u015ELAT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348695
+    m_Localized: "GER\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348696
+    m_Localized: SES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348697
+    m_Localized: "GRAF\u0130K"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348698
+    m_Localized: "OYNANI\u015E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348699
+    m_Localized: ANA SES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348700
+    m_Localized: "M\xDCZ\u0130K SES\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348701
+    m_Localized: TAM EKRAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348702
+    m_Localized: "GRAF\u0130K KAL\u0130TES\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348703
+    m_Localized: KAMERA SARSINTISI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348704
+    m_Localized: "LANGUAGE (D\u0130L)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348705
+    m_Localized: "Ba\u011Flan\u0131yor..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348706
+    m_Localized: "\u2714 HAZIR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348707
+    m_Localized: "\u2716 \u0130PTAL (HAZIR)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348708
+    m_Localized: "\u2714 HAZIR OL"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348709
+    m_Localized: ' (Lider)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348710
+    m_Localized: ' (Sen)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348711
+    m_Localized: "Odaya ba\u011Flan\u0131ld\u0131 ({0})! Ho\u015F geldin {1}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348712
+    m_Localized: "Oyun ba\u015Flat\u0131l\u0131yor! Sahne y\xFCkleniyor..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348713
+    m_Localized: "\u23F3 OYUNCULAR BEKLEN\u0130YOR..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348714
+    m_Localized: "Oda kuruluyor (Host ba\u015Flat\u0131l\u0131yor)..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348715
+    m_Localized: "L\xFCtfen ge\xE7erli bir oda kodu yaz\u0131n!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348716
+    m_Localized: "HATA: Koduna ait aktif bir oda bulunamad\u0131!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348717
+    m_Localized: "UYARI: Odadaki ma\xE7 zaten ba\u015Flad\u0131!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348718
+    m_Localized: 'UYARI: Oda tamamen dolu (4/4)!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348719
+    m_Localized: "Odas\u0131n\u0131na ba\u011Flan\u0131l\u0131yor..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348720
+    m_Localized: "\U0001F451 LOB\u0130 L\u0130DER\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348721
+    m_Localized: "\U0001F3AE KATILIMCI"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348722
+    m_Localized: "\u23F3 L\u0130DER BEKLEN\u0130YOR..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348723
+    m_Localized: "\U0001F7E2 A\xC7IK"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348724
+    m_Localized: "\u2694 MA\xC7TA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348725
+    m_Localized: "\U0001F512 DOLU"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348726
+    m_Localized: "KATIL \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348727
+    m_Localized: "D\xFC\u015F\xFCk"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348728
+    m_Localized: Orta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348729
+    m_Localized: "Y\xFCksek"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348730
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348731
+    m_Localized: "Lider odadan ayr\u0131ld\u0131 veya ba\u011Flant\u0131 koptu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348732
+    m_Localized: "{0}'in Odas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348733
+    m_Localized: "\U0001F4CB KOPYALA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348734
+    m_Localized: "\U0001F4E1 Ping: Ba\u011Flan\u0131yor..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348735
+    m_Localized: "\u26A1 AR\u0130XON ARENA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348736
+    m_Localized: '[ ID KARTI ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348737
+    m_Localized: "\U0001F3C6 ODA MERKEZ\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348738
+    m_Localized: "Yeni bir saha kurup tak\u0131m\u0131na liderlik et veya koda girip
+      ma\xE7a hemen kat\u0131l!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348739
+    m_Localized: "YEN\u0130 MA\xC7 KUR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348740
+    m_Localized: "\U0001F4E1 CANLI SAHALAR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348741
+    m_Localized: "A\u011Fdaki aktif odalar burada anl\u0131k listelenir. Tek t\u0131kla
+      odaya kat\u0131labilirsin!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348742
+    m_Localized: "SAHA \u015EU AN BO\u015E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348743
+    m_Localized: "Hemen yeni bir ma\xE7 kur ve topu sahaya indir!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348744
+    m_Localized: "\xC7IKI\u015E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348745
+    m_Localized: "\u26A1 AR\u0130XON"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348746
+    m_Localized: "G\xD6NDER \u27A1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348747
+    m_Localized: "\u2B05 ANA SAYFAYA D\xD6N"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

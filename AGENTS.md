@@ -112,3 +112,11 @@ Bu dosya, Antigravity AI asistanının ARİXON projesinde her etkileşimde, her 
 * **Proaktif İzleme:** Ekran görüntüleri sadece oyun başlamadan önce değil, oyun esnasında girilen tüm sayfalarda ve kritik durumlarda güncel tutulup, yapay zeka tarafından aktif olarak analiz edilecektir.
 
 * **Manuel Sürükle-Bırak Yasaktır:** Kullanıcıdan Inspector üzerinden script ataması, objeleri sürükleyip bırakması (drag and drop) veya referans bağlaması KESİNLİKLE istenmeyecektir. Tüm referans bağlamaları, component eklemeleri ve prefab atamaları C# Editor scriptleri (gerekirse SerializedObject ve SerializedProperty kullanılarak) yapay zeka tarafından tam otomatik yapılacaktır.
+
+---
+
+## 12. ÖLÇEKLENEBİLİRLİK VE PERFORMANS ODAKLI GELİŞTİRME (Optimization-Driven Architecture)
+* **Oyun Büyüdükçe Çökmeyecek Yapılar:** Yazılan tüm kodlar oyunun ileride çok büyüyeceği öngörülerek, "optimizasyona uygun" (Optimization-friendly) şekilde tasarlanacaktır. İleride sistemleri baştan yazmak veya refactor etmek zorunda kalmamak için en baştan sağlam temeller atılacaktır.
+* **Update() Fonksiyonu Kısıtlaması:** `Update()`, `FixedUpdate()` ve `LateUpdate()` içerisinde kesinlikle `GetComponent`, `Find`, `FindObjectOfType` veya `Camera.main` gibi ağır (expensive) çağrılar yapılmayacaktır. Bu tür referanslar `Awake` veya `Start` içinde önbelleğe (Cache) alınacaktır.
+* **Zamanlayıcılar (Timers):** Her kare (frame) çalışması gerekmeyen işlemler (örneğin hedef arama, UI güncellemesi, mesafe ölçümü) `Update` içinde her kare yerine bir zamanlayıcı (`timer`) yardımıyla saniyede 1 veya 2 kez (Tick Rate) çalışacak şekilde sınırlandırılacaktır.
+* **Nesne Havuzu (Object Pooling):** Mermi, efekt (VFX) veya sık oluşturulup silinen objeler için kesinlikle sürekli `Instantiate` / `Destroy` kullanılmayacak, baştan itibaren Object Pooling mantığı gözetilecektir.

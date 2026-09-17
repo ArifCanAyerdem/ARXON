@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Unity.Netcode;
@@ -1304,17 +1304,15 @@ namespace Arixon.UI
             bool allReady = true;
             int clientCount = NetworkManager.Singleton.ConnectedClientsList.Count;
             
-            if (clientCount < 2) {
-                allReady = false;
-            } else {
-                foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            // Tek başına (Solo) test edebilmek için <2 kısıtlamasını kaldırdık.
+            // allReady, diğer oyuncular hazır mı diye bakar.
+            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            {
+                if (client.ClientId == NetworkManager.ServerClientId) continue; // Host zaten hazırdır
+                if (!_playerReadyStates.ContainsKey(client.ClientId) || !_playerReadyStates[client.ClientId])
                 {
-                    if (client.ClientId == NetworkManager.ServerClientId) continue;
-                    if (!_playerReadyStates.ContainsKey(client.ClientId) || !_playerReadyStates[client.ClientId])
-                    {
-                        allReady = false;
-                        break;
-                    }
+                    allReady = false;
+                    break;
                 }
             }
 

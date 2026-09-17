@@ -542,6 +542,326 @@ MonoBehaviour:
     m_Localized: "\u2B05 BACK TO HOME"
     m_Metadata:
       m_Items: []
+  - m_Id: 191498238713856
+    m_Localized: "\u26A1 ARIXON ARENA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498347765760
+    m_Localized: '[ ID CARD ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498356154368
+    m_Localized: "\U0001F3C6 ROOM CENTER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498356154369
+    m_Localized: Create a new field and lead your team or enter a code to join instantly!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348672
+    m_Localized: CREATE NEW MATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348673
+    m_Localized: 'ROOM CODE:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348674
+    m_Localized: JOIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348675
+    m_Localized: "\U0001F4E1 LIVE FIELDS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348676
+    m_Localized: Active rooms are listed here. Join with one click!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348677
+    m_Localized: FIELD IS EMPTY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348678
+    m_Localized: Create a new match and drop the ball!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348679
+    m_Localized: QUIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348680
+    m_Localized: SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348681
+    m_Localized: "\U0001F451 LOBBY ROOM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348682
+    m_Localized: "\U0001F4CB COPY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348683
+    m_Localized: "\U0001F465 TEAM MEMBERS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348684
+    m_Localized: "\U0001F534 RED TEAM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348685
+    m_Localized: "\U0001F535 BLUE TEAM"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348686
+    m_Localized: WAITING FOR PLAYER...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348687
+    m_Localized: "\u274C WAITING"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348688
+    m_Localized: "\U0001F4AC LOBBY CHAT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348689
+    m_Localized: '[SYSTEM]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348690
+    m_Localized: Welcome to the lobby! Discuss tactics here before the match starts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348691
+    m_Localized: Type message...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348692
+    m_Localized: "SEND \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348693
+    m_Localized: "\u2B8C BACK TO HOME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348694
+    m_Localized: "\U0001F680 START GAME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348695
+    m_Localized: BACK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348696
+    m_Localized: AUDIO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348697
+    m_Localized: GRAPHICS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348698
+    m_Localized: GAMEPLAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348699
+    m_Localized: MASTER VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348700
+    m_Localized: MUSIC VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348701
+    m_Localized: FULLSCREEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348702
+    m_Localized: GRAPHICS QUALITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348703
+    m_Localized: CAMERA SHAKE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348704
+    m_Localized: "LANGUAGE (D\u0130L)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348705
+    m_Localized: Connecting...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348706
+    m_Localized: "\u2714 READY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348707
+    m_Localized: "\u2716 CANCEL (READY)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348708
+    m_Localized: "\u2714 GET READY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348709
+    m_Localized: ' (Leader)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348710
+    m_Localized: ' (You)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348711
+    m_Localized: Connected to room ({0})! Welcome {1}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348712
+    m_Localized: Game is starting! Loading scene...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348713
+    m_Localized: "\u23F3 WAITING FOR PLAYERS..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348714
+    m_Localized: Creating room (Host starting)...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348715
+    m_Localized: Please enter a valid room code!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348716
+    m_Localized: 'ERROR: No active room found for code'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348717
+    m_Localized: 'WARNING: Match has already started in room'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348718
+    m_Localized: 'WARNING: Room is completely full (4/4)!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348719
+    m_Localized: Connecting to room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348720
+    m_Localized: "\U0001F451 LOBBY LEADER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348721
+    m_Localized: "\U0001F3AE PARTICIPANT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348722
+    m_Localized: "\u23F3 WAITING FOR LEADER..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348723
+    m_Localized: "\U0001F7E2 OPEN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348724
+    m_Localized: "\u2694 IN GAME"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348725
+    m_Localized: "\U0001F512 FULL"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348726
+    m_Localized: "JOIN \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348727
+    m_Localized: Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348728
+    m_Localized: Medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348729
+    m_Localized: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348730
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348731
+    m_Localized: Leader left or disconnected.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348732
+    m_Localized: '{0}''s Room'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348733
+    m_Localized: "\U0001F4CB COPY"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348734
+    m_Localized: "\U0001F4E1 Ping: Connecting..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348735
+    m_Localized: "\u26A1 ARIXON ARENA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348736
+    m_Localized: '[ ID CARD ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348737
+    m_Localized: "\U0001F3C6 ROOM CENTER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348738
+    m_Localized: Create a new field and lead your team or enter a code to join instantly!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348739
+    m_Localized: CREATE NEW MATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348740
+    m_Localized: "\U0001F4E1 LIVE FIELDS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348741
+    m_Localized: Active rooms are listed here. Join with one click!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348742
+    m_Localized: FIELD IS EMPTY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348743
+    m_Localized: Create a new match and bring the ball to the field!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348744
+    m_Localized: QUIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348745
+    m_Localized: "\u26A1 ARIXON"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348746
+    m_Localized: "SEND \u27A1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 191498360348747
+    m_Localized: "\u2B05 BACK TO HOME"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
