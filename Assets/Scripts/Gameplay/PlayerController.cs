@@ -248,17 +248,16 @@ namespace Arixon.Gameplay
                 TryKickServerRpc(false, forward); // false = Pass
             }
 
-            // Şut (Sol Tık) - Şarj Başlat / Bitir
-            if (Mouse.current.leftButton.wasPressedThisFrame)
+            // Şut (Sol Tık) - Şarj Başlat / Bitir (Sürekli durum kontrolü)
+            if (Mouse.current.leftButton.isPressed)
             {
-                // En azından ufak bir staminası varsa şarja başlasın
-                if (CurrentStamina.Value > 1f)
+                if (!_isLocalCharging && CurrentStamina.Value > 1f)
                 {
                     _isLocalCharging = true;
                     SetChargingServerRpc(true);
                 }
             }
-            else if (Mouse.current.leftButton.wasReleasedThisFrame)
+            else
             {
                 if (_isLocalCharging)
                 {

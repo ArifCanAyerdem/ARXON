@@ -17,27 +17,18 @@ namespace Arixon.EditorScripts
             string animFolder = "Assets/Animations";
             if (!AssetDatabase.IsValidFolder(animFolder))
                 AssetDatabase.CreateFolder("Assets", "Animations");
-
-            // 1. Modelleri Humanoid yap
-            string[] fbxFiles = Directory.GetFiles(modelsFolder, "*.fbx", SearchOption.AllDirectories);
-            bool modelsUpdated = false;
-            foreach (string file in fbxFiles)
-            {
-                string assetPath = file.Replace("\\", "/");
-                ModelImporter importer = AssetImporter.GetAtPath(assetPath) as ModelImporter;
-                if (importer != null && importer.animationType != ModelImporterAnimationType.Human)
-                {
-                    importer.animationType = ModelImporterAnimationType.Human;
-                    importer.SaveAndReimport();
-                    modelsUpdated = true;
-                }
-            }
-            if (modelsUpdated) AssetDatabase.Refresh();
-
-            // 2. Animator Controller
+            
+            // 1. Animator Controller Oluştur
             string controllerPath = animFolder + "/PlayerAnimator.controller";
             AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(controllerPath);
-            if (controller == null) controller = AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+            if (controller == null || controller.layers.Length == 0 || controller.layers[0].stateMachine == null)
+            {
+                if (controller != null)
+                {
+                    AssetDatabase.DeleteAsset(controllerPath);
+                }
+                controller = AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+            }
 
             AddParameter(controller, "Speed", AnimatorControllerParameterType.Float);
             AddParameter(controller, "IsGrounded", AnimatorControllerParameterType.Bool);
@@ -51,11 +42,16 @@ namespace Arixon.EditorScripts
             AnimationClip sprint = FindAnim("strike foward jog") ?? run;
             AnimationClip kickNormal = FindAnim("kick soccerball");
             AnimationClip kickStrong = FindAnim("soccer penalty kick") ?? kickNormal;
-            AnimationClip pass = FindAnim("goalkeeper pass") ?? kickNormal; // Şimdilik ayak pası olarak kick kullan
+            AnimationClip pass = FindAnim("goalkeeper pass") ?? kickNormal;
             AnimationClip fall = FindAnim("soccer trip") ?? FindAnim("fallen idle");
 
             var rootStateMachine = controller.layers[0].stateMachine;
-            rootStateMachine.states = new ChildAnimatorState[0]; // Temizle
+            // Eski state'leri temizle
+            var existingStates = rootStateMachine.states;
+            foreach (var state in existingStates)
+            {
+                rootStateMachine.RemoveState(state.state);
+            }
 
             // Locomotion Blend Tree
             BlendTree blendTree;
@@ -71,53 +67,85 @@ namespace Arixon.EditorScripts
             if (pass != null) CreateTriggerState(rootStateMachine, locomotion, pass, "Pass");
             if (fall != null) CreateBoolState(rootStateMachine, locomotion, fall, "Fall");
 
-            // 3. Karakteri Entegre Et
+            // 2. Karakteri Prefab'a Entegre Et
             string prefabPath = "Assets/Prefabs/PlayerPrefab.prefab";
-            GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-            if (playerPrefab != null)
+            GameObject playerPrefabInst = PrefabUtility.LoadPrefabContents(prefabPath);
+            if (playerPrefabInst != null)
             {
-                Transform visuals = playerPrefab.transform.Find("Visuals");
-                if (visuals != null)
+                try
                 {
-                    MeshFilter mf = visuals.GetComponent<MeshFilter>();
-                    MeshRenderer mr = visuals.GetComponent<MeshRenderer>();
-                    if (mf != null) DestroyImmediate(mf, true);
-                    if (mr != null) DestroyImmediate(mr, true);
-
-                    // Tam olarak "character.fbx" dosyasını bulmaya çalış
-                    GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models/character.fbx");
-                    if (modelPrefab == null) modelPrefab = FindModelWithMesh(modelsFolder);
-
-                    if (modelPrefab != null)
+                    Transform faceIndicator = playerPrefabInst.transform.Find("FaceIndicator");
+                    if (faceIndicator != null)
                     {
-                        foreach (Transform child in visuals)
-                        {
-                            if (child.GetComponent<Animator>() != null || child.name.Contains(modelPrefab.name))
-                                DestroyImmediate(child.gameObject, true);
-                        }
+                        DestroyImmediate(faceIndicator.gameObject, true);
+                    }
 
-                        GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(modelPrefab);
-                        inst.transform.SetParent(visuals);
-                        inst.transform.localPosition = new Vector3(0, -1f, 0);
-                        inst.transform.localRotation = Quaternion.identity;
+                    Transform visualsHolder = playerPrefabInst.transform.Find("VisualsHolder");
+                    if (visualsHolder != null)
+                    {
+                        string modelPath = "Assets/Models/character.fbx";
+                        GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+                        if (modelPrefab == null) modelPrefab = FindModelWithMesh(modelsFolder);
 
-                        Animator anim = inst.GetComponent<Animator>();
-                        if (anim != null)
+                        if (modelPrefab != null)
                         {
-                            anim.runtimeAnimatorController = controller;
-                            anim.applyRootMotion = false;
+                            // Eski objeleri temizle
+                            for (int i = visualsHolder.childCount - 1; i >= 0; i--)
+                            {
+                                Transform child = visualsHolder.GetChild(i);
+                                if (child.GetComponent<Animator>() != null || child.name.Contains(modelPrefab.name) || child.name.Contains("DefaultModel") || child.name.Contains("character"))
+                                {
+                                    DestroyImmediate(child.gameObject, true);
+                                }
+                            }
+
+                            // Modeli yerleştir - Normal Instantiate kullanıyoruz ki iç içe prefab hatası olmasın
+                            GameObject inst = UnityEngine.Object.Instantiate(modelPrefab, visualsHolder);
+                            inst.name = modelPrefab.name; // "(Clone)" yazısını sil
+                            inst.transform.localPosition = Vector3.zero; // Pivot 0'da olmalı
+                            inst.transform.localRotation = Quaternion.identity;
+
+                            Animator anim = inst.GetComponent<Animator>();
+                            if (anim != null)
+                            {
+                                anim.runtimeAnimatorController = controller;
+                                anim.applyRootMotion = false;
+
+                                // _animator referansını PlayerController'a otomatik bağla
+                                var pc = playerPrefabInst.GetComponent<Arixon.Gameplay.PlayerController>();
+                                if (pc != null)
+                                {
+                                    SerializedObject so = new SerializedObject(pc);
+                                    so.Update();
+                                    SerializedProperty animProp = so.FindProperty("_animator");
+                                    if (animProp != null)
+                                    {
+                                        animProp.objectReferenceValue = anim;
+                                        so.ApplyModifiedProperties();
+                                    }
+                                }
+                            }
+                            Debug.Log($"[Arixon Setup] Model {modelPrefab.name} başarıyla eklendi ve Animator bağlandı!");
                         }
-                        Debug.Log($"[Arixon Setup] Model {modelPrefab.name} başarıyla eklendi!");
+                        else
+                        {
+                            Debug.LogError("[Arixon Setup] 'character.fbx' veya Mesh içeren bir model bulunamadı!");
+                        }
                     }
                     else
                     {
-                        Debug.LogError("[Arixon Setup] 'character.fbx' veya Mesh içeren bir model bulunamadı!");
+                        Debug.LogWarning("[Arixon Setup] PlayerPrefab'da 'VisualsHolder' alt objesi bulunamadı!");
                     }
+
+                    PrefabUtility.SaveAsPrefabAsset(playerPrefabInst, prefabPath);
                 }
-                EditorUtility.SetDirty(playerPrefab);
-                PrefabUtility.SavePrefabAsset(playerPrefab);
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(playerPrefabInst);
+                }
             }
-            Debug.Log("[Arixon Setup] Tamamlandı!");
+            
+            Debug.Log("[Arixon Setup] Kurulum İşlemi Bitti!");
         }
 
         private static void AddParameter(AnimatorController ctrl, string name, AnimatorControllerParameterType type)
@@ -155,17 +183,31 @@ namespace Arixon.EditorScripts
 
         private static AnimationClip FindAnim(string keyword)
         {
-            string[] guids = AssetDatabase.FindAssets("t:AnimationClip", new[] { "Assets/Models" });
-            foreach (string guid in guids)
+            string[] guids = AssetDatabase.FindAssets("t:AnimationClip", new[] { "Assets/Models", "Assets/Animations" });
+            AnimationClip partialMatch = null;
+            foreach (var guid in guids)
             {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                if (path.ToLower().Contains(keyword.ToLower()) && !path.Contains("__preview__"))
+                string p = AssetDatabase.GUIDToAssetPath(guid);
+                string fileName = System.IO.Path.GetFileNameWithoutExtension(p).ToLower();
+                
+                // Tam eşleşme (Örn: Sadece "idle")
+                if (fileName == keyword.ToLower())
                 {
-                    AnimationClip clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
-                    if (clip != null) return clip;
+                    return AssetDatabase.LoadAssetAtPath<AnimationClip>(p);
+                }
+                
+                // Kısmi eşleşme (Ama fallen idle olmasın, eğer sadece idle aranıyorsa)
+                if (fileName.Contains(keyword.ToLower()))
+                {
+                    if (keyword.ToLower() == "idle" && fileName.Contains("fallen")) continue;
+                    
+                    if (partialMatch == null)
+                    {
+                        partialMatch = AssetDatabase.LoadAssetAtPath<AnimationClip>(p);
+                    }
                 }
             }
-            return null;
+            return partialMatch;
         }
 
         private static GameObject FindModelWithMesh(string folder)
