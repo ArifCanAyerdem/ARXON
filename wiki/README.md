@@ -16,6 +16,7 @@ Bu klasör, ARİXON çok oyunculu (Multiplayer) oyun projesinin sıfırdan geli�
 | 04 | **NetworkManager ve Bağlantı Sistemi** | Giriş ekranından tetiklenen Host/Client bağlantı yöneticisi ve sahne geçişi | [04_networkmanager_ve_baglanti_sistemi.md](./04_networkmanager_ve_baglanti_sistemi.md) | ✅ Tamamlandı |
 | 05 | **Multiplayer Karakter Kontrolü** | NetworkObject, NetworkTransform ve IsOwner uyumlu oyuncu hareketi | *(Sırada)* | ⏳ Bekliyor |
 | 06 | **Steam Entegrasyonu** | Steamworks / Steam P2P Transport ve Lobi sistemi | *(Planlandı)* | ⏳ Bekliyor |
+| 07 | **Audio ve Müzik Sistemi** | Ana menü ve lobi için otomatik oluşturulan, DontDestroyOnLoad özellikli kesintisiz müzik oynatıcısı | [07_audio_ve_muzik_sistemi.md](./07_audio_ve_muzik_sistemi.md) | ✅ Tamamlandı |
 
 ---
 
