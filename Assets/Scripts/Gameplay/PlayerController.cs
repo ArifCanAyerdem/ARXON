@@ -24,6 +24,12 @@ namespace Arixon.Gameplay
         private bool _isGrounded;
         private float _jumpBufferTimer = 0f; // Zıplama gecikmesini önlemek için hafıza süresi
 
+        [Header("Şut ve Pas Mekanikleri")]
+        public NetworkVariable<float> ChargeLevel = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private bool _isCharging = false;
+        private ParticleSystem _chargeParticles;
+        private float _dribbleForce = 6f; // Sadece çarpıp sürerkenki hafif güç
+
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
@@ -50,20 +56,7 @@ namespace Arixon.Gameplay
         {
             if (IsOwner)
             {
-                Transform camTarget = transform.Find("CameraTarget");
-                if (camTarget == null)
-                {
-                    GameObject ctObj = new GameObject("CameraTarget");
-                    ctObj.transform.SetParent(transform);
-                    ctObj.transform.localPosition = new Vector3(0, 2f, 0);
-                    camTarget = ctObj.transform;
-                }
-
-                PlayerCameraFollow camFollow = FindFirstObjectByType<PlayerCameraFollow>();
-                if (camFollow != null)
-                {
-                    camFollow.SetTarget(camTarget);
-                }
+                EnsureCameraFollows();
             }
 
             // Renk senkronizasyonu
@@ -80,7 +73,54 @@ namespace Arixon.Gameplay
             IsSprinting.OnValueChanged += OnSprintStateChanged;
 
             ApplyTeamColor(TeamColorID.Value);
+
+            // Şarj Efekti (Particle System) Kurulumu
+            CreateChargeParticles();
+
+            // Animasyon Referansı
+            _animator = GetComponentInChildren<Animator>();
         }
+
+        private void CreateChargeParticles()
+        {
+            GameObject psObj = new GameObject("ChargeParticles");
+            psObj.transform.SetParent(transform);
+            psObj.transform.localPosition = new Vector3(0, 1f, 0); // Karakterin bel hizası
+
+            _chargeParticles = psObj.AddComponent<ParticleSystem>();
+            _chargeParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); // YAPILANDIRMADAN ÖNCE DURDUR
+
+            var main = _chargeParticles.main;
+            main.duration = 1f;
+            main.loop = true;
+            main.startLifetime = 0.4f;
+            main.startSpeed = 3f;
+            main.startSize = 0.08f; // ÇOK DAHA KÜÇÜK, zarif partiküller
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            var emission = _chargeParticles.emission;
+            emission.rateOverTime = 0f; // Başlangıçta görünmez
+
+            _chargeParticles.Play(); // YAPILANDIRMA BİTİNCE BAŞLAT
+
+            var shape = _chargeParticles.shape;
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = 0.8f; // Karakterin etrafında daha dar bir çember
+
+            var velOverTime = _chargeParticles.velocityOverLifetime;
+            velOverTime.enabled = true;
+            velOverTime.orbitalY = 15f; // Çok daha hızlı, sarmal dönen elektrik hissi
+            velOverTime.orbitalZ = 2f;
+            velOverTime.orbitalX = 2f;
+
+            var colOverTime = _chargeParticles.colorOverLifetime;
+            colOverTime.enabled = true;
+
+            var renderer = psObj.GetComponent<ParticleSystemRenderer>();
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            if (renderer.material.shader == null) renderer.material = new Material(Shader.Find("Sprites/Default"));
+        }
+
+
 
         public override void OnNetworkDespawn()
         {
@@ -136,9 +176,6 @@ namespace Arixon.Gameplay
             }
         }
 
-        [Header("Interaction Settings")]
-        [SerializeField] private float _hitForce = 15f;
-        [SerializeField] private float _dashForceMultiplier = 3f;
         [Header("Stamina & Boost Settings")]
         public float MaxStamina = 100f;
         public NetworkVariable<float> CurrentStamina = new NetworkVariable<float>(100f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -150,6 +187,8 @@ namespace Arixon.Gameplay
         public NetworkVariable<bool> IsSprinting = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private TrailRenderer _sprintTrail;
 
+        private Animator _animator;
+
         private void Update()
         {
             if (!IsOwner) return;
@@ -157,13 +196,192 @@ namespace Arixon.Gameplay
             EnsureCameraFollows();
             
             // Eğer maç başlamadıysa (ışınlanma veya 3, 2, 1 geri sayımı) karakteri DONDUR.
-            if (MatchManager.Instance != null && !MatchManager.Instance.IsPlaying) return;
+            if (MatchManager.Instance != null && !MatchManager.Instance.IsPlaying) 
+            {
+                UpdateAnimator(0f);
+                return;
+            }
             
             // Enerji (Stamina) ve Sprint kontrolü
             HandleStamina();
             
             HandleMovement();
             HandleGravityAndJump();
+            HandleKickInputs();
+        }
+
+        private void UpdateAnimator(float speed)
+        {
+            if (_animator == null) _animator = GetComponentInChildren<Animator>();
+            if (_animator == null) return;
+
+            _animator.SetFloat("Speed", speed);
+            _animator.SetBool("IsGrounded", _isGrounded);
+            // Düşme / Yere serilme efekti (Ragdoll tam aktifleşene kadar geçici animasyon)
+            _animator.SetBool("Fall", _isExhausted); 
+        }
+
+        private void FixedUpdate()
+        {
+            if (IsServer)
+            {
+                HandleServerCharging();
+            }
+        }
+
+        private void LateUpdate()
+        {
+            // Görseller herkes için (Server+Client) her frame güncellenir
+            UpdateChargeVisuals();
+        }
+
+        private bool _isLocalCharging = false;
+
+        private void HandleKickInputs()
+        {
+            if (Mouse.current == null) return;
+
+            // Pas (Sağ Tık)
+            if (Mouse.current.rightButton.wasPressedThisFrame)
+            {
+                Vector3 forward = _mainCameraTransform != null ? _mainCameraTransform.forward : transform.forward;
+                TryKickServerRpc(false, forward); // false = Pass
+            }
+
+            // Şut (Sol Tık) - Şarj Başlat / Bitir
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                // En azından ufak bir staminası varsa şarja başlasın
+                if (CurrentStamina.Value > 1f)
+                {
+                    _isLocalCharging = true;
+                    SetChargingServerRpc(true);
+                }
+            }
+            else if (Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                if (_isLocalCharging)
+                {
+                    _isLocalCharging = false;
+                    Vector3 forward = _mainCameraTransform != null ? _mainCameraTransform.forward : transform.forward;
+                    TryKickServerRpc(true, forward); // true = Shoot
+                }
+            }
+        }
+
+        [ServerRpc]
+        private void SetChargingServerRpc(bool charging)
+        {
+            _isCharging = charging;
+            if (!charging) ChargeLevel.Value = 0f; // İptal veya bırakıldıysa sıfırla
+        }
+
+        private void HandleServerCharging()
+        {
+            if (_isCharging && ChargeLevel.Value < 1f)
+            {
+                // Yaklaşık 1.5 saniyede tam şarj olur (100 üzerinden 1.0)
+                ChargeLevel.Value += Time.fixedDeltaTime / 1.5f; 
+                if (ChargeLevel.Value > 1f) ChargeLevel.Value = 1f;
+            }
+        }
+
+        [ServerRpc]
+        private void TryKickServerRpc(bool isShoot, Vector3 cameraForward)
+        {
+            _isCharging = false;
+            float currentCharge = ChargeLevel.Value;
+            ChargeLevel.Value = 0f;
+
+            // Karakterin etrafındaki 4.5 metrelik alanda topu bul (Havadan geçerken topu rahat yakalayabilmesi için alan büyütüldü)
+            Collider[] hits = Physics.OverlapSphere(transform.position, 4.5f);
+            GameBall ball = null;
+            foreach (var h in hits)
+            {
+                if (h.TryGetComponent(out GameBall b))
+                {
+                    ball = b;
+                    break;
+                }
+            }
+
+            if (ball != null)
+            {
+                Vector3 forceDir = cameraForward;
+                
+                if (isShoot)
+                {
+                    // Eğer karakter yere yakınsa ve düz bakıyorsa topu havalandır (Lob efekti).
+                    // AMA karakter havadaysa veya çok aşağı bakıyorsa "Smash (Kafa Sması)" vurabilmesi için yönü bozma!
+                    if (transform.position.y < 2.5f && forceDir.y > -0.2f)
+                    {
+                        forceDir.y += 0.2f + (currentCharge * 0.3f);
+                    }
+                }
+                else
+                {
+                    // Pas her zaman hafif yere doğru/paralel gitsin
+                    forceDir.y = 0.05f;
+                }
+                
+                forceDir.Normalize();
+
+                float force = 0f;
+                if (isShoot)
+                {
+                    // Şarj seviyesine göre 15 ile 50 arasında efsanevi bir şut gücü!
+                    force = Mathf.Lerp(15f, 50f, currentCharge); 
+                    Debug.Log($"[Gameplay] ŞUT ÇEKİLDİ! Şarj: %{(currentCharge*100):F0} | Kuvvet: {force:F1}");
+                    PlayAnimationClientRpc("Kick");
+                }
+                else
+                {
+                    force = 22f; // Pas her zaman isabetli ve sabit hızlıdır
+                    Debug.Log($"[Gameplay] PAS VERİLDİ!");
+                    PlayAnimationClientRpc("Pass");
+                }
+
+                ball.HitBall(forceDir * force, OwnerClientId);
+            }
+        }
+
+        [ClientRpc]
+        private void PlayAnimationClientRpc(string triggerName)
+        {
+            if (_animator == null) _animator = GetComponentInChildren<Animator>();
+            if (_animator != null)
+            {
+                _animator.SetTrigger(triggerName);
+            }
+        }
+
+        private void UpdateChargeVisuals()
+        {
+            if (_chargeParticles == null) return;
+
+            float charge = ChargeLevel.Value;
+            var em = _chargeParticles.emission;
+            var main = _chargeParticles.main;
+            
+            if (charge > 0.02f) 
+            {
+                // Play() / Stop() metodlarını sürekli çağırmak yerine sadece emission'u (üretimi) açıp kapatıyoruz.
+                // Bu, konsoldaki "Setting the duration while system is still playing" hatasını KÖKÜNDEN ÇÖZER.
+                em.rateOverTime = Mathf.Lerp(20f, 150f, charge);
+                main.startSpeed = Mathf.Lerp(3f, 8f, charge);
+
+                Color particleColor = Color.green;
+                if (charge < 0.5f) 
+                    particleColor = Color.Lerp(Color.green, Color.yellow, charge * 2f);
+                else 
+                    particleColor = Color.Lerp(Color.yellow, new Color(1f, 0.2f, 0f), (charge - 0.5f) * 2f); 
+                
+                main.startColor = particleColor;
+            }
+            else
+            {
+                em.rateOverTime = 0f; // Şarj yoksa üretim yok
+            }
         }
 
         private float _cameraSearchTimer = 0f;
@@ -200,29 +418,52 @@ namespace Arixon.Gameplay
 
             bool shiftPressed = Keyboard.current.shiftKey.isPressed;
 
-            // Eğer tuşu bırakırsak yorgunluk hissi kalkar (tekrar basabilmek için)
             if (!shiftPressed)
             {
                 _isExhausted = false;
             }
 
-            // Stamina sıfırlanırsa (0.1'in altına düşerse) zorunlu olarak tüketildi say, uçmayı bırak
             if (CurrentStamina.Value <= 0.1f)
             {
                 _isExhausted = true;
+
+                // Eğer şarj ediyorken stamina bittiyse, oyuncu daha fazla tutamayıp otomatik şutu ateşler!
+                if (_isLocalCharging)
+                {
+                    _isLocalCharging = false;
+                    Vector3 forward = _mainCameraTransform != null ? _mainCameraTransform.forward : transform.forward;
+                    TryKickServerRpc(true, forward);
+                }
             }
 
-            // SHIFT'e basılıysa ve tükenmemişsek (Stamina > 0 ise) sprint/boost yap
+            float staminaDrain = 0f;
+
+            // Koşma Stamina Tüketimi
             if (shiftPressed && !_isExhausted)
             {
                 IsSprinting.Value = true;
-                float newVal = CurrentStamina.Value - (_sprintDrainRate * Time.deltaTime);
-                CurrentStamina.Value = Mathf.Clamp(newVal, 0f, MaxStamina);
+                staminaDrain += _sprintDrainRate;
             }
             else
             {
                 IsSprinting.Value = false;
-                // Şarj olma durumu
+            }
+
+            // Şarj (Basılı Tutma) Stamina Tüketimi
+            if (_isLocalCharging && !_isExhausted)
+            {
+                staminaDrain += 40f; // Saniyede 40 birim! Şarjı fullemek 1.5 saniyede 60 stamina yer.
+            }
+
+            if (staminaDrain > 0f)
+            {
+                // Tüketim var
+                float newVal = CurrentStamina.Value - (staminaDrain * Time.deltaTime);
+                CurrentStamina.Value = Mathf.Clamp(newVal, 0f, MaxStamina);
+            }
+            else
+            {
+                // Hiçbir şey yapmıyorsa Yenilenme
                 float newVal = CurrentStamina.Value + (_staminaRegenRate * Time.deltaTime);
                 CurrentStamina.Value = Mathf.Clamp(newVal, 0f, MaxStamina);
             }
@@ -269,6 +510,12 @@ namespace Arixon.Gameplay
                 float currentSpeed = (IsSprinting.Value && _isGrounded) ? _moveSpeed * _sprintSpeedMultiplier : _moveSpeed;
 
                 _characterController.Move(moveDirection * (currentSpeed * Time.deltaTime));
+
+                UpdateAnimator(currentSpeed);
+            }
+            else
+            {
+                UpdateAnimator(0f);
             }
         }
 
@@ -327,15 +574,16 @@ namespace Arixon.Gameplay
                 {
                     _lastHitTime = Time.time;
 
-                    // Vuruş yönü: Karakterden topa doğru yatay (Y eksenini hafif yukarı verelim ki havalansın)
+                    // Vuruş yönü: Karakterden topa doğru yatay
                     Vector3 forceDirection = hit.gameObject.transform.position - transform.position;
-                    forceDirection.y = 0.5f; // Topu hafif havaya kaldır
+                    forceDirection.y = 0.1f; // Dribbling hep yerden gider
                     forceDirection.Normalize();
 
-                    // Eğer atılma (Sprint) yapılıyorsa çok daha güçlü vur!
-                    float finalForce = IsSprinting.Value ? _hitForce * _dashForceMultiplier : _hitForce;
+                    // Eskisi gibi sert vurmak yerine, sadece önünde sürüklüyor (Dribbling)
+                    // Gerçek vuruşlar artık Mouse Sol ve Sağ tık ile yapılıyor!
+                    float finalForce = IsSprinting.Value ? _dribbleForce * 1.5f : _dribbleForce;
 
-                    // Sunucuya topa vurmasını söyle, kimin vurduğunu da ilet
+                    // Sunucuya topa vurmasını söyle
                     HitBallServerRpc(ballNetObj, forceDirection, finalForce, OwnerClientId);
                 }
             }

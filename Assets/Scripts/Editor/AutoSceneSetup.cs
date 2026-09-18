@@ -14,7 +14,8 @@ namespace Arixon.EditorScripts
 
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            if (state == PlayModeStateChange.ExitingEditMode)
+            // EditMode'dan çıkarken değil, tam olarak PlayMode'a girildiğinde çalıştır ki Unity değişiklikleri sıfırlamasın!
+            if (state == PlayModeStateChange.EnteredPlayMode)
             {
                 SetupGoals();
             }

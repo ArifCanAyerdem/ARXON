@@ -7,6 +7,7 @@ namespace Arixon.Gameplay
     {
         [Tooltip("Bu kalenin kime ait olduğu. 1: Mavi, 2: Kırmızı")]
         [SerializeField] private int _teamId;
+        public int TeamId => _teamId;
         
         private void Start()
         {
@@ -32,8 +33,11 @@ namespace Arixon.Gameplay
                 bounds.size = new Vector3(10, 5, 5);
             }
 
+            Vector3 localCenter = transform.InverseTransformPoint(bounds.center);
+            Vector3 localSize = transform.InverseTransformVector(bounds.size);
+
             // --- 1. GOL ÇİZGİSİ (TRIGGER) OLUŞTURMA ---
-            // Trigger mutlaka GoalTrigger scriptinin olduğu objede (PARENT) olmalıdır! Alt objede olursa OnTriggerEnter çalışmaz.
+            // Trigger mutlaka GoalTrigger scriptinin olduğu objede (PARENT) olmalıdır!
             Collider[] colliders = GetComponents<Collider>();
             bool hasTrigger = false;
             foreach (var c in colliders)
@@ -49,41 +53,40 @@ namespace Arixon.Gameplay
             {
                 BoxCollider triggerCol = gameObject.AddComponent<BoxCollider>();
                 triggerCol.isTrigger = true;
-                
-                Vector3 localCenter = transform.InverseTransformPoint(bounds.center);
-                Vector3 localSize = transform.InverseTransformVector(bounds.size);
-                
                 triggerCol.center = localCenter;
                 // Z eksenini (derinliği) yarıya düşürdüm ki kale direğine çarpar çarpmaz gol saymasın, içeri girsin.
                 triggerCol.size = new Vector3(Mathf.Abs(localSize.x) * 0.85f, Mathf.Abs(localSize.y) * 0.85f, Mathf.Abs(localSize.z) * 0.5f);
             }
 
-            // --- 2. GÖRSEL DÜZENLEME (ÇİRKİN KÜP YERİNE İSKELETİ BOYAMA) ---
-            // Kalenin içini kapatan devasa küpü sildik. Onun yerine orijinal kalenin iskeletini havalı bir metale çevirip parlatıyoruz.
-            Shader urpLit = Shader.Find("Universal Render Pipeline/Lit");
-            Material mat = urpLit != null ? new Material(urpLit) : new Material(Shader.Find("Standard"));
+            // --- 2. GÖRSEL DÜZENLEME (ROCKET LEAGUE STİLİ NEON KALKAN) ---
+            Color teamColor = _teamId == 1 ? new Color(0f, 0.8f, 1f, 0.35f) : new Color(1f, 0.1f, 0.3f, 0.35f);
 
-            // Mavi ve Kırmızı takımlar için koyu gövde ve parlayan neon kenarlar
-            Color baseColor = _teamId == 1 ? new Color(0f, 0.2f, 0.4f) : new Color(0.4f, 0.1f, 0.1f);
-            Color emissionColor = _teamId == 1 ? new Color(0f, 0.6f, 1f) * 1.5f : new Color(1f, 0.2f, 0.2f) * 1.5f;
+            // Kalenin içine görsel olarak "İnce bir enerji duvarı" (ForceField) yerleştiriyoruz.
+            // Çirkin durmaması için derinliği (Z) çok ince olacak. Sadece çizgiyi belirtecek.
+            GameObject forceField = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            forceField.name = "Neon_ForceField";
+            forceField.transform.SetParent(transform);
+            forceField.transform.localPosition = localCenter;
+            forceField.transform.localRotation = Quaternion.identity;
+            forceField.transform.localScale = new Vector3(Mathf.Abs(localSize.x) * 0.95f, Mathf.Abs(localSize.y) * 0.95f, 0.2f); // Z ekseni sadece 0.2 kalınlıkta!
 
-            if (urpLit != null) mat.SetColor("_BaseColor", baseColor);
-            else mat.SetColor("_Color", baseColor);
+            // Fiziki olarak topu engellememesi için kalkanın collider'ını siliyoruz (Zaten trigger'ımız var)
+            Destroy(forceField.GetComponent<Collider>());
 
-            mat.EnableKeyword("_EMISSION");
-            mat.SetColor("_EmissionColor", emissionColor);
+            // Kusursuz çalışan Sprites/Default şeffaf materyali
+            Material forceMat = new Material(Shader.Find("Sprites/Default"));
+            forceMat.SetColor("_Color", teamColor);
+            forceField.GetComponent<Renderer>().material = forceMat;
 
-            // Kalenin tüm orijinal iskeletine uygula
-            foreach (var r in renderers)
-            {
-                // Eğer iskeletin render'ında çirkin bir child küp kaldıysa sil
-                if (r.gameObject.name == "Neon_Goal_Field") 
-                {
-                    Destroy(r.gameObject);
-                    continue;
-                }
-                r.material = mat;
-            }
+            // Rengin etrafa yayılması için ışık (Duvardaki mavilik/kırmızılık)
+            Light goalLight = GetComponent<Light>();
+            if (goalLight == null) goalLight = gameObject.AddComponent<Light>();
+            
+            goalLight.type = LightType.Point;
+            goalLight.color = _teamId == 1 ? Color.cyan : Color.red;
+            goalLight.range = 15f; 
+            goalLight.intensity = 15f; 
+            goalLight.transform.localPosition = localCenter; 
         }
         
         private void OnTriggerEnter(Collider other)
@@ -91,17 +94,15 @@ namespace Arixon.Gameplay
             // Golleri sadece sunucu kontrol eder
             if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return; 
 
-            // Topun Collider'ı bir alt objede (örneğin mesh içinde) olabilir, bu yüzden Parent'ta GameBall arıyoruz.
-            GameBall ball = other.GetComponentInParent<GameBall>();
-            if (ball != null)
+            // Optimizasyon: GetComponentInParent çok maliyetlidir. attachedRigidbody ile anında GameBall'ı buluruz.
+            if (other.attachedRigidbody != null && other.attachedRigidbody.TryGetComponent(out GameBall ball))
             {
                 ulong scorerId = ball.LastTouchedPlayerId;
                 Debug.Log($"[Gameplay] [GoalTrigger] -> GOL! Takım {_teamId} kalesine gol atıldı! Son dokunan: {scorerId}");
-                
-                // Skoru yaz
+
                 if (MatchManager.Instance != null)
                 {
-                    MatchManager.Instance.RegisterGoal(_teamId, scorerId);
+                    MatchManager.Instance.RegisterGoal(_teamId, ball);
                 }
             }
         }

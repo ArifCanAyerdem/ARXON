@@ -10,8 +10,12 @@ namespace Arixon.Gameplay
         private Vector3 _startPosition;
         private bool _isWaitingForFirstTouch = true;
         
-        // Gol olduğunda kime yazılacağını bilmek için
+        // Gol olduğunda doğru kişiye yazılabilmesi için (Own Goal mantığı)
         public ulong LastTouchedPlayerId { get; private set; } = 999;
+        public ulong LastTouchedBluePlayerId { get; private set; } = 999;
+        public ulong LastTouchedRedPlayerId { get; private set; } = 999;
+        public ulong LastPasserBlueId { get; private set; } = 999;
+        public ulong LastPasserRedId { get; private set; } = 999;
 
         private void Awake()
         {
@@ -43,6 +47,63 @@ namespace Arixon.Gameplay
             }
         }
 
+        private void ProcessTouch(ulong hitterId)
+        {
+            if (!IsServer || MatchManager.Instance == null || MatchManager.Instance.CurrentState.Value != MatchState.Playing) return;
+
+            PlayerController pc = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(hitterId)?.GetComponent<PlayerController>();
+            if (pc == null) return;
+
+            ulong previousHitter = LastTouchedPlayerId;
+            int teamId = pc.TeamColorID.Value;
+
+            if (previousHitter != 999 && previousHitter != hitterId)
+            {
+                PlayerController prevPc = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(previousHitter)?.GetComponent<PlayerController>();
+                if (prevPc != null)
+                {
+                    if (prevPc.TeamColorID.Value == teamId)
+                    {
+                        // PAS: Aynı takımdan başka birine değdi
+                        MatchManager.Instance.RegisterPass(previousHitter);
+                        if (teamId == 1) LastPasserBlueId = previousHitter;
+                        else if (teamId == 2) LastPasserRedId = previousHitter;
+                    }
+                    else
+                    {
+                        // ARAYA GİRME (INTERCEPTION): Rakip takım araya girdi, pas zinciri kırıldı!
+                        MatchManager.Instance.RegisterInterception(hitterId);
+                        if (teamId == 1) LastPasserBlueId = 999; 
+                        else if (teamId == 2) LastPasserRedId = 999;
+                    }
+                }
+            }
+
+            LastTouchedPlayerId = hitterId;
+            if (teamId == 1) LastTouchedBluePlayerId = hitterId;
+            else if (teamId == 2) LastTouchedRedPlayerId = hitterId;
+
+            CheckForSave(pc);
+        }
+
+        private void CheckForSave(PlayerController pc)
+        {
+            // KURTARIŞ (SAVE): Top kendi kalene çok yakınsa ve vurduysan
+            GoalTrigger[] goals = FindObjectsByType<GoalTrigger>(FindObjectsSortMode.None);
+            foreach (var goal in goals)
+            {
+                if (goal.TeamId == pc.TeamColorID.Value)
+                {
+                    float dist = Vector3.Distance(transform.position, goal.transform.position);
+                    if (dist < 15f) // Tehlike bölgesi (15 metre)
+                    {
+                        MatchManager.Instance.RegisterSave(pc.OwnerClientId);
+                        Debug.Log($"[Gameplay] SAVE! Oyuncu {pc.OwnerClientId} topu {dist:F1}m mesafeden uzaklaştırdı.");
+                    }
+                }
+            }
+        }
+
         private void OnCollisionEnter(Collision collision)
         {
             if (!IsServer) return;
@@ -58,7 +119,7 @@ namespace Arixon.Gameplay
 
                 if (pc != null && pc.NetworkObject != null)
                 {
-                    LastTouchedPlayerId = pc.OwnerClientId;
+                    ProcessTouch(pc.OwnerClientId);
                 }
 
                 if (_isWaitingForFirstTouch)
@@ -77,7 +138,7 @@ namespace Arixon.Gameplay
                     return;
 
                 _isWaitingForFirstTouch = false;
-                LastTouchedPlayerId = hitterId;
+                ProcessTouch(hitterId);
                 _rb.AddForce(force, ForceMode.Impulse);
                 Debug.Log($"[Gameplay] [GameBall.HitBall] -> Topa vuruldu! (Hitter: {hitterId}, Force: {force})");
             }
@@ -92,6 +153,10 @@ namespace Arixon.Gameplay
                 transform.position = _startPosition;
                 _isWaitingForFirstTouch = true;
                 LastTouchedPlayerId = 999; // Sıfırla
+                LastTouchedBluePlayerId = 999;
+                LastTouchedRedPlayerId = 999;
+                LastPasserBlueId = 999;
+                LastPasserRedId = 999;
                 Debug.Log("[Gameplay] [GameBall.ResetBall] -> Top merkeze sıfırlandı ve ilk vuruş için kilitlendi.");
             }
         }

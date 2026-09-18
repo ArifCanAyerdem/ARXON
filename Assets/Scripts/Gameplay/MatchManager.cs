@@ -21,7 +21,13 @@ namespace Arixon.Gameplay
         public ulong SteamId; // Steam Entegrasyonu için
         public Unity.Collections.FixedString64Bytes PlayerName;
         public int TeamId;
+        
         public int Goals;
+        public int Assists;
+        public int Passes;
+        public int Interceptions;
+        public int Saves;
+        public int Score;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
@@ -30,11 +36,18 @@ namespace Arixon.Gameplay
             serializer.SerializeValue(ref PlayerName);
             serializer.SerializeValue(ref TeamId);
             serializer.SerializeValue(ref Goals);
+            serializer.SerializeValue(ref Assists);
+            serializer.SerializeValue(ref Passes);
+            serializer.SerializeValue(ref Interceptions);
+            serializer.SerializeValue(ref Saves);
+            serializer.SerializeValue(ref Score);
         }
 
         public bool Equals(PlayerMatchState other)
         {
-            return ClientId == other.ClientId && SteamId == other.SteamId && PlayerName == other.PlayerName && TeamId == other.TeamId && Goals == other.Goals;
+            return ClientId == other.ClientId && SteamId == other.SteamId && PlayerName == other.PlayerName && 
+                   TeamId == other.TeamId && Goals == other.Goals && Assists == other.Assists && 
+                   Passes == other.Passes && Interceptions == other.Interceptions && Saves == other.Saves && Score == other.Score;
         }
     }
 
@@ -150,30 +163,118 @@ namespace Arixon.Gameplay
             SendLeaderboardClientRpc();
         }
 
-        public void RegisterGoal(int goalTeamId, ulong scorerId)
+        public void RegisterGoal(int goalTeamId, GameBall ball)
         {
             if (!IsServer || CurrentState.Value != MatchState.Playing) return;
 
             // Skoru artır (Eğer top Mavi Kaleye(1) girdiyse Kırmızı Takım(2) puan alır)
+            int scoringTeam = goalTeamId == 1 ? 2 : 1;
+
             if (goalTeamId == 1) Team2Score.Value++;
             else if (goalTeamId == 2) Team1Score.Value++;
 
-            // Oyuncu istatistiğini artır
-            if (scorerId != 999) // 999=Kendi kendine girdiyse
+            // Rocket League Own Goal Mantığı:
+            // Golü yiyen takımdan biri kendi kalesine atsa bile, asıl krediyi RAKİP TAKIMDAN topa en son değen kişi alır.
+            ulong creditedPlayerId = 999;
+            ulong assistPlayerId = 999;
+
+            if (scoringTeam == 1) 
+            {
+                creditedPlayerId = ball.LastTouchedBluePlayerId;
+                assistPlayerId = ball.LastPasserBlueId;
+            }
+            else if (scoringTeam == 2) 
+            {
+                creditedPlayerId = ball.LastTouchedRedPlayerId;
+                assistPlayerId = ball.LastPasserRedId;
+            }
+
+            if (creditedPlayerId != 999)
             {
                 for (int i = 0; i < PlayerStats.Count; i++)
                 {
-                    if (PlayerStats[i].ClientId == scorerId)
+                    if (PlayerStats[i].ClientId == creditedPlayerId)
                     {
                         var stat = PlayerStats[i];
                         stat.Goals++;
-                        PlayerStats[i] = stat; // Struct olduğu için geri atamak zorunlu
+                        stat.Score += 1000;
+                        PlayerStats[i] = stat;
+                        Debug.Log($"[MatchManager] Golü atan (kredi verilen) oyuncu: {creditedPlayerId}");
                         break;
                     }
                 }
             }
 
+            // Asist Kredisi
+            if (assistPlayerId != 999 && assistPlayerId != creditedPlayerId)
+            {
+                for (int i = 0; i < PlayerStats.Count; i++)
+                {
+                    if (PlayerStats[i].ClientId == assistPlayerId)
+                    {
+                        var stat = PlayerStats[i];
+                        stat.Assists++;
+                        stat.Score += 500;
+                        PlayerStats[i] = stat;
+                        Debug.Log($"[MatchManager] Asist yapan oyuncu: {assistPlayerId}");
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log($"[MatchManager] Gol oldu ama rakip takımdan topa değen kimse olmadığı için bireysel skor yazılamadı.");
+            }
+
             StartCoroutine(ServerGoalRoutine());
+        }
+
+        public void RegisterPass(ulong playerId)
+        {
+            if (!IsServer) return;
+            for (int i = 0; i < PlayerStats.Count; i++)
+            {
+                if (PlayerStats[i].ClientId == playerId)
+                {
+                    var stat = PlayerStats[i];
+                    stat.Passes++;
+                    stat.Score += 50;
+                    PlayerStats[i] = stat;
+                    break;
+                }
+            }
+        }
+
+        public void RegisterInterception(ulong playerId)
+        {
+            if (!IsServer) return;
+            for (int i = 0; i < PlayerStats.Count; i++)
+            {
+                if (PlayerStats[i].ClientId == playerId)
+                {
+                    var stat = PlayerStats[i];
+                    stat.Interceptions++;
+                    stat.Score += 100;
+                    PlayerStats[i] = stat;
+                    break;
+                }
+            }
+        }
+
+        public void RegisterSave(ulong playerId)
+        {
+            if (!IsServer) return;
+            for (int i = 0; i < PlayerStats.Count; i++)
+            {
+                if (PlayerStats[i].ClientId == playerId)
+                {
+                    var stat = PlayerStats[i];
+                    stat.Saves++;
+                    stat.Score += 500;
+                    PlayerStats[i] = stat;
+                    break;
+                }
+            }
         }
 
         private IEnumerator ServerGoalRoutine()

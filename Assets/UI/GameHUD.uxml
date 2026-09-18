@@ -28,11 +28,10 @@
             <ui:Label text="0" name="score-blue" class="score-text-blue" />
         </ui:VisualElement>
 
-        <!-- ROCKET LEAGUE STYLE BOOST METER -->
+        <!-- YATAY GHOST ENERGY BAR -->
         <ui:VisualElement name="boost-container" class="boost-container">
-            <Arixon.UI.RadialGauge name="boost-gauge" class="boost-gauge" />
-            <ui:Label name="boost-text" class="boost-text" text="100" />
-            <ui:Label text="BOOST" class="boost-label" />
+            <ui:Label text="STAMINA" class="boost-label" />
+            <Arixon.UI.GhostEnergyBar name="boost-gauge" class="boost-gauge" />
         </ui:VisualElement>
 
         <!-- Maç Sonu Tablosu -->
@@ -41,22 +40,52 @@
             <ui:Label text="İstatistikler yakında eklenecektir..." class="leaderboard-text" />
         </ui:VisualElement>
 
-        <!-- TAB Skor Tablosu -->
+        <!-- TAB Skor Tablosu (Gelişmiş Espor Tasarımı) -->
         <ui:VisualElement name="tab-scoreboard-panel" class="tab-scoreboard-panel" style="display: none;">
-            <ui:Label text="SKOR TABLOSU" class="tab-scoreboard-title" />
-            <ui:VisualElement class="tab-rows-container">
-                <!-- Mavi Takım -->
-                <ui:VisualElement class="tab-team-row blue-row">
-                    <ui:Label text="MAVİ TAKIM" class="tab-team-title blue-title" />
-                    <ui:ScrollView name="blue-team-list" class="tab-team-list" />
+            
+            <ui:VisualElement class="tab-scoreboard-box">
+                <!-- Başlık Satırı (Sütun İsimleri) -->
+                <ui:VisualElement class="tab-header-row">
+                    <ui:VisualElement class="tab-col-name" />
+                    <ui:Label text="Goal" class="tab-col-stat" />
+                    <ui:Label text="Assist" class="tab-col-stat" />
+                    <ui:Label text="Pass" class="tab-col-stat" />
+                    <ui:Label text="Interception" class="tab-col-stat" />
+                    <ui:Label text="Save" class="tab-col-stat" />
+                    <ui:Label text="Score" class="tab-col-stat" />
                 </ui:VisualElement>
-                
-                <!-- Kırmızı Takım -->
-                <ui:VisualElement class="tab-team-row red-row">
-                    <ui:Label text="KIRMIZI TAKIM" class="tab-team-title red-title" />
-                    <ui:ScrollView name="red-team-list" class="tab-team-list" />
+
+                <!-- HOME TEAM (Mavi Takım) -->
+                <ui:VisualElement class="tab-team-section home-team">
+                    <ui:VisualElement class="tab-team-title-row home-bg">
+                        <ui:VisualElement class="team-icon home-icon" />
+                        <ui:Label text="HOME" class="team-title-text" />
+                    </ui:VisualElement>
+                    
+                    <ui:ScrollView name="home-team-list" class="tab-player-list" />
+                    
+                    <ui:VisualElement class="tab-total-row">
+                        <ui:Label text="Total match" class="total-text" />
+                        <ui:Label text="0" name="home-total-score" class="total-score-text" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- AWAY TEAM (Kırmızı Takım) -->
+                <ui:VisualElement class="tab-team-section away-team">
+                    <ui:VisualElement class="tab-team-title-row away-bg">
+                        <ui:VisualElement class="team-icon away-icon" />
+                        <ui:Label text="AWAY" class="team-title-text" />
+                    </ui:VisualElement>
+                    
+                    <ui:ScrollView name="away-team-list" class="tab-player-list" />
+                    
+                    <ui:VisualElement class="tab-total-row">
+                        <ui:Label text="Total match" class="total-text" />
+                        <ui:Label text="0" name="away-total-score" class="total-score-text" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
+            
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

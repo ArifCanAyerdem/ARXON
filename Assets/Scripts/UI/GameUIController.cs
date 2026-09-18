@@ -13,8 +13,7 @@ namespace Arixon.UI
         private Label _statusText;
         private Label _countdownText;
         
-        private RadialGauge _boostGauge;
-        private Label _boostText;
+        private GhostEnergyBar _boostGauge;
 
         private Label _matchTimerText;
         private Label _scoreRedText;
@@ -35,8 +34,7 @@ namespace Arixon.UI
                 _statusText = root.Q<Label>("status-text");
                 _countdownText = root.Q<Label>("countdown-text");
 
-                _boostGauge = root.Q<RadialGauge>("boost-gauge");
-                _boostText = root.Q<Label>("boost-text");
+                _boostGauge = root.Q<GhostEnergyBar>("boost-gauge");
 
                 _matchTimerText = root.Q<Label>("match-timer");
                 _scoreRedText = root.Q<Label>("score-red");
@@ -193,29 +191,6 @@ namespace Arixon.UI
             {
                 _boostGauge.Progress = percentage * 100f;
             }
-
-            if (_boostText != null)
-            {
-                int boostAmount = Mathf.RoundToInt(percentage * 100f);
-                _boostText.text = boostAmount.ToString();
-                
-                // Renk değişimi
-                if (percentage < 0.25f)
-                {
-                    _boostText.style.color = new StyleColor(new Color32(255, 50, 50, 255));
-                    _boostText.style.textShadow = new StyleTextShadow(new TextShadow { color = new Color(1f, 0.2f, 0.2f, 0.8f), blurRadius = 15f });
-                }
-                else if (percentage < 0.5f)
-                {
-                    _boostText.style.color = new StyleColor(new Color32(255, 150, 0, 255));
-                    _boostText.style.textShadow = new StyleTextShadow(new TextShadow { color = new Color(1f, 0.6f, 0f, 0.8f), blurRadius = 15f });
-                }
-                else
-                {
-                    _boostText.style.color = new StyleColor(new Color32(0, 255, 255, 255));
-                    _boostText.style.textShadow = new StyleTextShadow(new TextShadow { color = new Color(0f, 1f, 1f, 0.8f), blurRadius = 15f });
-                }
-            }
         }
 
         public void ShowEndGameScreen()
@@ -234,7 +209,7 @@ namespace Arixon.UI
                 if (Keyboard.current.tabKey.wasPressedThisFrame)
                 {
                     _tabScoreboardPanel.style.display = DisplayStyle.Flex;
-                    RefreshTabScoreboard();
+                    UpdateTabScoreboard();
                 }
                 else if (Keyboard.current.tabKey.wasReleasedThisFrame)
                 {
@@ -243,32 +218,71 @@ namespace Arixon.UI
             }
         }
 
-        private void RefreshTabScoreboard()
+        private void UpdateTabScoreboard()
         {
-            if (_blueTeamList == null || _redTeamList == null || MatchManager.Instance == null) return;
+            if (MatchManager.Instance == null) return;
 
-            _blueTeamList.Clear();
-            _redTeamList.Clear();
+            var homeList = _tabScoreboardPanel.Q<ScrollView>("home-team-list");
+            var awayList = _tabScoreboardPanel.Q<ScrollView>("away-team-list");
+            var homeTotal = _tabScoreboardPanel.Q<Label>("home-total-score");
+            var awayTotal = _tabScoreboardPanel.Q<Label>("away-total-score");
+
+            if (homeList == null || awayList == null) return;
+
+            homeList.Clear();
+            awayList.Clear();
+
+            int hTotal = 0;
+            int aTotal = 0;
 
             foreach (var stat in MatchManager.Instance.PlayerStats)
             {
-                VisualElement row = new VisualElement();
-                row.AddToClassList("player-stat-row");
+                var row = new VisualElement();
+                row.AddToClassList("player-row");
 
-                Label nameLabel = new Label(stat.PlayerName.ToString());
-                nameLabel.AddToClassList("player-stat-name");
+                // Oyuncu Bilgi Kısmı (Avatar + İsim)
+                var infoContainer = new VisualElement();
+                infoContainer.AddToClassList("player-info-container");
 
-                Label scoreLabel = new Label(stat.Goals.ToString());
-                scoreLabel.AddToClassList("player-stat-score");
+                var avatar = new VisualElement();
+                avatar.AddToClassList("player-avatar");
 
-                row.Add(nameLabel);
-                row.Add(scoreLabel);
+                var nameLabel = new Label(stat.PlayerName.ToString());
+                nameLabel.AddToClassList("player-name");
 
-                if (stat.TeamId == 1) // Mavi
-                    _blueTeamList.Add(row);
-                else
-                    _redTeamList.Add(row);
+                infoContainer.Add(avatar);
+                infoContainer.Add(nameLabel);
+                row.Add(infoContainer);
+
+                // İstatistik Sütunları (Goal, Assist, Pass, Interception, Save, Score)
+                row.Add(CreateStatLabel(stat.Goals.ToString()));
+                row.Add(CreateStatLabel(stat.Assists.ToString()));
+                row.Add(CreateStatLabel(stat.Passes.ToString()));
+                row.Add(CreateStatLabel(stat.Interceptions.ToString()));
+                row.Add(CreateStatLabel(stat.Saves.ToString()));
+                row.Add(CreateStatLabel(stat.Score.ToString("N0")));
+
+                if (stat.TeamId == 1) // HOME (Mavi)
+                {
+                    homeList.Add(row);
+                    hTotal += stat.Score;
+                }
+                else // AWAY (Kırmızı)
+                {
+                    awayList.Add(row);
+                    aTotal += stat.Score;
+                }
             }
+
+            if (homeTotal != null) homeTotal.text = hTotal.ToString("N0");
+            if (awayTotal != null) awayTotal.text = aTotal.ToString("N0");
+        }
+
+        private Label CreateStatLabel(string text)
+        {
+            var lbl = new Label(text);
+            lbl.AddToClassList("player-stat");
+            return lbl;
         }
     }
 }

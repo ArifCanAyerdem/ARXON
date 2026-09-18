@@ -229,6 +229,19 @@ MonoBehaviour:
   _rotationSpeed: 15
   _gravity: -20
   _jumpHeight: 2
+  TeamColorID:
+    m_InternalValue: 0
+  ChargeLevel:
+    m_InternalValue: 0
+  MaxStamina: 100
+  CurrentStamina:
+    m_InternalValue: 100
+  _sprintDrainRate: 25
+  _staminaRegenRate: 15
+  _sprintSpeedMultiplier: 1.8
+  _boostJumpForce: 25
+  IsSprinting:
+    m_InternalValue: 0
 --- !u!1 &6638601162314356640
 GameObject:
   m_ObjectHideFlags: 0
