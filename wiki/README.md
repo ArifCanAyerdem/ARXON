@@ -14,8 +14,10 @@ Bu klasör, ARİXON çok oyunculu (Multiplayer) oyun projesinin sıfırdan geli�
 | 02 | **Multiplayer Altyapısı (Netcode & MPPM Kurulumu)** | Unity Netcode for GameObjects (NGO) ve Multiplayer Play Mode paketlerinin projeye entegrasyonu | [02_multiplayer_ve_netcode_kurulumu.md](./02_multiplayer_ve_netcode_kurulumu.md) | ✅ Tamamlandı |
 | 03 | **UI Toolkit Giriş Ekranı (MainMenu)** | Modern UI Toolkit (UXML + USS + C#) ile oyun başlığı, Host/Join butonları ve sahne kurulumu | [03_ui_toolkit_giris_ekrani.md](./03_ui_toolkit_giris_ekrani.md) | ✅ Tamamlandı |
 | 04 | **NetworkManager ve Bağlantı Sistemi** | Giriş ekranından tetiklenen Host/Client bağlantı yöneticisi ve sahne geçişi | [04_networkmanager_ve_baglanti_sistemi.md](./04_networkmanager_ve_baglanti_sistemi.md) | ✅ Tamamlandı |
-| 05 | **Multiplayer Karakter Kontrolü** | NetworkObject, NetworkTransform ve IsOwner uyumlu oyuncu hareketi | *(Sırada)* | ⏳ Bekliyor |
-| 06 | **Steam Entegrasyonu** | Steamworks / Steam P2P Transport ve Lobi sistemi | *(Planlandı)* | ⏳ Bekliyor |
+| 05 | **Multiplayer Karakter Kontrolü** | NetworkObject, Jetpack (Boost), Sprint ve Stamina yönetimi | *(Doküman Eklenecek)* | ✅ Tamamlandı |
+| 06 | **Maç Süresi ve Skorboard** | 3 dakikalık sayaç, neon skor arayüzü, gol tespiti ve liderlik tablosu | [06_mac_sistemi_ve_skorboard.md](./06_mac_sistemi_ve_skorboard.md) | ✅ Tamamlandı |
+| 07 | **Steam Entegrasyonu** | Steamworks / Steam P2P Transport ve Lobi sistemi | *(Planlandı)* | ⏳ Bekliyor |
+| 08 | **Audio ve Müzik Sistemi** | Ana menü ve lobi için otomatik oluşturulan, DontDestroyOnLoad özellikli kesintisiz müzik oynatıcısı | [07_audio_ve_muzik_sistemi.md](./07_audio_ve_muzik_sistemi.md) | ✅ Tamamlandı |
 | 07 | **Audio ve Müzik Sistemi** | Ana menü ve lobi için otomatik oluşturulan, DontDestroyOnLoad özellikli kesintisiz müzik oynatıcısı | [07_audio_ve_muzik_sistemi.md](./07_audio_ve_muzik_sistemi.md) | ✅ Tamamlandı |
 
 ---

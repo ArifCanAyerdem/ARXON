@@ -11,13 +11,20 @@ namespace Arixon.Gameplay
         [Header("Camera Settings")]
         [SerializeField] private float _distance = 7f;
         [SerializeField] private float _height = 4f;
-        [SerializeField] private float _smoothSpeed = 10f;
+        [SerializeField] private float _positionSmoothTime = 0.05f; // Çok daha pürüzsüz pozisyon takibi
+        [SerializeField] private float _rotationSmoothTime = 0.05f; // Çok daha pürüzsüz kamera dönüşü
         
         private float _currentX = 0f;
-        private float _currentY = 15f; // Başlangıç açısı
+        private float _currentY = 15f; 
+        
+        private float _smoothX = 0f;
+        private float _smoothY = 15f;
+        private float _velX;
+        private float _velY;
+        private Vector3 _posVelocity;
         
         [Header("Mouse Settings")]
-        [SerializeField] private float _mouseSensitivity = 2f;
+        [SerializeField] private float _mouseSensitivity = 1.5f; // Hassasiyeti biraz kıstık ki soft olsun
         [SerializeField] private float _minY = -20f;
         [SerializeField] private float _maxY = 60f;
 
@@ -25,17 +32,14 @@ namespace Arixon.Gameplay
         {
             if (_target == null) return;
 
-            // MainMenu hariç diğer sahnelerde farenin karakteri/kamerayı döndürmesine izin ver
             bool isGameScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "MainMenu";
 
             if (UnityEngine.InputSystem.Mouse.current != null)
             {
-                // Eğer oyundaysak (GameScene) kamerayı hep farenin yönüne çevir.
                 bool shouldRotateCamera = isGameScene && _target != null;
 
                 if (shouldRotateCamera)
                 {
-                    // Kamerayı kontrol ederken farenin ekrandan çıkmaması için kilitle
                     if (Cursor.lockState != CursorLockMode.Locked)
                     {
                         Cursor.lockState = CursorLockMode.Locked;
@@ -49,7 +53,6 @@ namespace Arixon.Gameplay
                 }
                 else
                 {
-                    // Kamerayı kontrol etmiyorsak (Örn: Lobide sağ tık bırakıldıysa) imleci göster
                     if (Cursor.lockState != CursorLockMode.None)
                     {
                         Cursor.lockState = CursorLockMode.None;
@@ -58,15 +61,17 @@ namespace Arixon.Gameplay
                 }
             }
 
-            // Rotasyonu hesapla
-            Quaternion rotation = Quaternion.Euler(_currentY, _currentX, 0);
+            // Pürüzsüz Rotasyon (SmoothDampAngle titremeleri tamamen yok eder)
+            _smoothX = Mathf.SmoothDampAngle(_smoothX, _currentX, ref _velX, _rotationSmoothTime);
+            _smoothY = Mathf.SmoothDampAngle(_smoothY, _currentY, ref _velY, _rotationSmoothTime);
+
+            Quaternion rotation = Quaternion.Euler(_smoothY, _smoothX, 0);
             
-            // Kamera pozisyonunu hedefin arkasına yerleştir
             Vector3 lookAtPoint = _target.position + (Vector3.up * _height);
             Vector3 desiredPosition = lookAtPoint - (rotation * Vector3.forward * _distance);
             
-            // Kamerayı uygula
-            transform.position = Vector3.Lerp(transform.position, desiredPosition, _smoothSpeed * Time.deltaTime);
+            // Pozisyonu yumuşak takip et (Lerp yerine SmoothDamp çok daha pürüzsüzdür ve donma hissini keser)
+            transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref _posVelocity, _positionSmoothTime);
             transform.LookAt(lookAtPoint);
         }
 
@@ -78,10 +83,10 @@ namespace Arixon.Gameplay
             {
                 Debug.Log($"[Gameplay] [PlayerCameraFollow.SetTarget] -> Kamera hedefi ayarlandı. (Hedef: {_target.name})");
                 
-                // (Kursor kilitleme işlemi LateUpdate içinde yapılıyor)
-                
-                // Başlangıç rotasyonunu hedefin arkasına göre ayarla
                 _currentX = _target.eulerAngles.y;
+                _smoothX = _currentX;
+                _currentY = 15f;
+                _smoothY = _currentY;
                 
                 Vector3 lookAtPoint = _target.position + (Vector3.up * _height);
                 Quaternion rotation = Quaternion.Euler(_currentY, _currentX, 0);

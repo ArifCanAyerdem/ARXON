@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ui="UnityEngine.UIElements"
+    xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd">
+
+    <ui:Style src="GameHUD.uss" />
+
+    <ui:VisualElement class="hud-container">
+        <!-- Yarı saydam geçiş ekranı (Hata gibi durmaması için lacivert tonlarında) -->
+        <ui:VisualElement name="match-overlay" class="overlay-panel">
+            <ui:Label text="SAHAYA İNİLİYOR..." name="status-text" class="status-label" />
+            <ui:Label text="3" name="countdown-text" class="countdown-text" style="display: none;" />
+        </ui:VisualElement>
+
+        <!-- Hologram Timer -->
+        <ui:VisualElement class="timer-container">
+            <ui:Label text="03:00" name="match-timer" class="match-timer-text" />
+        </ui:VisualElement>
+
+        <!-- Kırmızı Takım Skoru (Sağ Üst, Eğik Tasarım) -->
+        <ui:VisualElement class="score-panel-red">
+            <ui:Label text="0" name="score-red" class="score-text-red" />
+        </ui:VisualElement>
+
+        <!-- Mavi Takım Skoru (Sol Üst, Eğik Tasarım) -->
+        <ui:VisualElement class="score-panel-blue">
+            <ui:Label text="0" name="score-blue" class="score-text-blue" />
+        </ui:VisualElement>
+
+        <!-- ROCKET LEAGUE STYLE BOOST METER -->
+        <ui:VisualElement name="boost-container" class="boost-container">
+            <Arixon.UI.RadialGauge name="boost-gauge" class="boost-gauge" />
+            <ui:Label name="boost-text" class="boost-text" text="100" />
+            <ui:Label text="BOOST" class="boost-label" />
+        </ui:VisualElement>
+
+        <!-- Maç Sonu Tablosu -->
+        <ui:VisualElement name="leaderboard-panel" class="leaderboard-panel" style="display: none;">
+            <ui:Label text="MAÇ BİTTİ!" class="leaderboard-title" />
+            <ui:Label text="İstatistikler yakında eklenecektir..." class="leaderboard-text" />
+        </ui:VisualElement>
+
+        <!-- TAB Skor Tablosu -->
+        <ui:VisualElement name="tab-scoreboard-panel" class="tab-scoreboard-panel" style="display: none;">
+            <ui:Label text="SKOR TABLOSU" class="tab-scoreboard-title" />
+            <ui:VisualElement class="tab-rows-container">
+                <!-- Mavi Takım -->
+                <ui:VisualElement class="tab-team-row blue-row">
+                    <ui:Label text="MAVİ TAKIM" class="tab-team-title blue-title" />
+                    <ui:ScrollView name="blue-team-list" class="tab-team-list" />
+                </ui:VisualElement>
+                
+                <!-- Kırmızı Takım -->
+                <ui:VisualElement class="tab-team-row red-row">
+                    <ui:Label text="KIRMIZI TAKIM" class="tab-team-title red-title" />
+                    <ui:ScrollView name="red-team-list" class="tab-team-list" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

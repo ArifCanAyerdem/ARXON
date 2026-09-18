@@ -62,6 +62,8 @@ namespace Arixon.Editor
 
             var rb = ballObj.AddComponent<Rigidbody>();
             rb.mass = 5f; // Biraz ağır olsun, uçup gitmesin
+            rb.linearDamping = 0.2f; // Top havada veya yerde kayarken yavaşlasın
+            rb.angularDamping = 1.5f; // Top yuvarlanırken kendi etrafında dönmesi yavaşlasın (sonsuza kadar gitmesin)
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 

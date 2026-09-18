@@ -41,3 +41,23 @@ Bu sayfa, projede yapılan her işlemi hızlıca görebilmeniz için tutulan kı
   * **Sahne Geçişi & Çıkış:** Lobi lideri "OYUNU BAŞLAT" diyene kadar lobide beklenir; "ANA SAYFAYA DÖN" ile odadan güvenle çıkılır.
 * **Detaylı Doküman:** [04_networkmanager_ve_baglanti_sistemi.md](./04_networkmanager_ve_baglanti_sistemi.md)
 
+---
+
+### 📌 [05] Karakter Kontrolü ve Kaos Mekanikleri (Stamina & Boost)
+* **Durum:** ✅ Tamamlandı
+* **Ne Yapıldı:** 
+  * **Stamina Sistemi:** Shift tuşuna basılı tutulduğunda sprint atma ve enerji tüketimi.
+  * **Hava Sıçraması (Jetpack):** Zıpladıktan sonra havadayken Shift ile yukarı doğru sürekli roketleme.
+  * **Sert Vuruş:** Hızlı koşarken topa çarpıldığında standart şutun 3 katı şiddetli vurma.
+  * **UI:** Ekrana dolup boşalan Stamina (Enerji) Barı eklendi.
+
+---
+
+### 📌 [06] Maç Sistemi ve Özgün Skor Tablosu
+* **Durum:** ✅ Tamamlandı
+* **Ne Yapıldı:** 
+  * **Süre (Timer):** 3 Dakikalık (180s) merkezi sunucu sayacı ve ekran ortasında devasa hologram saat.
+  * **Arayüz (HUD):** Klasikleşik yapılar yerine Mavi Takım skoru Sol Üst köşede, Kırmızı Takım skoru Sağ Üst köşede neon tarzı konumlandırıldı.
+  * **Gol ve Reset:** Top kaleye girdiğinde oyun 3 saniye durur, "GOOOL" yazısı çıkar ve herkes başlangıç noktasına ışınlanır.
+  * **Maç Sonu:** 3 Dakika dolduğunda Liderlik Tablosu (Leaderboard) çıkar ve kimin kaç gol attığı gösterilir.
+* **Detaylı Doküman:** [06_mac_sistemi_ve_skorboard.md](./06_mac_sistemi_ve_skorboard.md)

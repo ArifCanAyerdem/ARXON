@@ -1350,7 +1350,12 @@ namespace Arixon.UI
                     allCards[k].AddToClassList("empty-card");
 
                     var avatarTag = allCards[k].Q<UnityEngine.UIElements.Label>($"slot-{k + 1}-avatar-tag");
-                    if (avatarTag != null) avatarTag.text = "+";
+                    if (avatarTag != null) 
+                    {
+                        avatarTag.RemoveFromClassList("avatar-tag");
+                        avatarTag.AddToClassList("empty-plus");
+                        avatarTag.text = "+";
+                    }
 
                     var circle = allCards[k].Q<UnityEngine.UIElements.VisualElement>($"slot-{k + 1}-circle");
                     if (circle != null)
@@ -1453,6 +1458,8 @@ namespace Arixon.UI
             }
             if (avatarTag != null)
             {
+                avatarTag.RemoveFromClassList("empty-plus");
+                avatarTag.AddToClassList("avatar-tag");
                 avatarTag.text = $"P{slotIndex + 1}";
             }
 
@@ -1505,6 +1512,13 @@ namespace Arixon.UI
                 AddMessageToChat(GetLoc("SYSTEM"), GetLoc("CHAT_GAME_STARTING"), true);
                 if (ArixonNetworkManager.Instance != null)
                 {
+                    // Takım verilerini ArixonNetworkManager'a aktar (1 = Mavi, 2 = Kırmızı)
+                    ArixonNetworkManager.Instance.PlayerTeams.Clear();
+                    foreach (var kvp in _playerTeams)
+                    {
+                        ArixonNetworkManager.Instance.PlayerTeams[kvp.Key] = (kvp.Value == "BLUE") ? 1 : 2;
+                    }
+
                     ArixonNetworkManager.Instance.LoadGameScene();
                 }
             }

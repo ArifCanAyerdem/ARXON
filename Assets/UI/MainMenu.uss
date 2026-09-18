@@ -671,10 +671,10 @@
 }
 
 .active-ready-card {
-    background-color: rgb(30, 70, 46); /* Koyu YeÅŸil Zemin */
-    border-color: rgb(46, 204, 113); /* Neon YeÅŸil (Mint) */
-    border-bottom-width: 6px;
-    border-bottom-color: rgb(15, 40, 25);
+    background-color: rgb(30, 70, 46) !important; /* Koyu Yeşil Zemin */
+    border-color: rgb(46, 204, 113) !important; /* Neon Yeşil (Mint) */
+    border-bottom-width: 6px !important;
+    border-bottom-color: rgb(15, 40, 25) !important;
 }
 
 .empty-card {
@@ -718,6 +718,16 @@
 .avatar-p2 {
     background-color: rgb(9, 132, 227);
     border-color: rgb(100, 210, 255);
+}
+
+.avatar-p3 {
+    background-color: rgb(155, 89, 182); /* Purple */
+    border-color: rgb(210, 150, 255);
+}
+
+.avatar-p4 {
+    background-color: rgb(231, 76, 60); /* Red */
+    border-color: rgb(255, 120, 120);
 }
 
 .avatar-tag {
