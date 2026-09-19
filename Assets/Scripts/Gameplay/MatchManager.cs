@@ -105,6 +105,7 @@ namespace Arixon.Gameplay
 
         private IEnumerator ServerMatchFlow()
         {
+            Debug.Log("[Gameplay] [MatchManager.ServerMatchFlow] -> Sunucu maç akışı başlatıldı.");
             CurrentState.Value = MatchState.WaitingForPlayers;
             
             // Oyuncuları Skor Tablosuna Ekle
@@ -115,6 +116,7 @@ namespace Arixon.Gameplay
             yield return StartCoroutine(ServerCountdownRoutine());
 
             CurrentState.Value = MatchState.Playing;
+            Debug.Log("[Gameplay] [MatchManager.ServerMatchFlow] -> Maç başladı! (Durum: Playing)");
             _matchTimerCoroutine = StartCoroutine(ServerMatchTimerRoutine());
         }
 
@@ -140,6 +142,7 @@ namespace Arixon.Gameplay
 
         private IEnumerator ServerCountdownRoutine()
         {
+            Debug.Log("[Gameplay] [MatchManager.ServerCountdownRoutine] -> Geri sayım başladı.");
             CurrentState.Value = MatchState.Countdown;
             CountdownTimer.Value = 3;
 
@@ -149,6 +152,7 @@ namespace Arixon.Gameplay
                 CountdownTimer.Value--;
             }
             yield return new WaitForSeconds(0.5f);
+            Debug.Log("[Gameplay] [MatchManager.ServerCountdownRoutine] -> Geri sayım bitti.");
         }
 
         private IEnumerator ServerMatchTimerRoutine()
@@ -159,16 +163,22 @@ namespace Arixon.Gameplay
                 MatchTimer.Value--;
             }
 
+            Debug.Log("[Gameplay] [MatchManager.ServerMatchTimerRoutine] -> Süre doldu, maç bitti!");
             CurrentState.Value = MatchState.Finished;
             SendLeaderboardClientRpc();
         }
 
         public void RegisterGoal(int goalTeamId, GameBall ball)
         {
-            if (!IsServer || CurrentState.Value != MatchState.Playing) return;
+            if (!IsServer || CurrentState.Value != MatchState.Playing)
+            {
+                Debug.LogWarning($"[Gameplay] [MatchManager.RegisterGoal] -> Başarısız: Sunucu değil veya maç oynanmıyor. (IsServer: {IsServer}, Durum: {CurrentState.Value})");
+                return;
+            }
 
             // Skoru artır (Eğer top Mavi Kaleye(1) girdiyse Kırmızı Takım(2) puan alır)
             int scoringTeam = goalTeamId == 1 ? 2 : 1;
+            Debug.Log($"[Gameplay] [MatchManager.RegisterGoal] -> GOL! (TopunGirdiğiKale: {goalTeamId}, PuanıAlanTakım: {scoringTeam})");
 
             if (goalTeamId == 1) Team2Score.Value++;
             else if (goalTeamId == 2) Team1Score.Value++;
@@ -223,7 +233,7 @@ namespace Arixon.Gameplay
             }
             else
             {
-                Debug.Log($"[MatchManager] Gol oldu ama rakip takımdan topa değen kimse olmadığı için bireysel skor yazılamadı.");
+                Debug.Log($"[Gameplay] [MatchManager.RegisterGoal] -> Gol oldu ama rakip takımdan topa değen kimse olmadığı için bireysel skor yazılamadı.");
             }
 
             StartCoroutine(ServerGoalRoutine());
@@ -264,6 +274,7 @@ namespace Arixon.Gameplay
         public void RegisterSave(ulong playerId)
         {
             if (!IsServer) return;
+            Debug.Log($"[Gameplay] [MatchManager.RegisterSave] -> Kurtarış kaydedildi. (OyuncuId: {playerId})");
             for (int i = 0; i < PlayerStats.Count; i++)
             {
                 if (PlayerStats[i].ClientId == playerId)
@@ -279,6 +290,7 @@ namespace Arixon.Gameplay
 
         private IEnumerator ServerGoalRoutine()
         {
+            Debug.Log("[Gameplay] [MatchManager.ServerGoalRoutine] -> Gol sonrası akış başlatıldı.");
             if (_matchTimerCoroutine != null) StopCoroutine(_matchTimerCoroutine);
 
             CurrentState.Value = MatchState.GoalScored;
@@ -293,13 +305,16 @@ namespace Arixon.Gameplay
             yield return StartCoroutine(ServerCountdownRoutine());
 
             CurrentState.Value = MatchState.Playing;
+            Debug.Log("[Gameplay] [MatchManager.ServerGoalRoutine] -> Maç kaldığı yerden devam ediyor! (Durum: Playing)");
             _matchTimerCoroutine = StartCoroutine(ServerMatchTimerRoutine());
         }
 
         private void ResetAllPlayersAndBall()
         {
+            Debug.Log("[Gameplay] [MatchManager.ResetAllPlayersAndBall] -> Oyuncular ve top başlangıç konumlarına döndürülüyor.");
             GameBall ball = FindFirstObjectByType<GameBall>();
             if (ball != null) ball.ResetBall();
+            else Debug.LogWarning("[Gameplay] [MatchManager.ResetAllPlayersAndBall] -> Başarısız: GameBall sahnede bulunamadı!");
 
             SpawnPointData[] spawnPoints = FindObjectsByType<SpawnPointData>(FindObjectsSortMode.None);
             List<SpawnPointData> usedSpawns = new List<SpawnPointData>();
@@ -338,11 +353,15 @@ namespace Arixon.Gameplay
         [ClientRpc]
         private void SendLeaderboardClientRpc()
         {
-            Debug.Log("[MatchManager] MAÇ BİTTİ! Liderlik tablosu açılacak.");
+            Debug.Log("[Gameplay] [MatchManager.SendLeaderboardClientRpc] -> MAÇ BİTTİ! Liderlik tablosu açılacak.");
             var uiController = FindFirstObjectByType<Arixon.UI.GameUIController>();
             if (uiController != null)
             {
                 uiController.ShowEndGameScreen();
+            }
+            else
+            {
+                Debug.LogWarning("[Gameplay] [MatchManager.SendLeaderboardClientRpc] -> Başarısız: GameUIController bulunamadı!");
             }
         }
     }

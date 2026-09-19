@@ -13,10 +13,10 @@ namespace Arixon.Gameplay
         [SerializeField] private float _gravity = -20f;
         [SerializeField] private float _jumpHeight = 2f;
 
-        [Header("Takım ve Renk Yönetimi")]
         public NetworkVariable<int> TeamColorID = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private Renderer _playerRenderer;
-        private Material _originalMaterial;
+        private Material[] _playerMaterials;
+        private int _bodyMaterialIndex = 0;
 
         private CharacterController _characterController;
         private Transform _mainCameraTransform;
@@ -33,22 +33,29 @@ namespace Arixon.Gameplay
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
-            Debug.Log($"[Gameplay] [PlayerController.Awake] -> CharacterController bileşeni alındı. (Obje: {gameObject.name})");
+            Debug.Log($"[Gameplay] [PlayerController.Awake] -> CharacterController alındı. (Obje: {gameObject.name})");
 
-            // Görsel kapsülün Renderer'ını bul
-            Transform visuals = transform.Find("VisualsHolder");
-            if (visuals != null)
+            // Karakterin asıl modelini bul (SkinnedMeshRenderer genellikle asıl karakterdir)
+            _playerRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+            if (_playerRenderer == null)
             {
-                Transform model = visuals.Find("DefaultModel_Temporary");
-                if (model != null)
+                _playerRenderer = GetComponentInChildren<Renderer>(); // Fallback
+            }
+
+            if (_playerRenderer != null)
+            {
+                Material[] sharedMats = _playerRenderer.sharedMaterials;
+                _playerMaterials = new Material[sharedMats.Length];
+                for (int i = 0; i < sharedMats.Length; i++)
                 {
-                    _playerRenderer = model.GetComponent<Renderer>();
-                    if (_playerRenderer != null)
+                    _playerMaterials[i] = new Material(sharedMats[i]);
+                    // Assuming the body material is the one that is NOT named "Face" or is index 0
+                    if (sharedMats[i].name.Contains("Body") || (i == 0 && !sharedMats[i].name.Contains("Face")))
                     {
-                        _originalMaterial = new Material(_playerRenderer.sharedMaterial);
-                        _playerRenderer.material = _originalMaterial;
+                        _bodyMaterialIndex = i;
                     }
                 }
+                _playerRenderer.materials = _playerMaterials;
             }
         }
 
@@ -138,18 +145,21 @@ namespace Arixon.Gameplay
 
         private void OnTeamColorChanged(int previousValue, int newValue)
         {
+            Debug.Log($"[Gameplay] [PlayerController.OnTeamColorChanged] -> Takım rengi değişti. (Eski: {previousValue}, Yeni: {newValue})");
             ApplyTeamColor(newValue);
         }
 
         private void ApplyTeamColor(int teamId)
         {
-            if (_playerRenderer == null || _originalMaterial == null) return;
+            if (_playerRenderer == null || _playerMaterials == null || _playerMaterials.Length == 0) return;
+
+            Material bodyMat = _playerMaterials[_bodyMaterialIndex];
 
             if (teamId == 1) // MAVİ
             {
-                _originalMaterial.color = Color.blue;
-                _originalMaterial.EnableKeyword("_EMISSION");
-                _originalMaterial.SetColor("_EmissionColor", Color.blue * 1.5f);
+                bodyMat.color = Color.blue;
+                bodyMat.EnableKeyword("_EMISSION");
+                bodyMat.SetColor("_EmissionColor", Color.blue * 1.5f);
 
                 if (_sprintTrail != null)
                 {
@@ -159,9 +169,9 @@ namespace Arixon.Gameplay
             }
             else if (teamId == 2) // KIRMIZI
             {
-                _originalMaterial.color = Color.red;
-                _originalMaterial.EnableKeyword("_EMISSION");
-                _originalMaterial.SetColor("_EmissionColor", Color.red * 1.5f);
+                bodyMat.color = Color.red;
+                bodyMat.EnableKeyword("_EMISSION");
+                bodyMat.SetColor("_EmissionColor", Color.red * 1.5f);
 
                 if (_sprintTrail != null)
                 {
@@ -171,8 +181,8 @@ namespace Arixon.Gameplay
             }
             else
             {
-                _originalMaterial.color = Color.white;
-                _originalMaterial.DisableKeyword("_EMISSION");
+                bodyMat.color = Color.white;
+                bodyMat.DisableKeyword("_EMISSION");
             }
         }
 
@@ -188,6 +198,32 @@ namespace Arixon.Gameplay
         private TrailRenderer _sprintTrail;
 
         private Animator _animator;
+        private float _currentAnimSpeed = 0f;
+
+        private void Start()
+        {
+            if (_animator == null) _animator = GetComponentInChildren<Animator>();
+        }
+
+        private void SetRagdollState(bool state)
+        {
+            Debug.Log($"[Gameplay] [PlayerController.SetRagdollState] -> Ragdoll durumu değiştirildi. (Durum: {(state ? "Yere Düştü" : "Ayağa Kalktı")}, IsExhausted: {_isExhausted})");
+
+            // Basit Ragdoll: Animasyonu kapat ve karakteri yere yatır (Fiziksel ragdoll animatörü bozduğu için geçici çözüm)
+            if (_animator != null) _animator.enabled = !state;
+            if (_characterController != null) _characterController.enabled = !state;
+            
+            if (state)
+            {
+                // Yere düşme efekti
+                transform.localRotation = Quaternion.Euler(90f, transform.localEulerAngles.y, 0f);
+            }
+            else
+            {
+                // Ayağa kalkma
+                transform.localRotation = Quaternion.Euler(0f, transform.localEulerAngles.y, 0f);
+            }
+        }
 
         private void Update()
         {
@@ -210,14 +246,17 @@ namespace Arixon.Gameplay
             HandleKickInputs();
         }
 
-        private void UpdateAnimator(float speed)
+        private void UpdateAnimator(float targetSpeed)
         {
             if (_animator == null) _animator = GetComponentInChildren<Animator>();
             if (_animator == null) return;
 
-            _animator.SetFloat("Speed", speed);
+            // Animasyonlar arası pürüzsüz geçiş (Smooth transition)
+            _currentAnimSpeed = Mathf.Lerp(_currentAnimSpeed, targetSpeed, Time.deltaTime * 10f);
+
+            _animator.SetFloat("Speed", _currentAnimSpeed);
             _animator.SetBool("IsGrounded", _isGrounded);
-            // Düşme / Yere serilme efekti (Ragdoll tam aktifleşene kadar geçici animasyon)
+            // Düşme / Yere serilme efekti
             _animator.SetBool("Fall", _isExhausted); 
         }
 
@@ -271,6 +310,7 @@ namespace Arixon.Gameplay
         [ServerRpc]
         private void SetChargingServerRpc(bool charging)
         {
+            Debug.Log($"[Gameplay] [PlayerController.SetChargingServerRpc] -> Şarj durumu sunucuya bildirildi. (ŞarjEdiliyor: {charging}, ClientId: {OwnerClientId})");
             _isCharging = charging;
             if (!charging) ChargeLevel.Value = 0f; // İptal veya bırakıldıysa sıfırla
         }
@@ -288,6 +328,7 @@ namespace Arixon.Gameplay
         [ServerRpc]
         private void TryKickServerRpc(bool isShoot, Vector3 cameraForward)
         {
+            Debug.Log($"[Gameplay] [PlayerController.TryKickServerRpc] -> Vuruş denemesi. (ŞutMu: {isShoot}, ŞarjMiktarı: {ChargeLevel.Value})");
             _isCharging = false;
             float currentCharge = ChargeLevel.Value;
             ChargeLevel.Value = 0f;
@@ -311,16 +352,16 @@ namespace Arixon.Gameplay
                 if (isShoot)
                 {
                     // Eğer karakter yere yakınsa ve düz bakıyorsa topu havalandır (Lob efekti).
-                    // AMA karakter havadaysa veya çok aşağı bakıyorsa "Smash (Kafa Sması)" vurabilmesi için yönü bozma!
+                    // Rocket League tarzı vuruşlar için lift (yukarı güç) eklendi
                     if (transform.position.y < 2.5f && forceDir.y > -0.2f)
                     {
-                        forceDir.y += 0.2f + (currentCharge * 0.3f);
+                        forceDir.y += 0.4f + (currentCharge * 0.6f);
                     }
                 }
                 else
                 {
                     // Pas her zaman hafif yere doğru/paralel gitsin
-                    forceDir.y = 0.05f;
+                    forceDir.y = 0.1f;
                 }
                 
                 forceDir.Normalize();
@@ -328,8 +369,8 @@ namespace Arixon.Gameplay
                 float force = 0f;
                 if (isShoot)
                 {
-                    // Şarj seviyesine göre 15 ile 50 arasında efsanevi bir şut gücü!
-                    force = Mathf.Lerp(15f, 50f, currentCharge); 
+                    // Şarj seviyesine göre 30 ile 120 arasında efsanevi bir şut gücü!
+                    force = Mathf.Lerp(30f, 120f, currentCharge); 
                     Debug.Log($"[Gameplay] ŞUT ÇEKİLDİ! Şarj: %{(currentCharge*100):F0} | Kuvvet: {force:F1}");
                     PlayAnimationClientRpc("Kick");
                 }
@@ -340,7 +381,54 @@ namespace Arixon.Gameplay
                     PlayAnimationClientRpc("Pass");
                 }
 
+                StartCoroutine(DelayedKickCoroutine(ball, forceDir, force, currentCharge, isShoot));
+            }
+        }
+
+        private System.Collections.IEnumerator DelayedKickCoroutine(GameBall ball, Vector3 forceDir, float force, float charge, bool isShoot)
+        {
+            // Animasyonun ayağın topa değme noktasına ulaşması için küçük bir bekleme (Game Feel / Vuruş Hissiyatı)
+            yield return new WaitForSeconds(0.15f);
+
+            if (ball != null)
+            {
                 ball.HitBall(forceDir * force, OwnerClientId);
+                TriggerHitEffectsClientRpc(ball.transform.position, charge, isShoot);
+            }
+        }
+
+        [ClientRpc]
+        private void TriggerHitEffectsClientRpc(Vector3 hitPos, float charge, bool isShoot)
+        {
+            if (isShoot && charge > 0.8f)
+            {
+                // Güçlü Kamera Sarsıntısı
+                if (Camera.main != null)
+                {
+                    var camFollow = Camera.main.GetComponent<PlayerCameraFollow>();
+                    if (camFollow != null) camFollow.TriggerShake(0.8f, 0.2f);
+                }
+                
+                // Patlama/Flaş Efekti (Basit Geometri ile Geçici VFX)
+                GameObject flash = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                flash.transform.position = hitPos;
+                flash.transform.localScale = Vector3.one * 2f;
+                Destroy(flash.GetComponent<Collider>());
+                var mr = flash.GetComponent<MeshRenderer>();
+                mr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                mr.material.color = Color.white;
+                mr.material.EnableKeyword("_EMISSION");
+                mr.material.SetColor("_EmissionColor", Color.white * 5f);
+                Destroy(flash, 0.1f); // 0.1 saniyede yok olsun
+            }
+            else if (isShoot)
+            {
+                // Normal şutlarda hafif sarsıntı
+                if (Camera.main != null)
+                {
+                    var camFollow = Camera.main.GetComponent<PlayerCameraFollow>();
+                    if (camFollow != null) camFollow.TriggerShake(0.3f, 0.1f);
+                }
             }
         }
 
@@ -417,14 +505,14 @@ namespace Arixon.Gameplay
 
             bool shiftPressed = Keyboard.current.shiftKey.isPressed;
 
-            if (!shiftPressed)
-            {
-                _isExhausted = false;
-            }
-
             if (CurrentStamina.Value <= 0.1f)
             {
-                _isExhausted = true;
+                if (!_isExhausted)
+                {
+                    _isExhausted = true;
+                    SetRagdollState(true); // Enerji bitince ragdoll'a dönüş (düşme)
+                    Debug.Log("[Gameplay] Stamina bitti, karakter Ragdoll moduna geçti.");
+                }
 
                 // Eğer şarj ediyorken stamina bittiyse, oyuncu daha fazla tutamayıp otomatik şutu ateşler!
                 if (_isLocalCharging)
@@ -446,6 +534,14 @@ namespace Arixon.Gameplay
             else
             {
                 IsSprinting.Value = false;
+            }
+
+            // Stamina dolunca Ragdoll'dan çık
+            if (_isExhausted && CurrentStamina.Value > MaxStamina * 0.3f)
+            {
+                _isExhausted = false;
+                SetRagdollState(false);
+                Debug.Log("[Gameplay] Stamina biraz doldu, karakter ayağa kalktı.");
             }
 
             // Şarj (Basılı Tutma) Stamina Tüketimi
@@ -508,9 +604,14 @@ namespace Arixon.Gameplay
                 // Eğer Sprint yapılıyorsa ve yerdeysek hızı katla
                 float currentSpeed = (IsSprinting.Value && _isGrounded) ? _moveSpeed * _sprintSpeedMultiplier : _moveSpeed;
 
-                _characterController.Move(moveDirection * (currentSpeed * Time.deltaTime));
+                if (_characterController.enabled)
+                {
+                    _characterController.Move(moveDirection * (currentSpeed * Time.deltaTime));
+                }
 
-                UpdateAnimator(currentSpeed);
+                // Animator BlendTree eşikleri: 0 = Idle, 0.5 = Walk, 1 = Run
+                float targetAnimSpeed = (IsSprinting.Value && _isGrounded) ? 1f : 0.5f;
+                UpdateAnimator(targetAnimSpeed);
             }
             else
             {
@@ -520,6 +621,8 @@ namespace Arixon.Gameplay
 
         private void HandleGravityAndJump()
         {
+            if (!_characterController.enabled) return;
+
             _isGrounded = _characterController.isGrounded;
 
             if (_isGrounded && _velocity.y < 0)
@@ -604,18 +707,24 @@ namespace Arixon.Gameplay
         [ClientRpc]
         public void TargetTeleportClientRpc(Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams = default)
         {
+            Debug.Log($"[Gameplay] [PlayerController.TargetTeleportClientRpc] -> Işınlanma tetiklendi. (Hedef: {position})");
+
+            // Işınlanırken stamina ve exhaust durumu sıfırlanmalıdır
+            _isExhausted = false;
+            SetRagdollState(false);
+
             // CharacterController, transform.position atamalarını engeller, bu yüzden kapat-ata-aç yapmalıyız
             if (_characterController != null)
             {
                 _characterController.enabled = false;
-            }
-
-            transform.position = position;
-            transform.rotation = rotation;
-
-            if (_characterController != null)
-            {
+                transform.position = position;
+                transform.rotation = rotation;
                 _characterController.enabled = true;
+                Debug.Log("[Gameplay] [PlayerController.TargetTeleportClientRpc] -> Işınlanma tamamlandı. (Başarı: True)");
+            }
+            else
+            {
+                Debug.LogWarning("[Gameplay] [PlayerController.TargetTeleportClientRpc] -> Başarısız: CharacterController bulunamadı!");
             }
 
             Debug.Log($"[Gameplay] [PlayerController] -> Sunucu komutuyla Spawn noktasına ışınlanıldı: {position}");

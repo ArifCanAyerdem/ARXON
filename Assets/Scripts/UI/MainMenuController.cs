@@ -802,6 +802,7 @@ namespace Arixon.UI
 
         private void OnCreateRoomClicked()
         {
+            Debug.Log("[UI] [MainMenuController.OnCreateRoomClicked] -> Oda kurma işlemi başlatıldı.");
             if (_inputPlayerName != null && !string.IsNullOrWhiteSpace(_inputPlayerName.value))
             {
                 _localPlayerName = _inputPlayerName.value.Trim();
@@ -824,32 +825,43 @@ namespace Arixon.UI
                 }
             }
 
+            bool success = false;
             if (ArixonNetworkManager.Instance != null)
             {
-                ArixonNetworkManager.Instance.StartHost();
+                success = ArixonNetworkManager.Instance.StartHost();
             }
             else if (Unity.Netcode.NetworkManager.Singleton != null)
             {
-                Unity.Netcode.NetworkManager.Singleton.StartHost();
+                success = Unity.Netcode.NetworkManager.Singleton.StartHost();
             }
 
-            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN HEMEN SONRA TAK!
-            RegisterNetworkHandlers();
+            if (success)
+            {
+                Debug.Log($"[UI] [MainMenuController.OnCreateRoomClicked] -> Oda başarıyla kuruldu. (OdaKodu: {_currentRoomCode}, Port: {assignedPort}, Başarı: True)");
+                // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN HEMEN SONRA TAK!
+                RegisterNetworkHandlers();
 
-            ArixonRoomDiscovery.PublishRoom(_currentRoomCode, _localPlayerName, assignedPort);
+                ArixonRoomDiscovery.PublishRoom(_currentRoomCode, _hostPlayerName, assignedPort);
 
-            // HOST kendini manuel olarak listeye eklesin
-            ulong hostId = Unity.Netcode.NetworkManager.ServerClientId;
-            _playerTeams[hostId] = "RED";
-            _playerReadyStates[hostId] = false;
-            _playerNames[hostId] = _localPlayerName;
+                // HOST kendini manuel olarak listeye eklesin
+                ulong hostId = Unity.Netcode.NetworkManager.ServerClientId;
+                _playerTeams[hostId] = "RED";
+                _playerReadyStates[hostId] = false;
+                _playerNames[hostId] = _localPlayerName;
 
-            PrepareLobbyViewAsHost();
-            SwitchView(true);
-            
-            BroadcastRoster(); // Kendi bilgisini lobidekilere ve kendi ekranına yansıt
-            
-            AddMessageToChat(GetLoc("SYSTEM"), $"{GetLoc("HOST_STARTING")} {GetLoc("ROOM_CODE")} {_currentRoomCode}", true);
+                PrepareLobbyViewAsHost();
+                SwitchView(true);
+                
+                BroadcastRoster(); // Kendi bilgisini lobidekilere ve kendi ekranına yansıt
+                
+                AddMessageToChat(GetLoc("SYSTEM"), $"{GetLoc("HOST_STARTING")} {GetLoc("ROOM_CODE")} {_currentRoomCode}", true);
+            }
+            else
+            {
+                Debug.LogError("[UI] [MainMenuController.OnCreateRoomClicked] -> Başarısız: Host başlatılamadı!");
+                SetHomeStatus("Hata: Host başlatılamadı!");
+                ArixonRoomDiscovery.UnpublishRoom(_currentRoomCode);
+            }
         }
 
         private void OnJoinWithCodeClicked()
@@ -886,6 +898,7 @@ namespace Arixon.UI
 
         private void JoinRoom(string roomCode, string hostName = "Oyuncu_01")
         {
+            Debug.Log($"[UI] [MainMenuController.JoinRoom] -> Odaya katılma isteği. (OdaKodu: {roomCode})");
             if (_inputPlayerName != null && !string.IsNullOrWhiteSpace(_inputPlayerName.value))
             {
                 _localPlayerName = _inputPlayerName.value.Trim();
@@ -909,22 +922,32 @@ namespace Arixon.UI
                 }
             }
 
+            bool success = false;
             if (ArixonNetworkManager.Instance != null)
             {
-                ArixonNetworkManager.Instance.StartClient();
+                success = ArixonNetworkManager.Instance.StartClient();
             }
             else if (Unity.Netcode.NetworkManager.Singleton != null)
             {
-                Unity.Netcode.NetworkManager.Singleton.StartClient();
+                success = Unity.Netcode.NetworkManager.Singleton.StartClient();
             }
 
-            // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN SONRA TAK!
-            RegisterNetworkHandlers();
+            if (success)
+            {
+                Debug.Log($"[UI] [MainMenuController.JoinRoom] -> Odaya bağlanılıyor. (OdaKodu: {roomCode}, Port: {targetPort}, Başarı: True)");
+                // KULAKLIKLARI (DİNLEYİCİLERİ) AĞ BAŞLADIKTAN SONRA TAK!
+                RegisterNetworkHandlers();
 
-            PrepareLobbyViewAsClient();
-            SwitchView(true);
+                PrepareLobbyViewAsClient();
+                SwitchView(true);
 
-            AddMessageToChat(GetLoc("SYSTEM"), GetLoc("CHAT_SYSTEM_JOIN", _currentRoomCode, _localPlayerName), true);
+                AddMessageToChat(GetLoc("SYSTEM"), GetLoc("CHAT_SYSTEM_JOIN", _currentRoomCode, _localPlayerName), true);
+            }
+            else
+            {
+                Debug.LogError("[UI] [MainMenuController.JoinRoom] -> Başarısız: İstemci (Client) başlatılamadı!");
+                SetHomeStatus("Hata: İstemci (Client) başlatılamadı!");
+            }
         }
 
         private void SetHomeStatus(string message)
@@ -1428,7 +1451,7 @@ namespace Arixon.UI
             else card.RemoveFromClassList("local-player-card");
             
             if (isReady) card.AddToClassList("active-ready-card");
-            else card.RemoveFromClassList("active-ready-card");
+            else card.AddToClassList("active-ready-card");
 
             // TAÇ KONTROLÜ
             var crown = card.Q<UnityEngine.UIElements.VisualElement>($"slot-{slotIndex + 1}-crown");
@@ -1506,6 +1529,7 @@ namespace Arixon.UI
 
         private void OnStartGameClicked()
         {
+            Debug.Log($"[UI] [MainMenuController.OnStartGameClicked] -> Maça başla butonuna tıklandı. (IsHost: {_isHost})");
             if (_isHost)
             {
                 ArixonRoomDiscovery.UpdateGameStarted(_currentRoomCode, true);
@@ -1516,10 +1540,17 @@ namespace Arixon.UI
                     ArixonNetworkManager.Instance.PlayerTeams.Clear();
                     foreach (var kvp in _playerTeams)
                     {
-                        ArixonNetworkManager.Instance.PlayerTeams[kvp.Key] = (kvp.Value == "BLUE") ? 1 : 2;
+                        string teamName = kvp.Value;
+                        int teamId = (teamName == "BLUE" || teamName == "blue") ? 1 : 2;
+                        ArixonNetworkManager.Instance.PlayerTeams[kvp.Key] = teamId;
                     }
 
                     ArixonNetworkManager.Instance.LoadGameScene();
+                    Debug.Log("[UI] [MainMenuController.OnStartGameClicked] -> Maç başlatıldı, sahne yükleniyor. (Başarı: True)");
+                }
+                else
+                {
+                    Debug.LogWarning("[UI] [MainMenuController.OnStartGameClicked] -> Başarısız: ArixonNetworkManager null!");
                 }
             }
             else
@@ -1537,11 +1568,13 @@ namespace Arixon.UI
                         Unity.Netcode.NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(READY_CHANNEL_C2S, Unity.Netcode.NetworkManager.ServerClientId, writer);
                     }
                 }
+                Debug.Log($"[UI] [MainMenuController.OnStartGameClicked] -> Hazır durumu değiştirildi. (HazırMı: {_isLocalPlayerReady}, Başarı: True)");
             }
         }
 
         private void OnLeaveLobbyClicked()
         {
+            Debug.Log("[UI] [MainMenuController.OnLeaveLobbyClicked] -> Lobiden ayrıl butonuna tıklandı.");
             if (_isHost && !string.IsNullOrEmpty(_currentRoomCode))
             {
                 ArixonRoomDiscovery.UnpublishRoom(_currentRoomCode);

@@ -63,20 +63,25 @@ namespace Arixon.Network
         /// </summary>
         public bool StartHost()
         {
+            Debug.Log($"[Network] [ArixonNetworkManager.StartHost] -> Metot çağrıldı. (NetworkManager.Singleton var mı: {NetworkManager.Singleton != null})");
             if (NetworkManager.Singleton == null)
             {
                 EmitLog("HATA: Sahnede NetworkManager bileşeni bulunamadı!");
+                Debug.LogError("[Network] [ArixonNetworkManager.StartHost] -> Başarısız: NetworkManager.Singleton null!");
                 return false;
             }
 
             if (NetworkManager.Singleton.IsListening)
             {
                 EmitLog("UYARI: Ağ oturumu zaten aktif durumda.");
+                Debug.LogWarning($"[Network] [ArixonNetworkManager.StartHost] -> Başarısız: Oturum zaten aktif. (IsServer: {NetworkManager.Singleton.IsServer}, IsClient: {NetworkManager.Singleton.IsClient})");
                 return false;
             }
 
             EmitLog("Lobi lideri olarak Host başlatılıyor...");
             bool success = NetworkManager.Singleton.StartHost();
+
+            Debug.Log($"[Network] [ArixonNetworkManager.StartHost] -> StartHost sonucu (Başarı: {success})");
 
             if (success)
             {
@@ -85,6 +90,7 @@ namespace Arixon.Network
             else
             {
                 EmitLog("HATA: Host başlatılamadı!");
+                Debug.LogError("[Network] [ArixonNetworkManager.StartHost] -> Başarısız: Unity Netcode StartHost() false döndürdü.");
             }
 
             return success;
@@ -95,20 +101,25 @@ namespace Arixon.Network
         /// </summary>
         public bool StartClient()
         {
+            Debug.Log($"[Network] [ArixonNetworkManager.StartClient] -> Metot çağrıldı. (NetworkManager.Singleton var mı: {NetworkManager.Singleton != null})");
             if (NetworkManager.Singleton == null)
             {
                 EmitLog("HATA: Sahnede NetworkManager bileşeni bulunamadı!");
+                Debug.LogError("[Network] [ArixonNetworkManager.StartClient] -> Başarısız: NetworkManager.Singleton null!");
                 return false;
             }
 
             if (NetworkManager.Singleton.IsListening)
             {
                 EmitLog("UYARI: Zaten bir ağ oturumundasınız.");
+                Debug.LogWarning($"[Network] [ArixonNetworkManager.StartClient] -> Başarısız: Oturum zaten aktif. (IsServer: {NetworkManager.Singleton.IsServer}, IsClient: {NetworkManager.Singleton.IsClient})");
                 return false;
             }
 
             EmitLog("Sunucuya bağlanılıyor (127.0.0.1:7777)...");
             bool success = NetworkManager.Singleton.StartClient();
+
+            Debug.Log($"[Network] [ArixonNetworkManager.StartClient] -> StartClient sonucu (Başarı: {success})");
 
             if (success)
             {
@@ -117,6 +128,7 @@ namespace Arixon.Network
             else
             {
                 EmitLog("HATA: İstemci başlatılamadı!");
+                Debug.LogError("[Network] [ArixonNetworkManager.StartClient] -> Başarısız: Unity Netcode StartClient() false döndürdü.");
             }
 
             return success;
@@ -127,16 +139,22 @@ namespace Arixon.Network
         /// </summary>
         public void LoadGameScene()
         {
+            Debug.Log($"[Network] [ArixonNetworkManager.LoadGameScene] -> Çağrıldı. (IsServer: {(NetworkManager.Singleton != null ? NetworkManager.Singleton.IsServer : false)})");
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
             {
                 EmitLog($"Oyun sahnesi senkronize ediliyor: '{gameSceneName}'...");
                 NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += OnGameSceneLoaded;
                 NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
             }
+            else
+            {
+                Debug.LogWarning("[Network] [ArixonNetworkManager.LoadGameScene] -> Başarısız: Sadece Server sahne yükleyebilir veya NetworkManager null!");
+            }
         }
 
         private void OnGameSceneLoaded(string sceneName, LoadSceneMode loadSceneMode, System.Collections.Generic.List<ulong> clientsCompleted, System.Collections.Generic.List<ulong> clientsTimedOut)
         {
+            Debug.Log($"[Network] [ArixonNetworkManager.OnGameSceneLoaded] -> Event tetiklendi. (Yüklenen Sahne: {sceneName}, Beklenen Sahne: {gameSceneName})");
             if (sceneName != gameSceneName) return;
             
             // Etkinliğe artık ihtiyacımız yok
@@ -203,6 +221,7 @@ namespace Arixon.Network
         /// </summary>
         public void ShutdownNetwork()
         {
+            Debug.Log($"[Network] [ArixonNetworkManager.ShutdownNetwork] -> Metot çağrıldı. (IsListening: {(NetworkManager.Singleton != null ? NetworkManager.Singleton.IsListening : false)})");
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
                 EmitLog("Ağ oturumu kapatılıyor...");
@@ -233,7 +252,7 @@ namespace Arixon.Network
 
         private void EmitLog(string message)
         {
-            Debug.Log($"[ARİXON Network] {message}");
+            Debug.Log($"[UI-Log] [ArixonNetworkManager.EmitLog] -> (Mesaj: {message})");
             OnNetworkLog?.Invoke(message);
         }
 

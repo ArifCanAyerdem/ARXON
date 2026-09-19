@@ -20,6 +20,25 @@ namespace Arixon.Gameplay
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
+            
+            // Rocket League tarzı top fizikleri:
+            _rb.mass = 0.5f; // Daha hafif
+            _rb.linearDamping = 0.5f; // Havada süzülme sürtünmesi (eski adıyla drag)
+            _rb.angularDamping = 0.5f; // Dönme sürtünmesi
+            _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // Hızlı vuruşlarda içinden geçmemesi için
+
+            // Zıplama için PhysicMaterial
+            Collider col = GetComponent<Collider>();
+            if (col != null)
+            {
+                PhysicsMaterial bouncyMat = new PhysicsMaterial("BallBouncyMat");
+                bouncyMat.bounciness = 0.8f; // Çok zıplayan bir top
+                bouncyMat.bounceCombine = PhysicsMaterialCombine.Maximum; // En yüksek sekme değerini al
+                bouncyMat.dynamicFriction = 0.2f; // Kaygan
+                bouncyMat.staticFriction = 0.2f;
+                bouncyMat.frictionCombine = PhysicsMaterialCombine.Minimum;
+                col.material = bouncyMat;
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -66,6 +85,7 @@ namespace Arixon.Gameplay
                     {
                         // PAS: Aynı takımdan başka birine değdi
                         MatchManager.Instance.RegisterPass(previousHitter);
+                        Debug.Log($"[Gameplay] [GameBall.ProcessTouch] -> PAS gerçekleşti! (Tutan: {hitterId}, PasVeren: {previousHitter}, Takım: {teamId})");
                         if (teamId == 1) LastPasserBlueId = previousHitter;
                         else if (teamId == 2) LastPasserRedId = previousHitter;
                     }
@@ -73,6 +93,7 @@ namespace Arixon.Gameplay
                     {
                         // ARAYA GİRME (INTERCEPTION): Rakip takım araya girdi, pas zinciri kırıldı!
                         MatchManager.Instance.RegisterInterception(hitterId);
+                        Debug.Log($"[Gameplay] [GameBall.ProcessTouch] -> ARAYA GİRME (INTERCEPT)! (ArayaGiren: {hitterId}, PasıKesilen: {previousHitter}, YeniTakım: {teamId})");
                         if (teamId == 1) LastPasserBlueId = 999; 
                         else if (teamId == 2) LastPasserRedId = 999;
                     }
@@ -98,7 +119,7 @@ namespace Arixon.Gameplay
                     if (dist < 15f) // Tehlike bölgesi (15 metre)
                     {
                         MatchManager.Instance.RegisterSave(pc.OwnerClientId);
-                        Debug.Log($"[Gameplay] SAVE! Oyuncu {pc.OwnerClientId} topu {dist:F1}m mesafeden uzaklaştırdı.");
+                        Debug.Log($"[Gameplay] [GameBall.CheckForSave] -> KURTARIŞ (SAVE)! (Oyuncu: {pc.OwnerClientId}, KaleUzaklığı: {dist:F1}m)");
                     }
                 }
             }
@@ -140,7 +161,11 @@ namespace Arixon.Gameplay
                 _isWaitingForFirstTouch = false;
                 ProcessTouch(hitterId);
                 _rb.AddForce(force, ForceMode.Impulse);
-                Debug.Log($"[Gameplay] [GameBall.HitBall] -> Topa vuruldu! (Hitter: {hitterId}, Force: {force})");
+                Debug.Log($"[Gameplay] [GameBall.HitBall] -> Topa vuruldu! (Vuran: {hitterId}, UygulananGüç: {force}, Başarı: True)");
+            }
+            else
+            {
+                Debug.LogWarning($"[Gameplay] [GameBall.HitBall] -> Başarısız: Sadece sunucu topa güç uygulayabilir!");
             }
         }
 

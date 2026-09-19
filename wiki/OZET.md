@@ -61,3 +61,13 @@ Bu sayfa, projede yapÄ±lan her iÅŸlemi hÄ±zlÄ±ca gÃ¶rebilmeniz iÃ§in tutulan kÄ±
   * **Gol ve Reset:** Top kaleye girdiÄŸinde oyun 3 saniye durur, "GOOOL" yazÄ±sÄ± Ã§Ä±kar ve herkes baÅŸlangÄ±Ã§ noktasÄ±na Ä±ÅŸÄ±nlanÄ±r.
   * **MaÃ§ Sonu:** 3 Dakika dolduÄŸunda Liderlik Tablosu (Leaderboard) Ã§Ä±kar ve kimin kaÃ§ gol attÄ±ÄŸÄ± gÃ¶sterilir.
 * **DetaylÄ± DokÃ¼man:** [06_mac_sistemi_ve_skorboard.md](./06_mac_sistemi_ve_skorboard.md)
+
+---
+
+### ?? [07] Görsel ve Fizik İyileştirmeleri (Ragdoll & Ölçeklendirme)
+* **Durum:** ? Tamamlandı
+* **Ne Yapıldı:** 
+  * Karakter, top ve harita boyutları oynanışı keyifli hale getirecek şekilde büyütüldü.
+  * Karakterin üzerindeki siyah yön göstergesi (FaceIndicator) gizlendi.
+  * Karakterin yürüyüş animasyonlarını bozan Root Motion kapatıldı.
+  * Stamina (Enerji) bittiğinde karakterin yere düşmesi için **Ragdoll** fizik sistemi entegre edildi.

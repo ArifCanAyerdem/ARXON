@@ -42,7 +42,9 @@ namespace Arixon.Network
         public static string GenerateRoomCode()
         {
             int rand = UnityEngine.Random.Range(1000, 9999);
-            return $"#ARX-{rand}";
+            string code = $"#ARX-{rand}";
+            Debug.Log($"[Network] [ArixonRoomDiscovery.GenerateRoomCode] -> Yeni oda kodu üretildi. (OdaKodu: {code}, Başarı: True)");
+            return code;
         }
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace Arixon.Network
 
                 container.rooms.Add(newRoom);
                 SaveContainer(container);
-                Debug.Log($"[ARİXON Discovery] 🟢 Yeni oda ilana eklendi: {roomCode} ({newRoom.roomName})");
+                Debug.Log($"[Network] [ArixonRoomDiscovery.PublishRoom] -> Yeni oda ilana eklendi. (OdaKodu: {roomCode}, OdaAdı: {newRoom.roomName}, Başarı: True)");
             }
         }
 
@@ -90,6 +92,11 @@ namespace Arixon.Network
                 {
                     room.lastHeartbeatTicks = DateTime.UtcNow.Ticks;
                     SaveContainer(container);
+                    // Heartbeat spami yapmamak için buraya log eklemiyoruz, ancak metot çalışıyor
+                }
+                else
+                {
+                    Debug.LogWarning($"[Network] [ArixonRoomDiscovery.KeepAlive] -> Başarısız: Oda bulunamadı! (OdaKodu: {roomCode})");
                 }
             }
         }
@@ -108,6 +115,11 @@ namespace Arixon.Network
                     room.currentPlayers = count;
                     room.lastHeartbeatTicks = DateTime.UtcNow.Ticks;
                     SaveContainer(container);
+                    Debug.Log($"[Network] [ArixonRoomDiscovery.UpdatePlayerCount] -> Oyuncu sayısı güncellendi. (OdaKodu: {roomCode}, Sayı: {count}, Başarı: True)");
+                }
+                else
+                {
+                    Debug.LogWarning($"[Network] [ArixonRoomDiscovery.UpdatePlayerCount] -> Başarısız: Oda bulunamadı! (OdaKodu: {roomCode})");
                 }
             }
         }
@@ -142,7 +154,11 @@ namespace Arixon.Network
                 if (removed > 0)
                 {
                     SaveContainer(container);
-                    Debug.Log($"[ARİXON Discovery] 🔴 Oda yayından kaldırıldı: {roomCode}");
+                    Debug.Log($"[Network] [ArixonRoomDiscovery.UnpublishRoom] -> Oda yayından kaldırıldı. (OdaKodu: {roomCode}, SilinenOda: {removed}, Başarı: True)");
+                }
+                else
+                {
+                    Debug.LogWarning($"[Network] [ArixonRoomDiscovery.UnpublishRoom] -> Başarısız: Silinecek oda bulunamadı. (OdaKodu: {roomCode})");
                 }
             }
         }
@@ -241,7 +257,7 @@ namespace Arixon.Network
                 }
                 catch (System.Exception ex)
                 {
-                    Debug.LogWarning($"[ARİXON Discovery] Oda kaydedilemedi: {ex.Message}");
+                    Debug.LogError($"[Network] [ArixonRoomDiscovery.SaveContainer] -> Başarısız: Dosyaya yazılamadı! (Hata: {ex.Message})");
                     break;
                 }
             }

@@ -23,6 +23,11 @@ namespace Arixon.Gameplay
         private float _velY;
         private Vector3 _posVelocity;
         
+        [Header("Shake Settings")]
+        private float _shakeIntensity = 0f;
+        private float _shakeDuration = 0f;
+        private float _shakeTimer = 0f;
+        
         [Header("Mouse Settings")]
         [SerializeField] private float _mouseSensitivity = 1.5f; // Hassasiyeti biraz kıstık ki soft olsun
         [SerializeField] private float _minY = -20f;
@@ -73,6 +78,27 @@ namespace Arixon.Gameplay
             // Pozisyonu yumuşak takip et (Lerp yerine SmoothDamp çok daha pürüzsüzdür ve donma hissini keser)
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref _posVelocity, _positionSmoothTime);
             transform.LookAt(lookAtPoint);
+
+            // Sarsıntı (Shake) Efekti Uygula
+            if (_shakeTimer > 0)
+            {
+                if (PlayerPrefs.GetInt("CameraShake", 1) == 1)
+                {
+                    transform.position += Random.insideUnitSphere * _shakeIntensity;
+                }
+                _shakeTimer -= Time.deltaTime;
+                if (_shakeTimer <= 0)
+                {
+                    _shakeIntensity = 0f;
+                }
+            }
+        }
+
+        public void TriggerShake(float intensity, float duration)
+        {
+            _shakeIntensity = intensity;
+            _shakeDuration = duration;
+            _shakeTimer = duration;
         }
 
         public void SetTarget(Transform newTarget)

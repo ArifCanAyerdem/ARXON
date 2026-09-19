@@ -87,11 +87,13 @@ namespace Arixon.UI
             switch (newState)
             {
                 case MatchState.WaitingForPlayers:
+                    Debug.Log("[UI] [GameUIController.HandleStateChanged] -> Durum değişti: WaitingForPlayers. Ara yüz güncelleniyor.");
                     _matchOverlay.RemoveFromClassList("overlay-hidden");
                     if (_statusText != null) _statusText.style.display = DisplayStyle.Flex;
                     if (_countdownText != null) _countdownText.style.display = DisplayStyle.None;
                     break;
                 case MatchState.Countdown:
+                    Debug.Log("[UI] [GameUIController.HandleStateChanged] -> Durum değişti: Countdown. Geri sayım arayüzü gösteriliyor.");
                     if (_statusText != null) _statusText.style.display = DisplayStyle.None;
                     if (_countdownText != null) 
                     {
@@ -100,6 +102,7 @@ namespace Arixon.UI
                     }
                     break;
                 case MatchState.Playing:
+                    Debug.Log("[UI] [GameUIController.HandleStateChanged] -> Durum değişti: Playing. Overlay gizleniyor.");
                     if (_countdownText != null)
                     {
                         _countdownText.text = "GO!";
@@ -109,6 +112,7 @@ namespace Arixon.UI
                     StartCoroutine(HideOverlayRoutine());
                     break;
                 case MatchState.GoalScored:
+                    Debug.Log("[UI] [GameUIController.HandleStateChanged] -> Durum değişti: GoalScored. GOL yazısı gösteriliyor.");
                     _matchOverlay.RemoveFromClassList("overlay-hidden");
                     _matchOverlay.style.display = DisplayStyle.Flex;
                     if (_statusText != null)
@@ -120,6 +124,7 @@ namespace Arixon.UI
                     if (_countdownText != null) _countdownText.style.display = DisplayStyle.None;
                     break;
                 case MatchState.Finished:
+                    Debug.Log("[UI] [GameUIController.HandleStateChanged] -> Durum değişti: Finished. Liderlik tablosu açılıyor.");
                     if (_leaderboardPanel != null)
                     {
                         _leaderboardPanel.style.display = DisplayStyle.Flex;
@@ -195,9 +200,14 @@ namespace Arixon.UI
 
         public void ShowEndGameScreen()
         {
+            Debug.Log("[UI] [GameUIController.ShowEndGameScreen] -> Oyun sonu ekranı (Leaderboard) gösteriliyor.");
             if (_leaderboardPanel != null)
             {
                 _leaderboardPanel.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                Debug.LogWarning("[UI] [GameUIController.ShowEndGameScreen] -> Başarısız: _leaderboardPanel null!");
             }
         }
 

@@ -98,11 +98,12 @@ Bu dosya, Antigravity AI asistanının ARİXON projesinde her etkileşimde, her 
 ---
 
 ## 10. AŞIRI KAPSAMLI LOGLAMA (Hyper-Detailed Logging Standards)
+* **KULLANICI TALEBİ - KESİN ZORUNLULUK:** Kullanıcı, oyun içindeki hataları hızlıca görebilmek ve "çalışan/çalışmayan" kısımları net şekilde öğrenebilmek adına loglamanın en üst seviyede olmasını talep etmiştir.
 * **HER İŞLEM İÇİN LOG ZORUNLULUĞU:** Yazılan her sınıf, her metot, her ağ olayı ve her durum (state) değişimi İSTİSNASIZ olarak konsola loglanacaktır. Hiçbir metot sessizce çalışıp bitmeyecektir. 
-* **Standart Format:** Loglar her zaman şu formatta yazılacaktır: `Debug.Log("[SistemAdı] [SınıfAdı.MetotAdı] -> Yapılan işlem açıklaması (Değişken: X)");`
+* **Standart Format:** Loglar her zaman şu formatta yazılacaktır: `Debug.Log("[SistemAdı] [SınıfAdı.MetotAdı] -> Yapılan işlem açıklaması (Değişken: X, Başarı: True/False)");`
   - *Örnek:* `Debug.Log("[Network] [PlayerController.OnNetworkSpawn] -> Oyuncu sahneye doğdu. (IsOwner: True)");`
-* **Hata Tespiti (Traceability):** Hataların nerede koptuğunu anında anlamak için, bir işlem başarısız olduğunda veya beklenen bir değer gelmediğinde (null geldiğinde) `Debug.LogWarning` veya `Debug.LogError` ile hatanın tam konumu ve sebebi anında yazdırılacaktır. Kodun çökmesi beklenmeyecektir.
-* **Geliştirici Rahatlığı:** Bu sayede kullanıcı Unity Console'a baktığında oyunun arka planda adım adım ne yaptığını bir kitap gibi okuyabilecektir. Hata çıkarsa saniyeler içinde "şu metotta patlamış" denilebilecektir.
+* **Hata Tespiti (Traceability):** Hataların nerede koptuğunu anında anlamak için, bir işlem başarısız olduğunda, bir if/else bloğunda 'else' durumuna düşüldüğünde veya beklenen bir değer gelmediğinde (null geldiğinde) `Debug.LogWarning` veya `Debug.LogError` ile hatanın tam konumu ve sebebi anında yazdırılacaktır. Kodun çökmesi beklenmeyecektir.
+* **Geliştirici Rahatlığı:** Bu sayede kullanıcı Unity Console'a baktığında oyunun arka planda adım adım ne yaptığını, hangi if bloğuna girildiğini ve hangi değerlerin hesaplandığını bir kitap gibi okuyabilecektir. Hata çıkarsa saniyeler içinde "şu metotta patlamış" denilebilecektir.
 
 ---
 
