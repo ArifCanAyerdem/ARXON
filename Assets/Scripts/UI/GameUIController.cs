@@ -24,6 +24,10 @@ namespace Arixon.UI
         private ScrollView _blueTeamList;
         private ScrollView _redTeamList;
 
+        // Maç Sonu UI Elemanları
+        private Label _winnerText;
+        private Button _returnToLobbyButton;
+
         private void Awake()
         {
             _uiDocument = GetComponent<UIDocument>();
@@ -44,6 +48,38 @@ namespace Arixon.UI
                 _tabScoreboardPanel = root.Q<VisualElement>("tab-scoreboard-panel");
                 _blueTeamList = root.Q<ScrollView>("blue-team-list");
                 _redTeamList = root.Q<ScrollView>("red-team-list");
+
+                // Maç Sonu Elemanlarını Kodla Oluştur
+                _winnerText = new Label("MAÇ BİTTİ!");
+                _winnerText.style.fontSize = 50;
+                _winnerText.style.color = Color.white;
+                _winnerText.style.unityTextAlign = TextAnchor.MiddleCenter;
+                _winnerText.style.marginTop = 20;
+
+                _returnToLobbyButton = new Button();
+                _returnToLobbyButton.text = "LOBİYE DÖN";
+                _returnToLobbyButton.style.marginTop = 30;
+                _returnToLobbyButton.style.paddingTop = 15;
+                _returnToLobbyButton.style.paddingBottom = 15;
+                _returnToLobbyButton.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f);
+                _returnToLobbyButton.style.color = Color.white;
+                _returnToLobbyButton.style.fontSize = 24;
+
+                _returnToLobbyButton.clicked += () => 
+                {
+                    if (Unity.Netcode.NetworkManager.Singleton != null)
+                    {
+                        Unity.Netcode.NetworkManager.Singleton.Shutdown();
+                    }
+                    // Lobi sahnesinin adının MainMenu veya Lobby olduğunu varsayıyoruz (Arixon için Lobi veya 1. sahne)
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(0); 
+                };
+
+                if (_leaderboardPanel != null)
+                {
+                    _leaderboardPanel.Add(_winnerText);
+                    _leaderboardPanel.Add(_returnToLobbyButton);
+                }
             }
         }
 
@@ -118,13 +154,69 @@ namespace Arixon.UI
                     if (_statusText != null)
                     {
                         _statusText.style.display = DisplayStyle.Flex;
-                        _statusText.text = "GOOOL!";
-                        _statusText.style.color = new StyleColor(new Color32(255, 215, 0, 255)); // Altın
+                        if (MatchManager.Instance != null)
+                        {
+                            int scoringTeam = MatchManager.Instance.LastScoringTeam.Value;
+                            
+                            // Yerel oyuncunun takımını bul
+                            int localTeam = 0;
+                            ulong localId = Unity.Netcode.NetworkManager.Singleton != null ? Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+                            for (int i = 0; i < MatchManager.Instance.PlayerStats.Count; i++)
+                            {
+                                if (MatchManager.Instance.PlayerStats[i].ClientId == localId)
+                                {
+                                    localTeam = MatchManager.Instance.PlayerStats[i].TeamId;
+                                    break;
+                                }
+                            }
+                            
+                            if (localTeam == scoringTeam)
+                            {
+                                // Bizim takım attı!
+                                _statusText.text = "GOL ATTIK!";
+                                _statusText.style.color = new StyleColor(new Color32(46, 204, 113, 255)); // Yeşil (Sevinç)
+                                _statusText.style.fontSize = 72;
+                            }
+                            else
+                            {
+                                // Rakip attı
+                                _statusText.text = "GOL YEDİK!";
+                                _statusText.style.color = new StyleColor(new Color32(231, 76, 60, 255)); // Kırmızı (Üzüntü)
+                                _statusText.style.fontSize = 72;
+                            }
+                        }
+                        else
+                        {
+                            _statusText.text = "GOOOL!";
+                            _statusText.style.color = new StyleColor(new Color32(255, 215, 0, 255)); // Altın
+                        }
                     }
                     if (_countdownText != null) _countdownText.style.display = DisplayStyle.None;
                     break;
                 case MatchState.Finished:
                     Debug.Log("[UI] [GameUIController.HandleStateChanged] -> Durum değişti: Finished. Liderlik tablosu açılıyor.");
+                    
+                    if (_winnerText != null && MatchManager.Instance != null)
+                    {
+                        int t1 = MatchManager.Instance.Team1Score.Value;
+                        int t2 = MatchManager.Instance.Team2Score.Value;
+                        if (t1 > t2)
+                        {
+                            _winnerText.text = "MAVİ TAKIM KAZANDI!";
+                            _winnerText.style.color = new Color(0.2f, 0.4f, 1f);
+                        }
+                        else if (t2 > t1)
+                        {
+                            _winnerText.text = "KIRMIZI TAKIM KAZANDI!";
+                            _winnerText.style.color = new Color(1f, 0.2f, 0.2f);
+                        }
+                        else
+                        {
+                            _winnerText.text = "BERABERE!";
+                            _winnerText.style.color = Color.white;
+                        }
+                    }
+
                     if (_leaderboardPanel != null)
                     {
                         _leaderboardPanel.style.display = DisplayStyle.Flex;

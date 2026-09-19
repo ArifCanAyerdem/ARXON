@@ -61,7 +61,8 @@ namespace Arixon.Gameplay
         // --- YENİ ZAMANLAYICI VE SKOR SİSTEMİ ---
         public NetworkVariable<int> MatchTimer = new NetworkVariable<int>(180); // 3 Dakika
         public NetworkVariable<int> Team1Score = new NetworkVariable<int>(0); // MAVİ
-        public NetworkVariable<int> Team2Score = new NetworkVariable<int>(0); // KIRMIZI
+        public NetworkVariable<int> Team2Score = new NetworkVariable<int>(0);
+        public NetworkVariable<int> LastScoringTeam = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); // KIRMIZI
 
         public Action<MatchState> OnStateChanged;
         public Action<int> OnCountdownTicked;
@@ -73,7 +74,7 @@ namespace Arixon.Gameplay
         public NetworkList<PlayerMatchState> PlayerStats;
 
         private Coroutine _matchTimerCoroutine;
-
+        [SerializeField] private GameObject _goalExplosionPrefab;
         private void Awake()
         {
             if (Instance == null) Instance = this;
@@ -182,6 +183,12 @@ namespace Arixon.Gameplay
 
             if (goalTeamId == 1) Team2Score.Value++;
             else if (goalTeamId == 2) Team1Score.Value++;
+            LastScoringTeam.Value = scoringTeam;
+
+            if (AudioManager.Instance != null)
+            {
+                PlayGoalEffectsClientRpc(ball.transform.position, scoringTeam);
+            }
 
             // Rocket League Own Goal Mantığı:
             // Golü yiyen takımdan biri kendi kalesine atsa bile, asıl krediyi RAKİP TAKIMDAN topa en son değen kişi alır.
@@ -319,33 +326,86 @@ namespace Arixon.Gameplay
             SpawnPointData[] spawnPoints = FindObjectsByType<SpawnPointData>(FindObjectsSortMode.None);
             List<SpawnPointData> usedSpawns = new List<SpawnPointData>();
 
-            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.ConnectedClientsList != null)
             {
-                if (client.PlayerObject != null && client.PlayerObject.TryGetComponent(out PlayerController pc))
+                foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
                 {
-                    int teamId = pc.TeamColorID.Value;
-                    SpawnPointData selectedSpawn = null;
-                    
-                    foreach (var sp in spawnPoints)
+                    if (client == null || client.PlayerObject == null) continue;
+
+                    if (client.PlayerObject.TryGetComponent(out PlayerController pc))
                     {
-                        if (sp.TeamID == teamId && !usedSpawns.Contains(sp))
+                        int teamId = pc.TeamColorID.Value;
+                        SpawnPointData selectedSpawn = null;
+                        
+                        foreach (var sp in spawnPoints)
                         {
-                            selectedSpawn = sp;
-                            usedSpawns.Add(sp);
-                            break;
+                            if (sp.TeamID == teamId && !usedSpawns.Contains(sp))
+                            {
+                                selectedSpawn = sp;
+                                usedSpawns.Add(sp);
+                                break;
+                            }
                         }
+
+                        Vector3 spawnPos = new Vector3(0, 1, 0);
+                        Quaternion spawnRot = Quaternion.identity;
+
+                        if (selectedSpawn != null)
+                        {
+                            spawnPos = selectedSpawn.transform.position;
+                            spawnRot = selectedSpawn.transform.rotation;
+                        }
+
+                        pc.TargetTeleportClientRpc(spawnPos, spawnRot);
                     }
+                }
+            }
+        }
 
-                    Vector3 spawnPos = new Vector3(0, 1, 0);
-                    Quaternion spawnRot = Quaternion.identity;
+        [ClientRpc]
+        private void PlayGoalEffectsClientRpc(Vector3 ballPos, int scoringTeam)
+        {
+            if (AudioManager.Instance != null)
+            {
+                // Sesi gaza getirici düzeyde patlatmak için 3 kez üst üste çaldırıyoruz
+                AudioManager.Instance.PlayGoalScore();
+                AudioManager.Instance.PlayGoalScore();
+                AudioManager.Instance.PlayGoalScore();
+            }
 
-                    if (selectedSpawn != null)
+            Debug.Log($"[Gameplay] [MatchManager.PlayGoalEffectsClientRpc] -> İstemcilerde patlama ve ses tetikleniyor. (Takım: {scoringTeam})");
+
+            Color teamColor = scoringTeam == 1 ? new Color(0.2f, 0.4f, 1f) : new Color(1f, 0.2f, 0.2f);
+
+            if (_goalExplosionPrefab != null)
+            {
+                GameObject explosion = Instantiate(_goalExplosionPrefab, ballPos, Quaternion.identity);
+                var particleSystems = explosion.GetComponentsInChildren<ParticleSystem>();
+                foreach (var ps in particleSystems)
+                {
+                    var main = ps.main;
+                    main.startColor = teamColor;
+                }
+                Destroy(explosion, 5f);
+            }
+            else
+            {
+                // Fallback: Resources klasöründen patlama prefabını yükle
+                GameObject resPrefab = Resources.Load<GameObject>("Effects/GoalExplosionEffect");
+                if (resPrefab != null)
+                {
+                    GameObject explosion = Instantiate(resPrefab, ballPos, Quaternion.identity);
+                    var particleSystems = explosion.GetComponentsInChildren<ParticleSystem>();
+                    foreach (var ps in particleSystems)
                     {
-                        spawnPos = selectedSpawn.transform.position;
-                        spawnRot = selectedSpawn.transform.rotation;
+                        var main = ps.main;
+                        main.startColor = teamColor;
                     }
-
-                    pc.TargetTeleportClientRpc(spawnPos, spawnRot);
+                    Destroy(explosion, 5f);
+                }
+                else
+                {
+                    Debug.LogWarning("[Gameplay] GoalExplosionEffect not found in Resources!");
                 }
             }
         }

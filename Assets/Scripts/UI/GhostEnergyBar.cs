@@ -24,9 +24,11 @@ namespace Arixon.UI
         private float _skewAngle = 20f; // Görseldeki gibi yatık (Paralelkenar) açısı
         
         // Görselinize tam uygun renkler:
-        private Color _bgColor = new Color(0.35f, 0.1f, 0.15f, 1f); // Koyu kırmızı arka plan
-        private Color _ghostColor = new Color(1f, 0.8f, 0.8f, 1f);  // Uçuk pembe/beyaz geriden gelen gölge
-        private Color _mainColor = new Color(0.2f, 0.9f, 0.6f, 1f); // Neon Su Yeşili/Cyan ön bar
+        private Color _bgColor = new Color(0.15f, 0.05f, 0.05f, 0.9f); // Koyu siyah/kırmızı arka plan
+        private Color _ghostColor = new Color(1f, 1f, 1f, 0.8f);  // Uçuk beyaz geriden gelen gölge
+        
+        private float _blinkTimer = 0f;
+        private bool _isBlinking = false;
 
         public float Progress
         {
@@ -48,17 +50,41 @@ namespace Arixon.UI
 
         private void UpdateGhostAnim()
         {
+            bool needsRepaint = false;
+
             if (_ghostProgress > _progress)
             {
                 _ghostProgress -= 0.6f; // Gölgenin erime hızı
                 if (_ghostProgress < _progress) _ghostProgress = _progress;
-                MarkDirtyRepaint();
+                needsRepaint = true;
             }
             else if (_ghostProgress < _progress)
             {
                 _ghostProgress = _progress; // Stamina dolarken gölge beklemeye gerek yok, anında dolsun
-                MarkDirtyRepaint();
+                needsRepaint = true;
             }
+
+            // Düşük enerjide yanıp sönme (Blink) efekti
+            if (_progress < 15f)
+            {
+                _blinkTimer += 0.1f;
+                if (_blinkTimer > 1f)
+                {
+                    _blinkTimer = 0f;
+                    _isBlinking = !_isBlinking;
+                }
+                needsRepaint = true;
+            }
+            else
+            {
+                if (_isBlinking)
+                {
+                    _isBlinking = false;
+                    needsRepaint = true;
+                }
+            }
+
+            if (needsRepaint) MarkDirtyRepaint();
         }
 
         private void OnGenerateVisualContent(MeshGenerationContext mgc)
@@ -77,9 +103,19 @@ namespace Arixon.UI
             float ghostWidth = maxWidth * (_ghostProgress / 100f);
             DrawParallelogram(mgc, r, ghostWidth, skewOffset, _ghostColor);
 
-            // 3. Katman: En üstteki Neon Yeşil Ana Enerji Barı
+            // 3. Katman: En üstteki Ana Enerji Barı (Gradient)
             float mainWidth = maxWidth * (_progress / 100f);
-            DrawParallelogram(mgc, r, mainWidth, skewOffset, _mainColor);
+            
+            // Renk Geçişi (Tam doluyken Yeşil, ortalarda Sarı, azaldığında Kırmızı)
+            Color barColor = Color.Lerp(Color.red, new Color(0.2f, 0.9f, 0.6f, 1f), _progress / 100f);
+            
+            // Eğer çok düşükse kırmızı yanıp sönecek
+            if (_progress < 15f && _isBlinking)
+            {
+                barColor = Color.white; // Flash efekti
+            }
+
+            DrawParallelogram(mgc, r, mainWidth, skewOffset, barColor);
         }
 
         private void DrawParallelogram(MeshGenerationContext mgc, Rect rect, float width, float skewOffset, Color color)

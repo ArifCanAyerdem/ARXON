@@ -32,6 +32,19 @@ namespace Arixon.Gameplay
         [SerializeField] private float _mouseSensitivity = 1.5f; // Hassasiyeti biraz kıstık ki soft olsun
         [SerializeField] private float _minY = -20f;
         [SerializeField] private float _maxY = 60f;
+        
+        [Header("Dynamic FOV")]
+        [SerializeField] private float _normalFOV = 60f;
+        [SerializeField] private float _sprintFOV = 75f;
+        [SerializeField] private float _fovTransitionSpeed = 5f;
+
+        private Camera _cam;
+        private PlayerController _playerController;
+
+        private void Awake()
+        {
+            _cam = GetComponent<Camera>();
+        }
 
         private void LateUpdate()
         {
@@ -79,6 +92,13 @@ namespace Arixon.Gameplay
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref _posVelocity, _positionSmoothTime);
             transform.LookAt(lookAtPoint);
 
+            // Dinamik FOV (Hız Hissiyatı)
+            if (_cam != null && _playerController != null)
+            {
+                float targetFOV = _playerController.IsSprinting.Value ? _sprintFOV : _normalFOV;
+                _cam.fieldOfView = Mathf.Lerp(_cam.fieldOfView, targetFOV, Time.deltaTime * _fovTransitionSpeed);
+            }
+
             // Sarsıntı (Shake) Efekti Uygula
             if (_shakeTimer > 0)
             {
@@ -107,6 +127,7 @@ namespace Arixon.Gameplay
             
             if (_target != null)
             {
+                _playerController = _target.GetComponent<PlayerController>();
                 Debug.Log($"[Gameplay] [PlayerCameraFollow.SetTarget] -> Kamera hedefi ayarlandı. (Hedef: {_target.name})");
                 
                 _currentX = _target.eulerAngles.y;

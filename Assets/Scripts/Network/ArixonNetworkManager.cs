@@ -246,8 +246,19 @@ namespace Arixon.Network
 
         private void HandleClientDisconnected(ulong clientId)
         {
-            EmitLog($"[AĞ] Oyuncu ayrıldı. (Oyuncu ID: #{clientId})");
+            EmitLog($"[Ağ] Oyuncu ayrıldı. (Oyuncu ID: #{clientId})");
             OnPlayerLeft?.Invoke(clientId);
+
+            // Eğer ayrılan (veya sunucu tarafından atılan) biz isek VEYA sunucu kapandıysa
+            if (clientId == NetworkManager.Singleton.LocalClientId || clientId == NetworkManager.ServerClientId)
+            {
+                // Host değilsek ve bağlantımız koptuysa Ana Sayfaya dön
+                if (!NetworkManager.Singleton.IsServer)
+                {
+                    Debug.Log("[Network] Sunucu ile bağlantı koptu. Ana sayfaya dönülüyor.");
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+                }
+            }
         }
 
         private void EmitLog(string message)

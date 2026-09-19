@@ -9,6 +9,7 @@ namespace Arixon.Gameplay
         private Rigidbody _rb;
         private Vector3 _startPosition;
         private bool _isWaitingForFirstTouch = true;
+        private TrailRenderer _trailRenderer;
         
         // Gol olduğunda doğru kişiye yazılabilmesi için (Own Goal mantığı)
         public ulong LastTouchedPlayerId { get; private set; } = 999;
@@ -17,8 +18,13 @@ namespace Arixon.Gameplay
         public ulong LastPasserBlueId { get; private set; } = 999;
         public ulong LastPasserRedId { get; private set; } = 999;
 
+        private LineRenderer _dropIndicator;
+
         private void Awake()
         {
+            // Ölçeklendirme (Daha görünür büyük top)
+            transform.localScale = Vector3.one * 1.5f; // %50 büyüt
+
             _rb = GetComponent<Rigidbody>();
             
             // Rocket League tarzı top fizikleri:
@@ -39,6 +45,36 @@ namespace Arixon.Gameplay
                 bouncyMat.frictionCombine = PhysicsMaterialCombine.Minimum;
                 col.material = bouncyMat;
             }
+
+            // Hız izi (Trail) kurulumu
+            _trailRenderer = gameObject.AddComponent<TrailRenderer>();
+            _trailRenderer.time = 0.4f;
+            _trailRenderer.startWidth = 0.6f;
+            _trailRenderer.endWidth = 0f;
+            _trailRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            _trailRenderer.material.color = Color.white;
+            _trailRenderer.emitting = false;
+
+            CreateDropIndicator();
+        }
+
+        private void CreateDropIndicator()
+        {
+            GameObject indicatorObj = new GameObject("DropIndicator");
+            // Top döndükçe LineRenderer yamulmasın diye topun çocuk objesi yapmıyoruz.
+            
+            _dropIndicator = indicatorObj.AddComponent<LineRenderer>();
+            int segments = 36;
+            _dropIndicator.positionCount = segments + 1;
+            _dropIndicator.useWorldSpace = true;
+            _dropIndicator.startWidth = 0.15f;
+            _dropIndicator.endWidth = 0.15f;
+            _dropIndicator.loop = true;
+            _dropIndicator.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            
+            _dropIndicator.material = new Material(Shader.Find("Sprites/Default"));
+            _dropIndicator.startColor = new Color(0, 0, 0, 0.5f);
+            _dropIndicator.endColor = new Color(0, 0, 0, 0.5f);
         }
 
         public override void OnNetworkSpawn()
@@ -63,6 +99,61 @@ namespace Arixon.Gameplay
                 
                 // Kesinlikle kaymaması için başlangıç x, z koordinatına hapsedelim
                 transform.position = new Vector3(_startPosition.x, transform.position.y, _startPosition.z);
+            }
+        }
+
+        private void Update()
+        {
+            if (_trailRenderer != null && _rb != null)
+            {
+                // Hız 15'ten büyükse iz bırak
+                _trailRenderer.emitting = _rb.linearVelocity.magnitude > 15f;
+            }
+
+            UpdateDropIndicator();
+        }
+
+        private void UpdateDropIndicator()
+        {
+            if (_dropIndicator == null) return;
+
+            // Topun tam altındaki zemini bul (Topun kendi colliderını yok sayması için biraz alttan başlatıyoruz)
+            Vector3 rayStart = transform.position + Vector3.down * 0.5f;
+            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, 100f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                float height = transform.position.y - hit.point.y;
+                
+                // Eğer top çok yüksekteyse göstergeyi belirginleştir, yerdeyse kapat
+                if (height > 1f)
+                {
+                    _dropIndicator.enabled = true;
+                    
+                    float radius = 1.5f; // Topun büyüklüğüne yakın bir gölge
+                    float angle = 0f;
+                    
+                    for (int i = 0; i < _dropIndicator.positionCount; i++)
+                    {
+                        float x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+                        float z = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+                        
+                        // Halkanın zeminin azıcık üstünde durması (Z-Fighting önlemek için)
+                        _dropIndicator.SetPosition(i, hit.point + new Vector3(x, 0.05f, z)); 
+                        angle += (360f / (_dropIndicator.positionCount - 1));
+                    }
+
+                    // Yükseğe çıktıkça hafifçe saydamlaşsın
+                    float alpha = Mathf.Clamp01(1f - (height / 30f)) * 0.7f;
+                    _dropIndicator.startColor = new Color(0, 0, 0, alpha);
+                    _dropIndicator.endColor = new Color(0, 0, 0, alpha);
+                }
+                else
+                {
+                    _dropIndicator.enabled = false;
+                }
+            }
+            else
+            {
+                _dropIndicator.enabled = false;
             }
         }
 
@@ -183,6 +274,14 @@ namespace Arixon.Gameplay
                 LastPasserBlueId = 999;
                 LastPasserRedId = 999;
                 Debug.Log("[Gameplay] [GameBall.ResetBall] -> Top merkeze sıfırlandı ve ilk vuruş için kilitlendi.");
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (_dropIndicator != null)
+            {
+                Destroy(_dropIndicator.gameObject);
             }
         }
     }

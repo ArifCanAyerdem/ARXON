@@ -42,7 +42,7 @@ namespace Arixon.Audio
             // AudioSource temel ayarları
             _audioSource.loop = true;         // Müzik bitince başa sarsın
             _audioSource.playOnAwake = false; // Biz kodla başlatacağız
-            _audioSource.volume = 0.5f;       // Ses seviyesi %50
+            _audioSource.volume = 0.15f;       // Ses seviyesi %15
 
             // Sahne değişimlerini dinlemeye başla
             SceneManager.sceneLoaded += OnSceneLoaded;
