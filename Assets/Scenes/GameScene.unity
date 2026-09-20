@@ -136,8 +136,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -234,7 +236,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0, g: 0, b: 1, a: 0.5}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0, g: 0, b: 1, a: 0.5}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -590,6 +592,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameBall
       objectReference: {fileID: 0}
+    - target: {fileID: 7678904603144326170, guid: 14b28bea68b41d34d91b2882116cc8f6, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2903851900
+      objectReference: {fileID: 0}
+    - target: {fileID: 7678904603144326170, guid: 14b28bea68b41d34d91b2882116cc8f6, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 3810472098
+      objectReference: {fileID: 0}
     - target: {fileID: 9170284956663352119, guid: 14b28bea68b41d34d91b2882116cc8f6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -653,7 +663,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -736,7 +747,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -945,7 +957,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2711f4c46472d847909d281eb8b8110, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arixon.Gameplay.GoalTrigger
-  ShowTopMostFoldoutHeaderGroup: 1
   _teamId: 1
 --- !u!23 &1100840318
 MeshRenderer:
@@ -1283,7 +1294,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -1366,7 +1378,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -1448,8 +1461,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -1546,7 +1561,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 0, b: 0, a: 0.5}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 0, b: 0, a: 0.5}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -1583,7 +1598,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2711f4c46472d847909d281eb8b8110, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arixon.Gameplay.GoalTrigger
-  ShowTopMostFoldoutHeaderGroup: 1
   _teamId: 2
 --- !u!23 &1921346924
 MeshRenderer:

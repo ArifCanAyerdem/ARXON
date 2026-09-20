@@ -39,6 +39,36 @@ namespace Arixon.Gameplay
         private ParticleSystem _chargeParticles;
         private float _dribbleForce = 6f; // Sadece çarpıp sürerkenki hafif güç
 
+        /// <summary>
+        /// URP uyumlu partikül materyali oluşturur. Shader bulunamazsa güvenli fallback kullanır.
+        /// </summary>
+        private Material CreateSafeParticleMaterial(Color color)
+        {
+            // Önce URP Particles/Unlit dene
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            
+            // Bulunamazsa alternatifleri dene
+            if (shader == null) shader = Shader.Find("Particles/Standard Unlit");
+            if (shader == null) shader = Shader.Find("Sprites/Default");
+            if (shader == null) shader = Shader.Find("Hidden/InternalErrorShader");
+            
+            Material mat = new Material(shader);
+            mat.color = color;
+            
+            // URP Particles/Unlit shader'ının Additive blend ayarı
+            if (shader.name.Contains("Particles"))
+            {
+                mat.SetFloat("_Surface", 1f); // Transparent
+                mat.SetFloat("_Blend", 1f); // Additive
+                mat.renderQueue = 3000; // Transparent queue
+                mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                mat.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+            }
+            
+            Debug.Log($"[Gameplay] [PlayerController.CreateSafeParticleMaterial] -> Partikül materyali oluşturuldu. (Shader: {shader.name}, Renk: {color})");
+            return mat;
+        }
+
         private void Awake()
         {
             // Ölçeklendirme (Daha büyük ve heybetli karakter)
@@ -61,11 +91,18 @@ namespace Arixon.Gameplay
                 _playerMaterials = new Material[sharedMats.Length];
                 for (int i = 0; i < sharedMats.Length; i++)
                 {
-                    _playerMaterials[i] = new Material(sharedMats[i]);
-                    // Assuming the body material is the one that is NOT named "Face" or is index 0
-                    if (sharedMats[i].name.Contains("Body") || (i == 0 && !sharedMats[i].name.Contains("Face")))
+                    if (sharedMats[i] != null)
                     {
-                        _bodyMaterialIndex = i;
+                        _playerMaterials[i] = new Material(sharedMats[i]);
+                        // Assuming the body material is the one that is NOT named "Face" or is index 0
+                        if (sharedMats[i].name.Contains("Body") || (i == 0 && !sharedMats[i].name.Contains("Face")))
+                        {
+                            _bodyMaterialIndex = i;
+                        }
+                    }
+                    else
+                    {
+                        _playerMaterials[i] = new Material(Shader.Find("Standard")); // Fallback
                     }
                 }
                 _playerRenderer.materials = _playerMaterials;
@@ -111,7 +148,7 @@ namespace Arixon.Gameplay
             var wRenderer = windObj.GetComponent<ParticleSystemRenderer>();
             wRenderer.renderMode = ParticleSystemRenderMode.Stretch; // Hız çizgileri gibi uzat
             wRenderer.lengthScale = 4f;
-            wRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            wRenderer.material = CreateSafeParticleMaterial(new Color(0.8f, 0.9f, 1f, 0.3f)); // Açık mavi rüzgar
             
             IsSprinting.OnValueChanged += OnSprintStateChanged;
 
@@ -143,7 +180,7 @@ namespace Arixon.Gameplay
             main.simulationSpace = ParticleSystemSimulationSpace.World;
             
             var renderer = dustObj.GetComponent<ParticleSystemRenderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            renderer.material = CreateSafeParticleMaterial(new Color(0.7f, 0.65f, 0.5f, 0.4f)); // Toprak/toz rengi
             
             var emission = _dustParticles.emission;
             emission.rateOverTime = 0f; // Sadece hareket ederken açılacak
@@ -188,8 +225,7 @@ namespace Arixon.Gameplay
             colOverTime.enabled = true;
 
             var renderer = psObj.GetComponent<ParticleSystemRenderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
-            if (renderer.material.shader == null) renderer.material = new Material(Shader.Find("Sprites/Default"));
+            renderer.material = CreateSafeParticleMaterial(Color.green); // Şarj efekti başlangıç rengi
         }
 
 
@@ -306,9 +342,9 @@ namespace Arixon.Gameplay
         {
             Debug.Log($"[Gameplay] [PlayerController.SetRagdollState] -> Ragdoll durumu değiştirildi. (Durum: {(state ? "Yere Düştü" : "Ayağa Kalktı")}, IsExhausted: {IsExhausted.Value})");
 
-            // Gerçek Ragdoll fizikleri (CharacterJoint) kurulana kadar "Fall" animasyonunu kullanıyoruz.
-            // Bu yüzden Animator'ı kapatmıyoruz, sadece state'i ayarlıyoruz.
-            if (_animator != null)
+            // Stamina bittiğinde (IsExhausted) karakter sadece duraksamalı, havada düşüyormuş gibi davranmamalı!
+            // Bu yüzden FreeFall animasyonunu SADECE yüksekten düşüp yere yığıldığında (IsKnockedDown) tetikliyoruz.
+            if (_animator != null && IsKnockedDown.Value)
             {
                 _animator.SetBool("FreeFall", state);
             }
@@ -329,6 +365,9 @@ namespace Arixon.Gameplay
             // Eğer maç başlamadıysa (ışınlanma veya 3, 2, 1 geri sayımı) karakteri DONDUR.
             if (MatchManager.Instance != null && !MatchManager.Instance.IsPlaying) 
             {
+                _fallTimer = 0f;          // Havada beklerken düşme süresi birikmesin
+                _spawnGraceTimer = 2f;    // Oyun başlayana kadar koruma süresini taze tut
+
                 UpdateAnimator(0f);
                 return;
             }
@@ -352,8 +391,12 @@ namespace Arixon.Gameplay
             _animator.SetFloat("Speed", _currentAnimSpeed, 0.1f, Time.deltaTime);
             _animator.SetFloat("MotionSpeed", 1f); // StarterAssets blend tree animasyon hızı için gerekli
             _animator.SetBool("Grounded", _isGrounded);
-            // Düşme / Yere serilme efekti
-            _animator.SetBool("FreeFall", IsExhausted.Value || IsKnockedDown.Value); 
+            // Sadece yere yığıldığında serbest düşüş (Ragdoll) animasyonunu tetikle
+            _animator.SetBool("FreeFall", IsKnockedDown.Value);
+            
+            // Kafa topu konsepti için Zıplama (Jump) aktif ediliyor
+            _animator.SetBool("Jump", !_isGrounded && _velocity.y > 0);
+            _animator.SetBool("Flying", false); // Uçma her halükarda kapalı
         }
 
         private void LateUpdate()
@@ -451,12 +494,8 @@ namespace Arixon.Gameplay
                 
                 if (isShoot)
                 {
-                    // Eğer karakter yere yakınsa ve düz bakıyorsa topu havalandır (Lob efekti).
-                    // Rocket League tarzı vuruşlar için lift (yukarı güç) eklendi
-                    if (transform.position.y < 2.5f && forceDir.y > -0.2f)
-                    {
-                        forceDir.y += 0.4f + (currentCharge * 0.6f);
-                    }
+                    // Kafa topu konsepti! Şutlar genel olarak hep havaya doğru kavis yapsın
+                    forceDir.y += 0.8f + (currentCharge * 0.4f);
                 }
                 else
                 {
@@ -469,8 +508,8 @@ namespace Arixon.Gameplay
                 float force = 0f;
                 if (isShoot)
                 {
-                    // Şarj seviyesine göre 15 ile 55 arasında kontrollü bir şut gücü!
-                    force = Mathf.Lerp(15f, 55f, currentCharge); 
+                    // Kafa topu konseptinde şarjla birlikte topun hızı çok abartı artmasın, kontrol edilebilsin
+                    force = Mathf.Lerp(15f, 35f, currentCharge); 
                     Debug.Log($"[Gameplay] ŞUT ÇEKİLDİ! Şarj: %{(currentCharge*100):F0} | Kuvvet: {force:F1}");
                     PlayAnimationClientRpc("Kick");
                 }
@@ -515,7 +554,9 @@ namespace Arixon.Gameplay
                 flash.transform.localScale = Vector3.one * 2f;
                 Destroy(flash.GetComponent<Collider>());
                 var mr = flash.GetComponent<MeshRenderer>();
-                mr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                Shader flashShader = Shader.Find("Universal Render Pipeline/Lit");
+                if (flashShader == null) flashShader = Shader.Find("Standard");
+                mr.material = new Material(flashShader);
                 mr.material.color = Color.white;
                 mr.material.EnableKeyword("_EMISSION");
                 mr.material.SetColor("_EmissionColor", Color.white * 5f);
@@ -636,11 +677,19 @@ namespace Arixon.Gameplay
 
             float staminaDrain = 0f;
 
-            // Koşma Stamina Tüketimi (Sadece belli bir seviyenin üstündeyse tekrar koşmaya izin ver)
-            if (shiftPressed && !IsExhausted.Value && CurrentStamina.Value > MaxStamina * 0.1f)
+            // Koşma Stamina Tüketimi (Koşmaya başlamak için %10 gerekli, başladıktan sonra 0'a kadar düşebilir)
+            if (shiftPressed && !IsExhausted.Value && CurrentStamina.Value > 0f)
             {
-                IsSprinting.Value = true;
-                staminaDrain += _sprintDrainRate;
+                // Eğer yeni koşmaya başlıyorsa ve stamina çok azsa izin verme
+                if (!IsSprinting.Value && CurrentStamina.Value < MaxStamina * 0.1f)
+                {
+                    IsSprinting.Value = false;
+                }
+                else
+                {
+                    IsSprinting.Value = true;
+                    staminaDrain += _sprintDrainRate;
+                }
             }
             else
             {
@@ -696,11 +745,7 @@ namespace Arixon.Gameplay
                 // Yığılmış veya düşmüş durumda
                 _currentMoveVelocity.x = Mathf.Lerp(_currentMoveVelocity.x, 0f, Time.deltaTime * 2f);
                 _currentMoveVelocity.z = Mathf.Lerp(_currentMoveVelocity.z, 0f, Time.deltaTime * 2f);
-                
-                if (!_characterController.isGrounded)
-                {
-                    _currentMoveVelocity.y -= 20f * Time.deltaTime;
-                }
+                _currentMoveVelocity.y = 0f; // Y yerçekimini HandleGravityAndJump fonksiyonu devralıyor
                 
                 _characterController.Move(_currentMoveVelocity * Time.deltaTime);
                 return;
@@ -739,7 +784,7 @@ namespace Arixon.Gameplay
                 // Sağa/Sola giderken Tilt hesapla (inputDirection.x)
                 targetTilt = -inputDirection.x * _tiltAmount;
 
-                float targetAnimSpeed = (IsSprinting.Value && _isGrounded) ? 1f : 0.5f;
+                float targetAnimSpeed = (IsSprinting.Value && _isGrounded) ? 6f : 2f; // StarterAssets Animator'ü için doğru Speed blend değerleri
                 UpdateAnimator(targetAnimSpeed);
             }
             else
@@ -788,20 +833,7 @@ namespace Arixon.Gameplay
 
             if (!_isGrounded)
             {
-                // Zıplama yükselişini sayma, SADECE serbest düşüşte geçen süreyi hesapla!
-                if (_velocity.y < 0) 
-                {
-                    _fallTimer += Time.deltaTime;
-                }
-            }
-            else
-            {
-                // Eğer SADECE aşağı doğru 0.8 saniyeden fazla düştüyse (yüksekten düştüyse) ragdoll çalıştır
-                if (!wasGrounded && _fallTimer > 0.8f)
-                {
-                    StartCoroutine(HardLandingRoutine());
-                }
-                _fallTimer = 0f;
+                // Kafa topu konseptinde serbest düşüş (ragdoll) donmaları iptal edildi.
             }
 
             if (_isGrounded && _velocity.y < 0)
@@ -856,12 +888,12 @@ namespace Arixon.Gameplay
 
                     // Vuruş yönü: Karakterden topa doğru yatay
                     Vector3 forceDirection = hit.gameObject.transform.position - transform.position;
-                    forceDirection.y = 0.1f; // Dribbling hep yerden gider
+                    // Kafa topu (Head Soccer) konseptinde top hafif havaya kalkar
+                    forceDirection.y = 0.5f; 
                     forceDirection.Normalize();
 
-                    // Eskisi gibi sert vurmak yerine, sadece önünde sürüklüyor (Dribbling)
-                    // Gerçek vuruşlar artık Mouse Sol ve Sağ tık ile yapılıyor!
-                    float finalForce = IsSprinting.Value ? _dribbleForce * 1.5f : _dribbleForce;
+                    // Dribble gücü düşürüldü ki top karakterden hemen kaçsın, havada kalsın
+                    float finalForce = IsSprinting.Value ? _dribbleForce * 1.2f : _dribbleForce * 0.8f;
 
                     // Sunucuya topa vurmasını söyle
                     HitBallServerRpc(ballNetObj, forceDirection, finalForce, OwnerClientId);
@@ -880,35 +912,6 @@ namespace Arixon.Gameplay
                     ball.HitBall(direction * force, hitterId);
                 }
             }
-        }
-        private System.Collections.IEnumerator HardLandingRoutine()
-        {
-            // Spawn koruması aktifse yüksekten düşme çalışmasın!
-            if (_spawnGraceTimer > 0f)
-            {
-                Debug.Log("[Gameplay] [PlayerController.HardLandingRoutine] -> Spawn koruması aktif, Hard Landing iptal edildi.");
-                yield break;
-            }
-
-            IsKnockedDown.Value = true;
-            SetRagdollState(true);
-            
-            if (Camera.main != null)
-            {
-                var camFollow = Camera.main.GetComponent<PlayerCameraFollow>();
-                if (camFollow != null) camFollow.TriggerShake(0.3f, 0.2f); // Daha hafif shake
-            }
-            
-            Debug.Log("[Gameplay] Yüksekten düşüldü, karakter yere çakıldı!");
-            
-            yield return new WaitForSeconds(1.5f); // 1.5 saniye yerde kal
-            
-            if (!IsExhausted.Value) 
-            {
-                SetRagdollState(false);
-            }
-            
-            IsKnockedDown.Value = false;
         }
 
         [ClientRpc]
@@ -941,6 +944,34 @@ namespace Arixon.Gameplay
             }
 
             Debug.Log($"[Gameplay] [PlayerController] -> Sunucu komutuyla Spawn noktasına ışınlanıldı: {position}");
+        }
+        // --- ANIMATION EVENT RECEIVERS ---
+        // StarterAssets animasyonları (Walk_N, Run_N, Walk_N_Land, Run_N_Land) bu metotları çağırır.
+        // Unity AnimationEvent sistemi bazen parametreli, bazen parametresiz çağrı yapar.
+        // Bu yüzden HER İKİ versiyonu da tanımlıyoruz.
+        
+        // Parametreli versiyon (AnimationEvent ile çağrılırsa)
+        private void OnFootstep(AnimationEvent animationEvent)
+        {
+            // Ayak sesi efekti gelecekte buraya eklenecek
+        }
+
+        // Parametresiz versiyon (Direkt çağrılırsa)
+        private void OnFootstep()
+        {
+            // Ayak sesi efekti gelecekte buraya eklenecek
+        }
+
+        // Parametreli versiyon
+        private void OnLand(AnimationEvent animationEvent)
+        {
+            // Yere iniş sesi efekti gelecekte buraya eklenecek
+        }
+
+        // Parametresiz versiyon
+        private void OnLand()
+        {
+            // Yere iniş sesi efekti gelecekte buraya eklenecek
         }
     }
 }

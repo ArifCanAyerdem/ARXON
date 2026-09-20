@@ -126,6 +126,10 @@ namespace Arixon.UI
         {
             _uiDocument = GetComponent<UIDocument>();
 
+            UnityEngine.Cursor.visible = true;
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            Debug.Log("[UI] [MainMenuController.Awake] -> İmleç serbest bırakıldı ve görünür yapıldı. (visible: True, lockState: None)");
+
 #if UNITY_EDITOR
             // Main Editor Play Mode'a yeni girdiğinde önceki oturumlardan kalan bayat odaları temizle
             if (CurrentPlayer.IsMainEditor)

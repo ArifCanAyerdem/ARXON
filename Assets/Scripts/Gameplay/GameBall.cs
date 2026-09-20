@@ -47,11 +47,19 @@ namespace Arixon.Gameplay
             }
 
             // Hız izi (Trail) kurulumu
-            _trailRenderer = gameObject.AddComponent<TrailRenderer>();
+            _trailRenderer = GetComponent<TrailRenderer>();
+            if (_trailRenderer == null)
+            {
+                _trailRenderer = gameObject.AddComponent<TrailRenderer>();
+            }
             _trailRenderer.time = 0.4f;
             _trailRenderer.startWidth = 0.6f;
             _trailRenderer.endWidth = 0f;
-            _trailRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            Shader trailShader = Shader.Find("Universal Render Pipeline/Lit");
+            if (trailShader == null) trailShader = Shader.Find("Standard");
+            if (trailShader == null) trailShader = Shader.Find("Hidden/InternalErrorShader");
+            
+            _trailRenderer.material = new Material(trailShader);
             _trailRenderer.material.color = Color.white;
             _trailRenderer.emitting = false;
 
